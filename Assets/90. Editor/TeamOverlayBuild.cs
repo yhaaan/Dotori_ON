@@ -82,6 +82,12 @@ namespace TeamOverlay.Editor
             PlayerSettings.runInBackground = true;
             PlayerSettings.forceSingleInstance = true;
             PlayerSettings.usePlayerLog = true;
+
+            // Re-asserted on every build because the Editor silently restores the
+            // splash under some licences, and it kept coming back after being
+            // switched off by hand.
+            PlayerSettings.SplashScreen.show = false;
+            PlayerSettings.SplashScreen.showUnityLogo = false;
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
             QualitySettings.vSyncCount = 0;
 
