@@ -99,11 +99,30 @@ Evidence is stored under ignored `Logs/TeamOverlayValidation`:
 - `editmode-m4.xml`
 - `editmode-m4.log`
 
+## Checkout on Windows shutdown
+
+`WM_QUERYENDSESSION` is now handled, which completes the last open MVP
+requirement ("정상 종료 또는 컴퓨터 종료 시 자동 퇴근 시도").
+
+The window procedure runs on Unity's main thread, so it cannot await a network
+call — blocking it would stop `Update` and deadlock the very work it is waiting
+for. Instead the procedure calls `ShutdownBlockReasonCreate`, returns TRUE
+immediately, and raises `SessionEndingRequested` from `Update` on the next frame.
+The shell keeps the shutdown open and shows the reason while the checkout runs;
+`ShutdownBlockReasonDestroy` releases it as soon as the attempt finishes,
+successful or not.
+
+`WM_ENDSESSION` with `wParam == FALSE` means another application vetoed the
+shutdown, so the block is released and the flag reset for a later attempt.
+
+This only exists in the player: the whole path is inside
+`UNITY_STANDALONE_WIN && !UNITY_EDITOR`, and Unity's editor process owns the
+window otherwise. **It cannot be covered by EditMode tests and has not been
+exercised against a real shutdown yet** — only verified to compile in the player
+configuration.
+
 ## Current boundary
 
-- Automatic checkout on OS shutdown is still missing: `WM_QUERYENDSESSION` is not
-  handled, so `os_shutdown` is never sent. The server's stale-session sweep covers
-  it within three minutes.
 - `team_events` is not read. Nudges, emotes and messages will need it.
 - Cross-PC name handover still fails with `member_name_taken`; see
   `Docs/PREFAB_UI_EDITING.md`.
