@@ -115,3 +115,6 @@ InitTestScene*.unity*
 
 # Node tooling used by the project-local Supabase CLI
 /node_modules/
+
+# JetBrains Rider project directory
+/.idea/
