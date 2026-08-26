@@ -5,6 +5,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace TeamOverlay.Editor
@@ -90,6 +91,16 @@ namespace TeamOverlay.Editor
             PlayerSettings.SplashScreen.showUnityLogo = false;
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
             QualitySettings.vSyncCount = 0;
+
+            // A 480x220 2D overlay gains nothing from D3D12, and the run that froze
+            // logged "IDXGISwapChain::GetFrameStatistics is broken" repeatedly —
+            // this app rewrites its own window style after the swapchain exists,
+            // which D3D12 does not take well. Pinned so the shipped build behaves
+            // like a launch with -force-d3d11.
+            PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.StandaloneWindows64, false);
+            PlayerSettings.SetGraphicsAPIs(
+                BuildTarget.StandaloneWindows64,
+                new[] { GraphicsDeviceType.Direct3D11 });
 
             EnsureFolder("Assets", "00. Scenes");
             EnsureSceneExists();
