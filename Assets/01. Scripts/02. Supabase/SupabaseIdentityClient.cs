@@ -49,22 +49,45 @@ namespace TeamOverlay.Supabase
 
         public SupabaseAuthSession CurrentSession => _session;
 
-        public async Task<SupabaseIdentityBootstrap> InitializeAsync(
+        /// <summary>
+        /// Signs in as the account the name itself designates, creating it on first
+        /// use. The same name resolves to the same Auth user on every machine, so a
+        /// member is no longer tied to the PC that first claimed the name.
+        /// </summary>
+        public async Task<SupabaseIdentityBootstrap> InitializeForNameAsync(
+            DisplayNameValidationResult validation,
             CancellationToken cancellationToken)
         {
-            var createdAnonymousUser = false;
+            if (validation == null || !validation.IsValid)
+            {
+                throw new ArgumentException("A valid display name is required.", nameof(validation));
+            }
+
+            var createdUser = false;
             if (_sessionStore.TryLoad(out var storedSession))
             {
                 _session = storedSession;
                 if (ShouldRefresh(_session))
                 {
-                    _session = await RefreshStoredSessionAsync(_session, cancellationToken);
+                    try
+                    {
+                        _session = await RefreshStoredSessionAsync(_session, cancellationToken);
+                    }
+                    catch (SupabaseIdentityRecoveryException)
+                    {
+                        // A dead refresh token used to be unrecoverable because the
+                        // anonymous account had no other way in. The credentials are
+                        // derived from the name now, so signing in again is safe and
+                        // lands on the very same account.
+                        _session = await SignInWithNameAsync(validation, cancellationToken);
+                    }
                 }
             }
             else
             {
-                _session = await SignInAnonymouslyAsync(cancellationToken);
-                createdAnonymousUser = true;
+                var signIn = await SignInOrSignUpWithNameAsync(validation, cancellationToken);
+                _session = signIn.Session;
+                createdUser = signIn.CreatedUser;
             }
 
             SupabaseMemberRecord member;
@@ -78,7 +101,105 @@ namespace TeamOverlay.Supabase
                 member = await GetCurrentMemberAsync(_session, cancellationToken);
             }
 
-            return new SupabaseIdentityBootstrap(_session, member, createdAnonymousUser);
+            return new SupabaseIdentityBootstrap(_session, member, createdUser);
+        }
+
+        private async Task<NameSignInResult> SignInOrSignUpWithNameAsync(
+            DisplayNameValidationResult validation,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                return new NameSignInResult(
+                    await SignInWithNameAsync(validation, cancellationToken),
+                    false);
+            }
+            catch (SupabaseApiException exception) when (IsUnknownAccount(exception))
+            {
+                // Nobody has used this name yet, so this launch is the one that
+                // creates the account for it.
+                return new NameSignInResult(
+                    await SignUpWithNameAsync(validation, cancellationToken),
+                    true);
+            }
+        }
+
+        private async Task<SupabaseAuthSession> SignInWithNameAsync(
+            DisplayNameValidationResult validation,
+            CancellationToken cancellationToken)
+        {
+            var body = JsonUtility.ToJson(new PasswordGrantRequest
+            {
+                email = DerivedTeamCredentials.EmailFor(validation),
+                password = DerivedTeamCredentials.PasswordFor(validation)
+            });
+            var response = await _transport.SendAsync(
+                CreatePublicRequest(
+                    "POST",
+                    _projectUrl + "/auth/v1/token?grant_type=password",
+                    body),
+                cancellationToken);
+            EnsureSuccess(response);
+
+            var session = ParseAuthResponse(response.Body, Guid.Empty);
+            _sessionStore.Save(session);
+            return session;
+        }
+
+        private async Task<SupabaseAuthSession> SignUpWithNameAsync(
+            DisplayNameValidationResult validation,
+            CancellationToken cancellationToken)
+        {
+            var body = JsonUtility.ToJson(new PasswordGrantRequest
+            {
+                email = DerivedTeamCredentials.EmailFor(validation),
+                password = DerivedTeamCredentials.PasswordFor(validation)
+            });
+            var response = await _transport.SendAsync(
+                CreatePublicRequest(
+                    "POST",
+                    _projectUrl + "/auth/v1/signup",
+                    body),
+                cancellationToken);
+            EnsureSuccess(response);
+
+            SupabaseAuthSession session;
+            try
+            {
+                session = ParseAuthResponse(response.Body, Guid.Empty);
+            }
+            catch (InvalidOperationException exception)
+            {
+                // Signup returns a user without a session while "Confirm email" is
+                // on, which no derived address can ever receive.
+                throw new SupabaseIdentityRecoveryException(
+                    "Supabase 프로젝트에서 이메일 확인이 켜져 있어 이름으로 계정을 만들 수 없습니다. " +
+                    "Authentication 설정에서 Confirm email을 꺼주세요.",
+                    exception);
+            }
+
+            _sessionStore.Save(session);
+            return session;
+        }
+
+        private static bool IsUnknownAccount(SupabaseApiException exception)
+        {
+            return exception.StatusCode == 400
+                   && (exception.ErrorCode == "invalid_credentials"
+                       || exception.ServerMessage == "Invalid login credentials");
+        }
+
+        private sealed class NameSignInResult
+        {
+            public NameSignInResult(SupabaseAuthSession session, bool createdUser)
+            {
+                Session = session;
+                CreatedUser = createdUser;
+            }
+
+            public SupabaseAuthSession Session { get; }
+
+            public bool CreatedUser { get; }
         }
 
         /// <summary>
@@ -170,22 +291,6 @@ namespace TeamOverlay.Supabase
         private bool ShouldRefresh(SupabaseAuthSession session)
         {
             return session.ExpiresAtUtc <= _clock.UtcNow.Add(RefreshWindow);
-        }
-
-        private async Task<SupabaseAuthSession> SignInAnonymouslyAsync(
-            CancellationToken cancellationToken)
-        {
-            var response = await _transport.SendAsync(
-                CreatePublicRequest(
-                    "POST",
-                    _projectUrl + "/auth/v1/signup",
-                    "{}"),
-                cancellationToken);
-            EnsureSuccess(response);
-
-            var auth = ParseAuthResponse(response.Body, Guid.Empty);
-            _sessionStore.Save(auth);
-            return auth;
         }
 
         private async Task<SupabaseAuthSession> RefreshStoredSessionAsync(
@@ -362,6 +467,13 @@ namespace TeamOverlay.Supabase
         private sealed class AuthUser
         {
             public string id;
+        }
+
+        [Serializable]
+        private sealed class PasswordGrantRequest
+        {
+            public string email;
+            public string password;
         }
 
         [Serializable]

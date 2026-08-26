@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using TeamOverlay.Identity;
 using TeamOverlay.Supabase;
 
 namespace TeamOverlay.Tests.EditMode
@@ -17,23 +18,59 @@ namespace TeamOverlay.Tests.EditMode
             new DateTimeOffset(2026, 8, 26, 2, 0, 0, TimeSpan.Zero);
 
         [Test]
-        public async Task InitializeWithoutStoredSession_CreatesAndPersistsAnonymousIdentity()
+        public async Task FirstUseOfAName_SignsUpWithTheDerivedAccount()
         {
             var transport = new QueueTransport(
+                InvalidCredentials(),
                 Ok(AuthJson("access-a", "refresh-a", Now.AddHours(1))),
                 Ok("[]"));
             var store = new MemorySessionStore();
             var client = CreateClient(transport, store);
 
-            var result = await client.InitializeAsync(CancellationToken.None);
+            var result = await client.InitializeForNameAsync(Name("하늘"), CancellationToken.None);
 
             Assert.That(result.CreatedAnonymousUser, Is.True);
-            Assert.That(result.Session.UserId, Is.EqualTo(UserId));
             Assert.That(result.Member, Is.Null);
             Assert.That(store.Saved.UserId, Is.EqualTo(UserId));
-            Assert.That(transport.Requests[0].Url, Does.EndWith("/auth/v1/signup"));
-            Assert.That(transport.Requests[0].Headers.ContainsKey("Authorization"), Is.False);
-            Assert.That(transport.Requests[1].Headers["Authorization"], Is.EqualTo("Bearer access-a"));
+            Assert.That(transport.Requests[0].Url, Does.Contain("grant_type=password"));
+            Assert.That(transport.Requests[1].Url, Does.EndWith("/auth/v1/signup"));
+            Assert.That(
+                transport.Requests[1].Body,
+                Does.Contain(DerivedTeamCredentials.EmailFor(Name("하늘"))));
+        }
+
+        [Test]
+        public async Task SameNameOnAnotherPc_SignsIntoTheExistingMember()
+        {
+            // No stored session is what a second machine looks like. The name alone
+            // has to be enough to reach the member that already exists.
+            var transport = new QueueTransport(
+                Ok(AuthJson("access-b", "refresh-b", Now.AddHours(1))),
+                Ok("[" + MemberJson("하늘") + "]"));
+            var client = CreateClient(transport, new MemorySessionStore());
+
+            var result = await client.InitializeForNameAsync(Name("하늘"), CancellationToken.None);
+
+            Assert.That(result.CreatedAnonymousUser, Is.False);
+            Assert.That(result.Member.DisplayName, Is.EqualTo("하늘"));
+            Assert.That(transport.Requests[0].Url, Does.Contain("grant_type=password"));
+            Assert.That(transport.Requests, Has.Count.EqualTo(2), "signup must not be attempted");
+        }
+
+        [Test]
+        public void DerivedCredentials_AreStableAndNameSpecific()
+        {
+            Assert.That(
+                DerivedTeamCredentials.EmailFor(Name("하늘")),
+                Is.EqualTo(DerivedTeamCredentials.EmailFor(Name("  하늘 "))),
+                "canonicalisation must survive whitespace");
+            Assert.That(
+                DerivedTeamCredentials.EmailFor(Name("하늘")),
+                Is.Not.EqualTo(DerivedTeamCredentials.EmailFor(Name("길동"))));
+            Assert.That(
+                DerivedTeamCredentials.PasswordFor(Name("하늘")),
+                Is.Not.EqualTo(DerivedTeamCredentials.EmailFor(Name("하늘"))));
+            Assert.That(DerivedTeamCredentials.PasswordFor(Name("하늘")).Length, Is.GreaterThan(6));
         }
 
         [Test]
@@ -52,38 +89,58 @@ namespace TeamOverlay.Tests.EditMode
                 Ok("[" + MemberJson("하늘") + "]"));
             var client = CreateClient(transport, store);
 
-            var result = await client.InitializeAsync(CancellationToken.None);
+            var result = await client.InitializeForNameAsync(Name("하늘"), CancellationToken.None);
 
             Assert.That(result.CreatedAnonymousUser, Is.False);
             Assert.That(result.Member.DisplayName, Is.EqualTo("하늘"));
             Assert.That(store.Saved.AccessToken, Is.EqualTo("new-access"));
             Assert.That(store.Saved.RefreshToken, Is.EqualTo("new-refresh"));
             Assert.That(transport.Requests[0].Url, Does.Contain("grant_type=refresh_token"));
-            Assert.That(transport.Requests[1].Headers["Authorization"], Is.EqualTo("Bearer new-access"));
         }
 
         [Test]
-        public void InvalidRefreshToken_NeverCreatesReplacementAnonymousUser()
+        public async Task DeadRefreshToken_RecoversBySigningInWithTheNameAgain()
         {
-            var original = new SupabaseAuthSession(
-                UserId,
-                "expired-access",
-                "invalid-refresh",
-                Now.AddMinutes(-1));
-            var store = new MemorySessionStore { Saved = original };
+            // Previously fatal: an anonymous account had no second way in. The
+            // derived credentials reach the very same account, so a rotated-out
+            // refresh token is recoverable instead of stranding the member.
+            var store = new MemorySessionStore
+            {
+                Saved = new SupabaseAuthSession(
+                    UserId,
+                    "expired-access",
+                    "invalid-refresh",
+                    Now.AddMinutes(-1))
+            };
             var transport = new QueueTransport(
                 new SupabaseHttpResponse(
                     400,
-                    "{\"error_code\":\"refresh_token_not_found\",\"msg\":\"Invalid Refresh Token\"}"));
+                    "{\"error_code\":\"refresh_token_not_found\",\"msg\":\"Invalid Refresh Token\"}"),
+                Ok(AuthJson("fresh-access", "fresh-refresh", Now.AddHours(1))),
+                Ok("[" + MemberJson("하늘") + "]"));
             var client = CreateClient(transport, store);
 
-            Assert.ThrowsAsync<SupabaseIdentityRecoveryException>(async () =>
-                await client.InitializeAsync(CancellationToken.None));
+            var result = await client.InitializeForNameAsync(Name("하늘"), CancellationToken.None);
 
-            Assert.That(transport.Requests, Has.Count.EqualTo(1));
-            Assert.That(transport.Requests[0].Url, Does.Contain("grant_type=refresh_token"));
-            Assert.That(store.Saved, Is.SameAs(original));
-            Assert.That(store.DeleteCount, Is.Zero);
+            Assert.That(result.Member.DisplayName, Is.EqualTo("하늘"));
+            Assert.That(store.Saved.AccessToken, Is.EqualTo("fresh-access"));
+            Assert.That(transport.Requests[1].Url, Does.Contain("grant_type=password"));
+        }
+
+        [Test]
+        public void SignUpWithoutASession_ReportsThatEmailConfirmationIsOn()
+        {
+            // Confirm email returns a user with no session, and a derived address
+            // can never receive the mail, so the cause has to be named.
+            var transport = new QueueTransport(
+                InvalidCredentials(),
+                Ok("{\"user\":{\"id\":\"" + UserId.ToString("D") + "\"}}"));
+            var client = CreateClient(transport, new MemorySessionStore());
+
+            var error = Assert.ThrowsAsync<SupabaseIdentityRecoveryException>(async () =>
+                await client.InitializeForNameAsync(Name("하늘"), CancellationToken.None));
+
+            Assert.That(error.Message, Does.Contain("Confirm email"));
         }
 
         [Test]
@@ -101,7 +158,7 @@ namespace TeamOverlay.Tests.EditMode
                 Ok("[]"),
                 Ok(MemberJson("김 하늘")));
             var client = CreateClient(transport, store);
-            await client.InitializeAsync(CancellationToken.None);
+            await client.InitializeForNameAsync(Name("하늘"), CancellationToken.None);
 
             var member = await client.ClaimMemberNameAsync("  김   하늘  ", CancellationToken.None);
 
@@ -150,6 +207,18 @@ namespace TeamOverlay.Tests.EditMode
                 transport,
                 store,
                 new FixedClock());
+        }
+
+        private static DisplayNameValidationResult Name(string raw)
+        {
+            return DisplayNamePolicy.Validate(raw);
+        }
+
+        private static SupabaseHttpResponse InvalidCredentials()
+        {
+            return new SupabaseHttpResponse(
+                400,
+                "{\"error_code\":\"invalid_credentials\",\"msg\":\"Invalid login credentials\"}");
         }
 
         private static SupabaseHttpResponse Ok(string body)
