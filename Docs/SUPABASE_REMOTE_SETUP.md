@@ -29,6 +29,30 @@ confirmed identical local and remote versions:
 Production seed data was not pushed. This avoids treating local fixture data as
 remote application data.
 
+## Pending migrations
+
+These two are committed but **not yet pushed**. Run `npx supabase db push` before
+relying on them:
+
+- `202608270001_orphan_anonymous_user_cleanup.sql`
+- `202608270002_schedule_orphan_user_cleanup.sql`
+
+They exist because signing in must happen before a name can be claimed, so every
+rejected claim leaves an anonymous Auth user that owns nothing and that the
+client has no permission to delete.
+
+- `delete_orphan_anonymous_users(interval, integer)` removes anonymous users with
+  no member row once they are older than a grace period. It never touches a user
+  that owns a member row. Granted to `service_role` only and scheduled hourly
+  through pg_cron when the extension is available.
+- `team_capacity(uuid)` reports occupied and total slots and is granted to `anon`
+  so the client can refuse to sign up into a full team instead of creating an
+  identity the server is guaranteed to reject. Only counts are exposed; member
+  names stay unreadable before joining.
+
+`delete_orphan_anonymous_users` requires `auth.users.is_anonymous`. On an older
+GoTrue the migration fails loudly rather than matching rows by a looser condition.
+
 ## Safe maintenance commands
 
 Preview remote schema changes before every deployment:
