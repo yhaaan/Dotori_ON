@@ -34,9 +34,9 @@ namespace TeamOverlay.Backend.Mock
             _members = new List<MemberState>
             {
                 CreateClockedOutMember(DefaultLocalMemberId, "나", "avatar-local", 0, now.AddHours(-18)),
-                CreateClockedOutMember("member-02", "민지", "avatar-mint", 1, now.AddHours(-12)),
-                CreateClockedOutMember("member-03", "준호", "avatar-gold", 2, now.AddHours(-4)),
-                CreateClockedOutMember("member-04", "서연", "avatar-coral", 3, now.AddHours(-2))
+                CreateClockedOutMember("member-02", "뱁버드", "avatar-mint", 1, now.AddHours(-12)),
+                CreateClockedOutMember("member-03", "잔다", "avatar-gold", 2, now.AddHours(-4)),
+                CreateClockedOutMember("member-04", "메이비", "avatar-coral", 3, now.AddHours(-2))
             };
         }
 

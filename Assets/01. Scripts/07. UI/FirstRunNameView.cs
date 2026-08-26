@@ -9,7 +9,7 @@ namespace TeamOverlay.UI
     /// <summary>The editable first-launch name modal prefab.</summary>
     public sealed class FirstRunNameView : MonoBehaviour
     {
-        private const string DefaultHint = "이름을 입력하면 팀 오버레이를 시작할 수 있어요.";
+        private const string DefaultHint = "이름은 바꾸기 어려우니 신중하게 적어주세요.";
 
         [Header("Optional typography override")]
         [SerializeField] private Font _fontOverride;

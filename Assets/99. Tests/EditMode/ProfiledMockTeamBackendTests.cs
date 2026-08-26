@@ -14,18 +14,18 @@ namespace TeamOverlay.Tests.EditMode
         [Test]
         public async Task ProfileName_ReplacesOnlyLocalDisplayName()
         {
-            using (var backend = new ProfiledMockTeamBackend("김하늘"))
+            using (var backend = new ProfiledMockTeamBackend("김햄초"))
             {
                 var states = await backend.GetTeamStateAsync(CancellationToken.None);
 
                 Assert.That(states, Has.Count.EqualTo(4));
                 Assert.That(
                     states.Single(state => state.MemberId == backend.LocalMemberId).DisplayName,
-                    Is.EqualTo("김하늘"));
+                    Is.EqualTo("김햄초"));
                 Assert.That(
                     states.Where(state => state.MemberId != backend.LocalMemberId)
                         .Select(state => state.DisplayName),
-                    Is.EqualTo(new[] { "민지", "준호", "서연" }));
+                    Is.EqualTo(new[] { "뱁버드", "잔다", "메이비" }));
             }
         }
 
