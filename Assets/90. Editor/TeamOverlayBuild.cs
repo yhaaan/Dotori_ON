@@ -11,7 +11,7 @@ namespace TeamOverlay.Editor
 {
     public static class TeamOverlayBuild
     {
-        private const string SceneFolder = "Assets/_TeamOverlay/Scenes";
+        private const string SceneFolder = "Assets/00. Scenes";
         private const string ScenePath = SceneFolder + "/TeamOverlay.unity";
         private const string BuildPath = "Builds/Windows/TeamOverlay.exe";
 
@@ -85,8 +85,7 @@ namespace TeamOverlay.Editor
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
             QualitySettings.vSyncCount = 0;
 
-            EnsureFolder("Assets", "_TeamOverlay");
-            EnsureFolder("Assets/_TeamOverlay", "Scenes");
+            EnsureFolder("Assets", "00. Scenes");
             EnsureSceneExists();
 
             EditorBuildSettings.scenes = new[]

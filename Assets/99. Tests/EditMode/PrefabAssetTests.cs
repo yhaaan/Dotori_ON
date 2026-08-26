@@ -11,13 +11,13 @@ namespace TeamOverlay.Tests.EditMode
         public void EditableUiPrefabs_HaveCompleteSerializedReferences()
         {
             var card = AssetDatabase.LoadAssetAtPath<TeamMemberCardView>(
-                "Assets/_TeamOverlay/Prefabs/TeamMemberCard.prefab");
+                "Assets/02. Prefabs/TeamMemberCard.prefab");
             var main = AssetDatabase.LoadAssetAtPath<TeamOverlayView>(
-                "Assets/_TeamOverlay/Prefabs/TeamOverlayCanvas.prefab");
+                "Assets/02. Prefabs/TeamOverlayCanvas.prefab");
             var name = AssetDatabase.LoadAssetAtPath<FirstRunNameView>(
-                "Assets/_TeamOverlay/Prefabs/FirstRunNameModal.prefab");
+                "Assets/02. Prefabs/FirstRunNameModal.prefab");
             var app = AssetDatabase.LoadAssetAtPath<TeamOverlayApp>(
-                "Assets/_TeamOverlay/Resources/TeamOverlay/TeamOverlayApp.prefab");
+                "Assets/02. Prefabs/Resources/TeamOverlay/TeamOverlayApp.prefab");
 
             Assert.That(card, Is.Not.Null);
             Assert.That(main, Is.Not.Null);

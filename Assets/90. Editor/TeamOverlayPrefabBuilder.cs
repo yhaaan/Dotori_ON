@@ -9,10 +9,14 @@ namespace TeamOverlay.Editor
 {
     public static class TeamOverlayPrefabBuilder
     {
-        public const string CardPath = "Assets/_TeamOverlay/Prefabs/TeamMemberCard.prefab";
-        public const string MainViewPath = "Assets/_TeamOverlay/Prefabs/TeamOverlayCanvas.prefab";
-        public const string NameViewPath = "Assets/_TeamOverlay/Prefabs/FirstRunNameModal.prefab";
-        public const string AppPath = "Assets/_TeamOverlay/Resources/TeamOverlay/TeamOverlayApp.prefab";
+        public const string PrefabFolder = "Assets/02. Prefabs";
+        public const string CardPath = PrefabFolder + "/TeamMemberCard.prefab";
+        public const string MainViewPath = PrefabFolder + "/TeamOverlayCanvas.prefab";
+        public const string NameViewPath = PrefabFolder + "/FirstRunNameModal.prefab";
+
+        // Resources must keep its exact folder name for Resources.Load, so it is
+        // nested here instead of taking a numbered folder of its own.
+        public const string AppPath = PrefabFolder + "/Resources/TeamOverlay/TeamOverlayApp.prefab";
 
         [MenuItem("Team Overlay/Create Missing Editable UI Prefabs")]
         public static void CreateMissingPrefabs()
@@ -45,9 +49,9 @@ namespace TeamOverlay.Editor
 
         private static void BuildAll()
         {
-            EnsureFolder("Assets/_TeamOverlay", "Prefabs");
-            EnsureFolder("Assets/_TeamOverlay", "Resources");
-            EnsureFolder("Assets/_TeamOverlay/Resources", "TeamOverlay");
+            EnsureFolder("Assets", "02. Prefabs");
+            EnsureFolder(PrefabFolder, "Resources");
+            EnsureFolder(PrefabFolder + "/Resources", "TeamOverlay");
 
             var cardPrefab = BuildCard();
             var mainPrefab = BuildMainView(cardPrefab);
