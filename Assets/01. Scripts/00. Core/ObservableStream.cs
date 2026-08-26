@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace TeamOverlay.Backend.Mock
+namespace TeamOverlay.Core
 {
+    /// <summary>Minimal thread-safe hot observable shared by every backend.</summary>
     internal sealed class ObservableStream<T> : IObservable<T>, IDisposable
     {
         private readonly object _gate = new object();

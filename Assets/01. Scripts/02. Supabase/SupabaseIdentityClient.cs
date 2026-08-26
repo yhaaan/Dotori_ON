@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TeamOverlay.Supabase
 {
-    public sealed class SupabaseIdentityClient
+    public sealed class SupabaseIdentityClient : ISupabaseSessionProvider
     {
         private static readonly TimeSpan RefreshWindow = TimeSpan.FromMinutes(2);
         private readonly string _projectUrl;
@@ -81,6 +81,27 @@ namespace TeamOverlay.Supabase
             return new SupabaseIdentityBootstrap(_session, member, createdAnonymousUser);
         }
 
+        /// <summary>
+        /// Returns a session whose access token is still valid, rotating it first
+        /// when it is inside the refresh window. Every authorized caller goes
+        /// through here so only one component ever spends a refresh token.
+        /// </summary>
+        public async Task<SupabaseAuthSession> GetValidSessionAsync(
+            CancellationToken cancellationToken)
+        {
+            if (_session == null)
+            {
+                throw new InvalidOperationException("Supabase identity has not been initialized.");
+            }
+
+            if (ShouldRefresh(_session))
+            {
+                _session = await RefreshStoredSessionAsync(_session, cancellationToken);
+            }
+
+            return _session;
+        }
+
         public async Task<SupabaseMemberRecord> ClaimMemberNameAsync(
             string rawDisplayName,
             CancellationToken cancellationToken)
@@ -93,16 +114,7 @@ namespace TeamOverlay.Supabase
                     nameof(rawDisplayName));
             }
 
-            if (_session == null)
-            {
-                throw new InvalidOperationException("Supabase identity has not been initialized.");
-            }
-
-            if (ShouldRefresh(_session))
-            {
-                _session = await RefreshStoredSessionAsync(_session, cancellationToken);
-            }
-
+            var session = await GetValidSessionAsync(cancellationToken);
             var requestBody = JsonUtility.ToJson(new ClaimMemberRequest
             {
                 p_display_name = validation.DisplayName,
@@ -113,7 +125,7 @@ namespace TeamOverlay.Supabase
                     "POST",
                     _projectUrl + "/rest/v1/rpc/claim_member_name",
                     requestBody,
-                    _session),
+                    session),
                 cancellationToken);
 
             EnsureSuccess(response);
@@ -298,27 +310,7 @@ namespace TeamOverlay.Supabase
 
         private static void EnsureSuccess(SupabaseHttpResponse response)
         {
-            if (response.IsSuccess)
-            {
-                return;
-            }
-
-            ErrorDocument error = null;
-            try
-            {
-                error = JsonUtility.FromJson<ErrorDocument>(response.Body);
-            }
-            catch (ArgumentException)
-            {
-            }
-
-            var code = !string.IsNullOrWhiteSpace(error?.code)
-                ? error.code
-                : error?.error_code;
-            var message = !string.IsNullOrWhiteSpace(error?.message)
-                ? error.message
-                : error?.msg;
-            throw new SupabaseApiException(response.StatusCode, code, message);
+            SupabaseErrors.EnsureSuccess(response);
         }
 
         [Serializable]
@@ -364,15 +356,6 @@ namespace TeamOverlay.Supabase
             public string display_name;
             public string normalized_name;
             public int sort_order;
-        }
-
-        [Serializable]
-        private sealed class ErrorDocument
-        {
-            public string code;
-            public string error_code;
-            public string message;
-            public string msg;
         }
     }
 }

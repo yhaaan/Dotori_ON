@@ -24,9 +24,23 @@ namespace TeamOverlay.UI
     {
         private const string AppPrefabResourcePath = "TeamOverlay/TeamOverlayApp";
 
+        // Polling stands in for a Realtime subscription. Four members at three
+        // seconds is a handful of requests a minute, and a dropped poll self-heals
+        // on the next tick instead of leaving the roster stale until a reconnect.
+        private const float TeamStatePollSeconds = 3f;
+
+        // Comfortably inside the server's three-minute stale-session timeout, so a
+        // single failed heartbeat never clocks anyone out.
+        private const float HeartbeatSeconds = 45f;
+
+        private const float MaximumPollBackoffSeconds = 30f;
+
         [Header("Prefab references")]
         [SerializeField] private TeamOverlayView _mainViewPrefab;
         [SerializeField] private FirstRunNameView _firstRunNamePrefab;
+        [Header("Development")]
+        [Tooltip("Runs the overlay against the in-memory roster instead of Supabase. Identity still uses the real project.")]
+        [SerializeField] private bool _useMockBackend;
 
         private static TeamOverlayApp _instance;
 
@@ -45,6 +59,11 @@ namespace TeamOverlay.UI
         private NotificationTonePlayer _tonePlayer;
         private WindowsOverlayWindow _window;
         private float _nextTimerRefresh;
+        private float _nextTeamStatePoll;
+        private float _nextHeartbeat;
+        private int _consecutivePollFailures;
+        private bool _refreshInProgress;
+        private bool _heartbeatInProgress;
         private bool _identityActivationInProgress;
         private bool _signOutInProgress;
         private bool _mutationInProgress;
@@ -143,8 +162,8 @@ namespace TeamOverlay.UI
                 }
 
                 var profile = loadResult.Profile;
-                await SignInAsync(DisplayNamePolicy.Validate(profile.DisplayName), _lifetime.Token);
-                ActivateIdentity(profile);
+                var member = await SignInAsync(DisplayNamePolicy.Validate(profile.DisplayName), _lifetime.Token);
+                ActivateIdentity(profile, member);
                 await RefreshStateAsync();
                 _view.ShowFeedback(RestoredProfileFeedback(loadResult));
             }
@@ -174,10 +193,8 @@ namespace TeamOverlay.UI
                 return;
             }
 
-            var stateChanged = false;
             while (_pendingEvents.TryDequeue(out var teamEvent))
             {
-                stateChanged = true;
                 if (teamEvent.Type == TeamEventType.MemberCheckedIn
                     && !string.Equals(teamEvent.ActorMemberId, _backend.LocalMemberId, StringComparison.Ordinal))
                 {
@@ -185,14 +202,22 @@ namespace TeamOverlay.UI
                 }
             }
 
-            if (stateChanged)
+            var now = Time.unscaledTime;
+            if (now >= _nextTeamStatePoll)
             {
+                _nextTeamStatePoll = now + TeamStatePollSeconds;
                 RefreshStateWithoutWaiting();
             }
 
-            if (_members != null && Time.unscaledTime >= _nextTimerRefresh)
+            if (now >= _nextHeartbeat)
             {
-                _nextTimerRefresh = Time.unscaledTime + 0.2f;
+                _nextHeartbeat = now + HeartbeatSeconds;
+                SendHeartbeatWithoutWaiting();
+            }
+
+            if (_members != null && now >= _nextTimerRefresh)
+            {
+                _nextTimerRefresh = now + 0.2f;
                 _view.Bind(_members, _backend.LocalMemberId, DateTimeOffset.UtcNow);
             }
         }
@@ -217,7 +242,7 @@ namespace TeamOverlay.UI
             {
                 var remoteMember = await SignInAsync(validation, _lifetime.Token);
                 var profile = EnsureLocalProfile(validation, remoteMember);
-                ActivateIdentity(profile);
+                ActivateIdentity(profile, remoteMember);
                 await RefreshStateAsync();
                 _view.ShowFeedback(profile.DisplayName + " 이름으로 로그인했습니다.");
                 _firstRunNameView.Hide();
@@ -394,11 +419,16 @@ namespace TeamOverlay.UI
             return _identityStore.Create(remoteMember.DisplayName);
         }
 
-        private void ActivateIdentity(LocalIdentityProfile profile)
+        private void ActivateIdentity(LocalIdentityProfile profile, SupabaseMemberRecord remoteMember)
         {
             if (profile == null)
             {
                 throw new ArgumentNullException(nameof(profile));
+            }
+
+            if (remoteMember == null)
+            {
+                throw new ArgumentNullException(nameof(remoteMember));
             }
 
             if (_backend != null)
@@ -412,9 +442,11 @@ namespace TeamOverlay.UI
             }
 
             _identityProfile = profile;
-            _backend = new ProfiledMockTeamBackend(profile.DisplayName);
+            _backend = CreateBackend(profile, remoteMember);
             _mockControls = _backend as IMockTeamBackendControls;
             _eventSubscription = _backend.Events.Subscribe(new TeamEventObserver(_pendingEvents));
+            _nextTeamStatePoll = Time.unscaledTime + TeamStatePollSeconds;
+            _nextHeartbeat = Time.unscaledTime + HeartbeatSeconds;
 
             _view = Instantiate(_mainViewPrefab, transform);
             _view.name = _mainViewPrefab.name;
@@ -430,6 +462,26 @@ namespace TeamOverlay.UI
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _firstRunNameView.Hide();
+        }
+
+        /// <summary>
+        /// The mock backend stays reachable so the overlay can be exercised in the
+        /// Editor without a network, but the shipped default is the live backend.
+        /// </summary>
+        private ITeamBackend CreateBackend(LocalIdentityProfile profile, SupabaseMemberRecord remoteMember)
+        {
+            if (_useMockBackend)
+            {
+                return new ProfiledMockTeamBackend(profile.DisplayName);
+            }
+
+            return new SupabaseTeamBackend(
+                SupabaseProjectConfig.ProjectUrl,
+                SupabaseProjectConfig.PublishableKey,
+                _supabaseTransport,
+                _supabaseIdentity,
+                remoteMember.Id,
+                profile.ClientInstanceId);
         }
 
         private void TeardownSession()
@@ -450,6 +502,11 @@ namespace TeamOverlay.UI
             _identityProfile = null;
             _members = null;
             _nextTimerRefresh = 0f;
+            _nextTeamStatePoll = 0f;
+            _nextHeartbeat = 0f;
+            _refreshInProgress = false;
+            _heartbeatInProgress = false;
+            _consecutivePollFailures = 0;
             while (_pendingEvents.TryDequeue(out _))
             {
             }
@@ -579,7 +636,7 @@ namespace TeamOverlay.UI
             catch (Exception exception)
             {
                 Debug.LogException(exception);
-                _view?.ShowFeedback(exception.Message, true);
+                _view?.ShowFeedback(BackendError(exception), true);
             }
             finally
             {
@@ -608,19 +665,118 @@ namespace TeamOverlay.UI
             _view.Bind(_members, _backend.LocalMemberId, DateTimeOffset.UtcNow);
         }
 
+        /// <summary>
+        /// A poll that outlives its interval must not stack another request behind
+        /// it, or a slow network turns into an ever-growing queue of requests.
+        /// </summary>
         private async void RefreshStateWithoutWaiting()
         {
+            if (_refreshInProgress || _mutationInProgress || _signOutInProgress)
+            {
+                return;
+            }
+
+            _refreshInProgress = true;
             try
             {
                 await RefreshStateAsync();
+                _consecutivePollFailures = 0;
             }
             catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
             {
             }
             catch (Exception exception)
             {
-                Debug.LogException(exception);
-                _view?.ShowFeedback(exception.Message, true);
+                // A dead connection would otherwise fill the console with the same
+                // exception every three seconds, so back off and log once per
+                // streak instead of once per attempt.
+                if (_consecutivePollFailures == 0)
+                {
+                    Debug.LogException(exception);
+                }
+
+                _consecutivePollFailures++;
+                _nextTeamStatePoll = Time.unscaledTime + PollBackoffSeconds(_consecutivePollFailures);
+                _view?.ShowFeedback(BackendError(exception), true);
+            }
+            finally
+            {
+                _refreshInProgress = false;
+            }
+        }
+
+        private static float PollBackoffSeconds(int consecutiveFailures)
+        {
+            var seconds = TeamStatePollSeconds * (1 << Math.Min(consecutiveFailures, 4));
+            return Math.Min(seconds, MaximumPollBackoffSeconds);
+        }
+
+        private async void SendHeartbeatWithoutWaiting()
+        {
+            if (_heartbeatInProgress || _signOutInProgress || _backend == null)
+            {
+                return;
+            }
+
+            _heartbeatInProgress = true;
+            try
+            {
+                await _backend.SendHeartbeatAsync(_lifetime.Token);
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                // A missed heartbeat is recoverable: the server only auto-closes a
+                // session after three minutes without one, so this stays a warning
+                // and never interrupts what the person is doing.
+                Debug.LogWarning("Heartbeat failed: " + exception.Message);
+            }
+            finally
+            {
+                _heartbeatInProgress = false;
+            }
+        }
+
+        private static string BackendError(Exception exception)
+        {
+            if (exception is HttpRequestException || exception is TaskCanceledException)
+            {
+                return "서버에 연결하지 못했습니다. 다시 시도하는 중입니다.";
+            }
+
+            if (exception is SupabaseApiException apiException)
+            {
+                return AttendanceError(apiException);
+            }
+
+            return "요청을 처리하지 못했습니다: " + exception.Message;
+        }
+
+        /// <summary>
+        /// The attendance RPCs raise stable machine-readable messages. Anything not
+        /// listed here falls back to the shared registration wording rather than
+        /// showing a raw server code.
+        /// </summary>
+        private static string AttendanceError(SupabaseApiException exception)
+        {
+            switch (exception.ServerMessage)
+            {
+                case "member_already_clocked_in":
+                    return "이미 출근 상태입니다.";
+                case "member_not_clocked_in":
+                    return "출근 상태가 아닙니다.";
+                case "attendance_session_not_open":
+                    return "출근 세션이 이미 종료되었습니다. 다시 출근해주세요.";
+                case "client_instance_mismatch":
+                    return "다른 PC에서 출근한 세션입니다. 그 PC에서 퇴근해주세요.";
+                case "member_identity_mismatch":
+                    return "로그인 정보가 일치하지 않습니다. 앱을 다시 실행해주세요.";
+                case "member_not_registered_or_inactive":
+                    return "등록되지 않았거나 비활성화된 계정입니다.";
+                default:
+                    return SupabaseRegistrationError(exception);
             }
         }
 

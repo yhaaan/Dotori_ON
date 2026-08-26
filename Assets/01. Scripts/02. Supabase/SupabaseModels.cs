@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TeamOverlay.Supabase
 {
@@ -32,6 +34,16 @@ namespace TeamOverlay.Supabase
         public string RefreshToken { get; }
 
         public DateTimeOffset ExpiresAtUtc { get; }
+    }
+
+    /// <summary>
+    /// Hands out an access token that is still valid, refreshing it first when it
+    /// is about to expire. One implementation owns the rotating refresh token so
+    /// two callers can never race each other into an invalidated session.
+    /// </summary>
+    public interface ISupabaseSessionProvider
+    {
+        Task<SupabaseAuthSession> GetValidSessionAsync(CancellationToken cancellationToken);
     }
 
     public sealed class SupabaseMemberRecord
