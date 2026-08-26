@@ -20,7 +20,8 @@ namespace TeamOverlay.Core
             DateTimeOffset? activityStartedAtUtc,
             DateTimeOffset? lastHeartbeatAtUtc,
             DateTimeOffset? lastCheckedOutAtUtc,
-            DateTimeOffset updatedAtUtc)
+            DateTimeOffset updatedAtUtc,
+            string statusNote = null)
         {
             if (string.IsNullOrWhiteSpace(memberId))
             {
@@ -71,6 +72,12 @@ namespace TeamOverlay.Core
             LastHeartbeatAtUtc = ToUtc(lastHeartbeatAtUtc);
             LastCheckedOutAtUtc = ToUtc(lastCheckedOutAtUtc);
             UpdatedAtUtc = updatedAtUtc.ToUniversalTime();
+            // A note describes current work, so it is meaningless once the
+            // session is closed. The server clears it on checkout; dropping it
+            // here too keeps a hand-built state from disagreeing.
+            StatusNote = attendanceStatus == AttendanceStatus.ClockedIn && !string.IsNullOrWhiteSpace(statusNote)
+                ? statusNote.Trim()
+                : null;
         }
 
         public string MemberId { get; }
@@ -96,6 +103,9 @@ namespace TeamOverlay.Core
         public DateTimeOffset? LastCheckedOutAtUtc { get; }
 
         public DateTimeOffset UpdatedAtUtc { get; }
+
+        /// <summary>Optional short note shown on the card while clocked in.</summary>
+        public string StatusNote { get; }
 
         public bool IsClockedIn => AttendanceStatus == AttendanceStatus.ClockedIn;
 

@@ -481,6 +481,7 @@ namespace TeamOverlay.UI
             _view.MinimizeRequested += HandleMinimizeRequested;
             _view.ExitRequested += HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
+            _view.StatusNoteSubmitted += HandleStatusNoteSubmitted;
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _firstRunNameView.Hide();
         }
@@ -543,6 +544,7 @@ namespace TeamOverlay.UI
             _view.MinimizeRequested -= HandleMinimizeRequested;
             _view.ExitRequested -= HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested -= HandleSwitchAccountRequested;
+            _view.StatusNoteSubmitted -= HandleStatusNoteSubmitted;
         }
 
         private bool IsLocalMemberClockedIn()
@@ -590,6 +592,39 @@ namespace TeamOverlay.UI
             RunMutation(
                 token => _mockControls.TriggerFakeTeammateCheckInAsync(token),
                 "가짜 팀원 출근 이벤트를 발생시켰습니다.");
+        }
+
+        private void HandleStatusNoteSubmitted(string note)
+        {
+            var trimmed = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
+            if (string.Equals(LocalStatusNote(), trimmed, StringComparison.Ordinal))
+            {
+                // onEndEdit also fires when the field merely loses focus, so an
+                // unchanged note must not cost a request.
+                return;
+            }
+
+            RunMutation(
+                token => _backend.SetStatusNoteAsync(trimmed, token),
+                trimmed == null ? "메모를 지웠습니다." : "메모를 남겼습니다.");
+        }
+
+        private string LocalStatusNote()
+        {
+            if (_members == null || _backend == null)
+            {
+                return null;
+            }
+
+            foreach (var member in _members)
+            {
+                if (string.Equals(member.MemberId, _backend.LocalMemberId, StringComparison.Ordinal))
+                {
+                    return member.StatusNote;
+                }
+            }
+
+            return null;
         }
 
         private void HandleAlwaysOnTopToggleRequested()

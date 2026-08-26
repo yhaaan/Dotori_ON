@@ -28,6 +28,12 @@
 
 시스템 트레이로 숨기는 `숨김` 버튼은 제거했습니다. 트레이 아이콘이 Windows 11의 오버플로 영역에 가려지면 창을 되찾을 방법이 없고, `forceSingleInstance` 때문에 재실행까지 막혀 작업 관리자로 프로세스를 죽여야 했습니다. 최소화는 항상 작업 표시줄에 남으므로 같은 용도를 안전하게 대신합니다.
 
+## 상태 메모 입력칸
+
+하단 컨트롤 바 오른쪽의 `StatusNoteInput`(`TeamOverlayView._statusNoteInput`)은 지금 뭘 하는지 24자까지 적는 칸입니다. 출근 중일 때만 보이고, Enter를 누르거나 포커스를 잃으면 저장됩니다. 서버가 퇴근 시 자동으로 비웁니다.
+
+글자 수 제한을 늘리려면 InputField의 `Character Limit`만이 아니라 `member_current_state.status_note`의 CHECK 제약도 같이 고쳐야 합니다. 카드 폭이 약 110px라 그 이상은 어차피 잘립니다.
+
 ## 이름변경(재로그인) 버튼
 
 상단 바의 `이름변경`(`TopBar/SwitchAccount`, `TeamOverlayView._switchAccountButton`)은 이름을 고치는 기능이 아니라 로그아웃 후 최초 이름 입력 화면으로 돌아가는 재로그인 버튼입니다. 눌리면 출근 중이던 세션을 퇴근 처리하고, 이 PC에 저장된 "현재 로그인한 이름" 표시만 지운 뒤 `FirstRunNameModal`을 다시 띄웁니다.

@@ -23,6 +23,9 @@ namespace TeamOverlay.Core
 
         Task CheckOutAsync(CheckoutReason reason, CancellationToken cancellationToken);
 
+        /// <summary>Sets the local member's card note; null or blank clears it.</summary>
+        Task SetStatusNoteAsync(string note, CancellationToken cancellationToken);
+
         Task SendHeartbeatAsync(CancellationToken cancellationToken);
     }
 }

@@ -177,6 +177,30 @@ namespace TeamOverlay.Editor
                 var working = ControlButton(controls.transform, font, "Working", "작업중", -81f, 70f);
                 var rest = ControlButton(controls.transform, font, "Break", "쉬는중", -5f, 70f);
                 var meal = ControlButton(controls.transform, font, "Meal", "식사중", 71f, 70f);
+                var noteBackground = UiFactory.CreateImage("StatusNoteInput", controls.transform, TeamOverlayPalette.Window);
+                var noteRect = noteBackground.rectTransform;
+                noteRect.anchorMin = noteRect.anchorMax = new Vector2(0.5f, 1f);
+                noteRect.pivot = new Vector2(0f, 1f);
+                noteRect.anchoredPosition = new Vector2(145f, -4f);
+                noteRect.sizeDelta = new Vector2(92f, 27f);
+                var noteInput = noteBackground.gameObject.AddComponent<InputField>();
+                noteInput.targetGraphic = noteBackground;
+                noteInput.lineType = InputField.LineType.SingleLine;
+                // Matches the 24-character check on member_current_state.status_note.
+                noteInput.characterLimit = 24;
+                noteInput.caretColor = TeamOverlayPalette.TextPrimary;
+                var noteText = UiFactory.CreateText("Text", noteBackground.transform, font, 10,
+                    TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary);
+                UiFactory.Stretch(noteText.rectTransform, 8f, 2f, 8f, 2f);
+                var notePlaceholder = UiFactory.CreateText("Placeholder", noteBackground.transform, font, 10,
+                    TextAnchor.MiddleLeft, new Color(TeamOverlayPalette.TextSecondary.r,
+                        TeamOverlayPalette.TextSecondary.g, TeamOverlayPalette.TextSecondary.b, 0.68f));
+                notePlaceholder.text = "메모를 입력하고 Enter";
+                notePlaceholder.fontStyle = FontStyle.Italic;
+                UiFactory.Stretch(notePlaceholder.rectTransform, 8f, 2f, 8f, 2f);
+                noteInput.textComponent = noteText;
+                noteInput.placeholder = notePlaceholder;
+
                 var feedback = UiFactory.CreateText("Feedback", controls.transform, font, 8,
                     TextAnchor.LowerCenter, TeamOverlayPalette.TextSecondary);
                 feedback.text = "Supabase Auth 연결 · 팀 상태 Mock";
@@ -196,6 +220,7 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_minimizeButton", minimize);
                 Set(serialized, "_exitButton", exit);
                 Set(serialized, "_switchAccountButton", switchAccount);
+                Set(serialized, "_statusNoteInput", noteInput);
                 Set(serialized, "_topmostLabel", topmost.GetComponentInChildren<Text>());
                 Set(serialized, "_feedbackText", feedback);
                 Set(serialized, "_windowDragHandle", dragHandle);

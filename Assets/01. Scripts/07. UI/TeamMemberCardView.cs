@@ -36,7 +36,16 @@ namespace TeamOverlay.UI
             {
                 _timerText.text = FormatElapsed(member.GetAttendanceElapsed(nowUtc));
                 _timerText.color = TeamOverlayPalette.TextPrimary;
-                _detailText.text = "출근 " + FormatKoreaTime(member.CheckedInAtUtc.Value, includeDate: false);
+
+                // The note is what the person chose to say about right now, so it
+                // outranks the check-in time, which the timer already implies.
+                var hasNote = !string.IsNullOrWhiteSpace(member.StatusNote);
+                _detailText.text = hasNote
+                    ? member.StatusNote
+                    : "출근 " + FormatKoreaTime(member.CheckedInAtUtc.Value, includeDate: false);
+                _detailText.color = hasNote
+                    ? TeamOverlayPalette.TextPrimary
+                    : TeamOverlayPalette.TextSecondary;
             }
             else
             {
@@ -45,6 +54,7 @@ namespace TeamOverlay.UI
                 _detailText.text = member.LastCheckedOutAtUtc.HasValue
                     ? "마지막 퇴근\n" + FormatKoreaTime(member.LastCheckedOutAtUtc.Value, includeDate: true)
                     : "출근 기록 없음";
+                _detailText.color = TeamOverlayPalette.TextSecondary;
             }
         }
 

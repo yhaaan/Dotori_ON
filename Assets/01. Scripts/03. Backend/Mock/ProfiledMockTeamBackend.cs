@@ -71,6 +71,11 @@ namespace TeamOverlay.Backend.Mock
             return _inner.CheckOutAsync(reason, cancellationToken);
         }
 
+        public Task SetStatusNoteAsync(string note, CancellationToken cancellationToken)
+        {
+            return _inner.SetStatusNoteAsync(note, cancellationToken);
+        }
+
         public Task SendHeartbeatAsync(CancellationToken cancellationToken)
         {
             return _inner.SendHeartbeatAsync(cancellationToken);
@@ -112,7 +117,8 @@ namespace TeamOverlay.Backend.Mock
                 state.ActivityStartedAtUtc,
                 state.LastHeartbeatAtUtc,
                 state.LastCheckedOutAtUtc,
-                state.UpdatedAtUtc);
+                state.UpdatedAtUtc,
+                state.StatusNote);
         }
 
         private TeamEvent MapEvent(TeamEvent source)

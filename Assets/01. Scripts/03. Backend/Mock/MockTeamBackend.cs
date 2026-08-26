@@ -173,6 +173,53 @@ namespace TeamOverlay.Backend.Mock
             return Task.CompletedTask;
         }
 
+        public Task SetStatusNoteAsync(string note, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            TeamEvent teamEvent = null;
+            lock (_gate)
+            {
+                ThrowIfDisposed();
+                var index = FindMemberIndex(LocalMemberId);
+                var current = _members[index];
+                if (!current.IsClockedIn)
+                {
+                    throw new InvalidOperationException("The local member must check in before writing a note.");
+                }
+
+                var trimmed = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
+                if (string.Equals(current.StatusNote, trimmed, StringComparison.Ordinal))
+                {
+                    return Task.CompletedTask;
+                }
+
+                var now = GetUtcNow();
+                var next = new MemberState(
+                    current.MemberId,
+                    current.DisplayName,
+                    current.AvatarKey,
+                    current.SortOrder,
+                    current.AttendanceStatus,
+                    current.ActivityStatus,
+                    current.ConnectionStatus,
+                    current.CheckedInAtUtc,
+                    current.ActivityStartedAtUtc,
+                    current.LastHeartbeatAtUtc,
+                    current.LastCheckedOutAtUtc,
+                    now,
+                    trimmed);
+                _members[index] = next;
+                teamEvent = CreateEvent(
+                    TeamEventType.MemberActivityChanged,
+                    next,
+                    now,
+                    next.ActivityStatus);
+            }
+
+            _events.Publish(teamEvent);
+            return Task.CompletedTask;
+        }
+
         public Task SendHeartbeatAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();

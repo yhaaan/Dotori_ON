@@ -23,7 +23,7 @@ namespace TeamOverlay.Supabase
         private const string StateSelect =
             "member_id,attendance_session_id,attendance_status,activity_status," +
             "connection_status,checked_in_at,status_started_at,last_heartbeat_at," +
-            "last_checked_out_at,updated_at,members!inner(display_name,avatar_key,sort_order,is_active)";
+            "last_checked_out_at,updated_at,status_note,members!inner(display_name,avatar_key,sort_order,is_active)";
 
         private readonly ObservableStream<TeamEvent> _events = new ObservableStream<TeamEvent>();
         private readonly object _gate = new object();
@@ -144,6 +144,18 @@ namespace TeamOverlay.Supabase
             {
                 _openAttendanceSessionId = null;
             }
+        }
+
+        public async Task SetStatusNoteAsync(string note, CancellationToken cancellationToken)
+        {
+            var body = JsonUtility.ToJson(new StatusNoteRequest
+            {
+                p_member_id = _memberId.ToString("D"),
+                // The server treats an empty string as "clear", so a null note does
+                // not need a separate call.
+                p_note = string.IsNullOrWhiteSpace(note) ? string.Empty : note.Trim()
+            });
+            await CallRpcAsync("set_status_note", body, cancellationToken);
         }
 
         public async Task SendHeartbeatAsync(CancellationToken cancellationToken)
@@ -383,7 +395,8 @@ namespace TeamOverlay.Supabase
                 isClockedIn ? ParseTimestamp(document.status_started_at) : null,
                 ParseTimestamp(document.last_heartbeat_at),
                 ParseTimestamp(document.last_checked_out_at),
-                ParseTimestamp(document.updated_at) ?? DateTimeOffset.UtcNow);
+                ParseTimestamp(document.updated_at) ?? DateTimeOffset.UtcNow,
+                document.status_note);
         }
 
         private static AttendanceStatus ParseAttendance(string value)
@@ -484,6 +497,7 @@ namespace TeamOverlay.Supabase
             public string last_heartbeat_at;
             public string last_checked_out_at;
             public string updated_at;
+            public string status_note;
             public MemberDocument members;
         }
 
@@ -515,6 +529,13 @@ namespace TeamOverlay.Supabase
         {
             public string p_member_id;
             public string p_reason;
+        }
+
+        [Serializable]
+        private sealed class StatusNoteRequest
+        {
+            public string p_member_id;
+            public string p_note;
         }
 
         [Serializable]

@@ -26,6 +26,7 @@ namespace TeamOverlay.UI
         [SerializeField] private Button _minimizeButton;
         [SerializeField] private Button _exitButton;
         [SerializeField] private Button _switchAccountButton;
+        [SerializeField] private InputField _statusNoteInput;
         [SerializeField] private Text _topmostLabel;
         [SerializeField] private Text _feedbackText;
         [SerializeField] private WindowDragHandle _windowDragHandle;
@@ -41,6 +42,7 @@ namespace TeamOverlay.UI
         public event Action MinimizeRequested;
         public event Action ExitRequested;
         public event Action SwitchAccountRequested;
+        public event Action<string> StatusNoteSubmitted;
 
         public void Initialize(Action beginWindowDrag)
         {
@@ -69,6 +71,11 @@ namespace TeamOverlay.UI
             AddInteractive(_mealButton);
             AddInteractive(_fakeEventButton);
             AddInteractive(_switchAccountButton);
+
+            if (_statusNoteInput != null)
+            {
+                _statusNoteInput.onEndEdit.AddListener(note => StatusNoteSubmitted?.Invoke(note));
+            }
         }
 
         public void Bind(IReadOnlyList<MemberState> members, string localMemberId, DateTimeOffset nowUtc)
@@ -100,6 +107,33 @@ namespace TeamOverlay.UI
             SetActive(_breakButton, isClockedIn);
             SetActive(_mealButton, isClockedIn);
             if (isClockedIn) SetActivitySelection(localMember.ActivityStatus.GetValueOrDefault());
+            BindStatusNote(localMember, isClockedIn);
+        }
+
+        /// <summary>
+        /// Mirrors the server's note into the field, but never while it has focus:
+        /// a poll landing mid-sentence would otherwise overwrite what is being
+        /// typed. Writing a note requires an open session, so the field is hidden
+        /// when clocked out.
+        /// </summary>
+        private void BindStatusNote(MemberState localMember, bool isClockedIn)
+        {
+            if (_statusNoteInput == null)
+            {
+                return;
+            }
+
+            _statusNoteInput.gameObject.SetActive(isClockedIn);
+            if (!isClockedIn || _statusNoteInput.isFocused)
+            {
+                return;
+            }
+
+            var note = localMember?.StatusNote ?? string.Empty;
+            if (!string.Equals(_statusNoteInput.text, note, StringComparison.Ordinal))
+            {
+                _statusNoteInput.text = note;
+            }
         }
 
         public void SetBusy(bool busy)

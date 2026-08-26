@@ -32,6 +32,7 @@ namespace TeamOverlay.Tests.EditMode
             AssertReference(mainData, "_checkInButton");
             AssertReference(mainData, "_exitButton");
             AssertReference(mainData, "_switchAccountButton");
+            AssertReference(mainData, "_statusNoteInput");
             AssertReference(mainData, "_windowDragHandle");
 
             var nameData = new SerializedObject(name);
