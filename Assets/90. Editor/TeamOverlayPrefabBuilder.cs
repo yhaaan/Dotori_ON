@@ -14,9 +14,11 @@ namespace TeamOverlay.Editor
         public const string MainViewPath = PrefabFolder + "/TeamOverlayCanvas.prefab";
         public const string NameViewPath = PrefabFolder + "/FirstRunNameModal.prefab";
 
-        // Resources must keep its exact folder name for Resources.Load, so it is
-        // nested here instead of taking a numbered folder of its own.
-        public const string AppPath = PrefabFolder + "/Resources/TeamOverlay/TeamOverlayApp.prefab";
+        // Resources.Load resolves paths relative to a folder named exactly
+        // "Resources", so this one keeps its engine-given name and sits at the
+        // Assets root rather than taking a numbered folder.
+        public const string ResourceFolder = "Assets/Resources/TeamOverlay";
+        public const string AppPath = ResourceFolder + "/TeamOverlayApp.prefab";
 
         [MenuItem("Team Overlay/Create Missing Editable UI Prefabs")]
         public static void CreateMissingPrefabs()
@@ -50,8 +52,8 @@ namespace TeamOverlay.Editor
         private static void BuildAll()
         {
             EnsureFolder("Assets", "02. Prefabs");
-            EnsureFolder(PrefabFolder, "Resources");
-            EnsureFolder(PrefabFolder + "/Resources", "TeamOverlay");
+            EnsureFolder("Assets", "Resources");
+            EnsureFolder("Assets/Resources", "TeamOverlay");
 
             var cardPrefab = BuildCard();
             var mainPrefab = BuildMainView(cardPrefab);

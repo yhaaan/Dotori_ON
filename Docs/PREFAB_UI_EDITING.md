@@ -5,7 +5,7 @@
 - `Assets/02. Prefabs/TeamOverlayCanvas.prefab`: 메인 화면 전체
 - `Assets/02. Prefabs/TeamMemberCard.prefab`: 메인 화면에 중첩된 멤버 카드 원본
 - `Assets/02. Prefabs/FirstRunNameModal.prefab`: 최초 실행 이름 설정 화면
-- `Assets/02. Prefabs/Resources/TeamOverlay/TeamOverlayApp.prefab`: 앱 시작점과 위 프리팹 참조
+- `Assets/Resources/TeamOverlay/TeamOverlayApp.prefab`: 앱 시작점과 위 프리팹 참조
 
 ## 권장 편집 순서
 

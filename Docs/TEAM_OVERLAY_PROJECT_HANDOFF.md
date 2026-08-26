@@ -315,15 +315,15 @@ Assets/
     05. Audio/
     07. UI/
   02. Prefabs/
-    Resources/
-      TeamOverlay/
   07. Settings/
   90. Editor/
   99. Tests/
     EditMode/
+  Resources/
+    TeamOverlay/
 ```
 
-폴더 번호는 `Docs/FolderNumberingConvention.md`를 따른다. `Resources`는 Resources.Load가 폴더 이름에 의존해 번호를 붙이지 않았다.
+폴더 번호는 `Docs/FolderNumberingConvention.md`를 따른다. `Resources`만 번호가 없는데, Resources.Load가 `Resources`라는 폴더 이름 자체에 의존하기 때문이다(같은 문서 5.1의 "도구·엔진이 위치를 정하는 폴더" 예외).
 
 핵심 인터페이스 예시:
 

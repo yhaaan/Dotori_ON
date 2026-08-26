@@ -17,7 +17,7 @@ namespace TeamOverlay.Tests.EditMode
             var name = AssetDatabase.LoadAssetAtPath<FirstRunNameView>(
                 "Assets/02. Prefabs/FirstRunNameModal.prefab");
             var app = AssetDatabase.LoadAssetAtPath<TeamOverlayApp>(
-                "Assets/02. Prefabs/Resources/TeamOverlay/TeamOverlayApp.prefab");
+                "Assets/Resources/TeamOverlay/TeamOverlayApp.prefab");
 
             Assert.That(card, Is.Not.Null);
             Assert.That(main, Is.Not.Null);
