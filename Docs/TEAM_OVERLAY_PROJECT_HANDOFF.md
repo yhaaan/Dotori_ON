@@ -299,28 +299,31 @@ Unity 개발 경험을 활용하는 선택은 충분히 가능하다. 특히 캐
 
 Unity의 단점은 일반 데스크톱 UI 프레임워크보다 실행 파일과 메모리 사용량이 크고, 트레이·항상 위·투명 창 같은 기능에 Windows 네이티브 연동이 필요하다는 점이다. 4인 팀 내부 도구이고 사용자가 Unity 개발자이므로 이 비용은 감수할 만하다.
 
-## 13. Unity 코드 구조 제안
+## 13. Unity 코드 구조
 
 ```text
-Assets/_TeamOverlay/
-  Scenes/
-  Scripts/
-    Core/
-      Models/
-      Interfaces/
-      Services/
-    Backend/
+Assets/
+  00. Scenes/
+  01. Scripts/
+    00. Core/
+    01. Identity/
+    02. Supabase/
+    03. Backend/
       Mock/
-      Supabase/
-    UI/
-    Platform/
+    04. Platform/
       Windows/
-    Audio/
-  Prefabs/
-  Art/
-  Audio/
-  Settings/
+    05. Audio/
+    07. UI/
+  02. Prefabs/
+    Resources/
+      TeamOverlay/
+  07. Settings/
+  90. Editor/
+  99. Tests/
+    EditMode/
 ```
+
+폴더 번호는 `Docs/FolderNumberingConvention.md`를 따른다. `Resources`는 Resources.Load가 폴더 이름에 의존해 번호를 붙이지 않았다.
 
 핵심 인터페이스 예시:
 

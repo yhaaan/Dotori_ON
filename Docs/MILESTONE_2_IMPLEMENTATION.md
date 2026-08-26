@@ -35,11 +35,11 @@ team members a simple human-readable identifier.
 
 Key implementation files:
 
-- `Assets/_TeamOverlay/Scripts/Identity/DisplayNamePolicy.cs`
-- `Assets/_TeamOverlay/Scripts/Identity/LocalIdentityProfileStore.cs`
-- `Assets/_TeamOverlay/Scripts/UI/FirstRunNameView.cs`
-- `Assets/_TeamOverlay/Scripts/UI/TeamOverlayApp.cs`
-- `Assets/_TeamOverlay/Scripts/Backend/Mock/ProfiledMockTeamBackend.cs`
+- `Assets/01. Scripts/01. Identity/DisplayNamePolicy.cs`
+- `Assets/01. Scripts/01. Identity/LocalIdentityProfileStore.cs`
+- `Assets/01. Scripts/07. UI/FirstRunNameView.cs`
+- `Assets/01. Scripts/07. UI/TeamOverlayApp.cs`
+- `Assets/01. Scripts/03. Backend/Mock/ProfiledMockTeamBackend.cs`
 
 ## Supabase database contract
 

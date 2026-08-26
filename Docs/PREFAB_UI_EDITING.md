@@ -2,10 +2,10 @@
 
 이제 화면은 런타임 코드로 생성되지 않고 아래 네 개의 실제 프리팹을 사용합니다.
 
-- `Assets/_TeamOverlay/Prefabs/TeamOverlayCanvas.prefab`: 메인 화면 전체
-- `Assets/_TeamOverlay/Prefabs/TeamMemberCard.prefab`: 메인 화면에 중첩된 멤버 카드 원본
-- `Assets/_TeamOverlay/Prefabs/FirstRunNameModal.prefab`: 최초 실행 이름 설정 화면
-- `Assets/_TeamOverlay/Resources/TeamOverlay/TeamOverlayApp.prefab`: 앱 시작점과 위 프리팹 참조
+- `Assets/02. Prefabs/TeamOverlayCanvas.prefab`: 메인 화면 전체
+- `Assets/02. Prefabs/TeamMemberCard.prefab`: 메인 화면에 중첩된 멤버 카드 원본
+- `Assets/02. Prefabs/FirstRunNameModal.prefab`: 최초 실행 이름 설정 화면
+- `Assets/02. Prefabs/Resources/TeamOverlay/TeamOverlayApp.prefab`: 앱 시작점과 위 프리팹 참조
 
 ## 권장 편집 순서
 

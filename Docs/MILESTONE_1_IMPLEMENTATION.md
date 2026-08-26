@@ -16,13 +16,13 @@
 
 ## 코드 구조
 
-- `Assets/_TeamOverlay/Scripts/Core`: 상태 모델, 이벤트, 백엔드 계약
-- `Assets/_TeamOverlay/Scripts/Backend/Mock`: 메모리 기반 Mock 백엔드와 테스트 제어 계약
-- `Assets/_TeamOverlay/Scripts/UI`: 런타임 uGUI 구성과 사용자 상호작용
-- `Assets/_TeamOverlay/Scripts/Audio`: 런타임 생성 알림음
-- `Assets/_TeamOverlay/Scripts/Platform/Windows`: Win32 창/트레이 통합
-- `Assets/_TeamOverlay/Tests/EditMode`: Mock 백엔드 EditMode 테스트
-- `Assets/_TeamOverlay/Editor`: 프로젝트 구성 및 Windows x86_64 빌드 메뉴
+- `Assets/01. Scripts/00. Core`: 상태 모델, 이벤트, 백엔드 계약
+- `Assets/01. Scripts/03. Backend/Mock`: 메모리 기반 Mock 백엔드와 테스트 제어 계약
+- `Assets/01. Scripts/07. UI`: 런타임 uGUI 구성과 사용자 상호작용
+- `Assets/01. Scripts/05. Audio`: 런타임 생성 알림음
+- `Assets/01. Scripts/04. Platform/Windows`: Win32 창/트레이 통합
+- `Assets/99. Tests/EditMode`: Mock 백엔드 EditMode 테스트
+- `Assets/90. Editor`: 프로젝트 구성 및 Windows x86_64 빌드 메뉴
 
 ## 실행과 빌드
 
