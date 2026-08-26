@@ -1,0 +1,21 @@
+{
+  "name": "TeamOverlay.EditModeTests",
+  "rootNamespace": "TeamOverlay.Tests.EditMode",
+  "references": [
+    "TeamOverlay.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
