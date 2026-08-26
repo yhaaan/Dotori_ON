@@ -18,7 +18,7 @@ namespace TeamOverlay.Supabase
     /// a missed poll degrades into a late event instead of a lost one. Swapping in
     /// a Realtime subscription later only has to replace <see cref="Poll"/>.
     /// </summary>
-    public sealed class SupabaseTeamBackend : ITeamBackend, IDisposable
+    public sealed class SupabaseTeamBackend : ITeamBackend, ITeamStatistics, IDisposable
     {
         private const string StateSelect =
             "member_id,attendance_session_id,attendance_status,activity_status," +
@@ -144,6 +144,82 @@ namespace TeamOverlay.Supabase
             {
                 _openAttendanceSessionId = null;
             }
+        }
+
+        public async Task<IReadOnlyList<MemberDailyStat>> GetDailyStatsAsync(
+            string memberId,
+            DateTime fromLocalDate,
+            DateTime toLocalDate,
+            CancellationToken cancellationToken)
+        {
+            var body = JsonUtility.ToJson(new DailyStatsRequest
+            {
+                p_member_id = string.IsNullOrWhiteSpace(memberId) ? LocalMemberId : memberId,
+                p_from = FormatLocalDate(fromLocalDate),
+                p_to = FormatLocalDate(toLocalDate)
+            });
+            var response = await CallRpcAsync("member_daily_stats", body, cancellationToken);
+
+            DailyStatArrayDocument document;
+            try
+            {
+                document = JsonUtility.FromJson<DailyStatArrayDocument>(
+                    "{\"items\":" + response.Body + "}");
+            }
+            catch (ArgumentException exception)
+            {
+                throw new InvalidOperationException("Supabase 통계 응답을 읽지 못했습니다.", exception);
+            }
+
+            var results = new List<MemberDailyStat>(document?.items?.Length ?? 0);
+            foreach (var item in document?.items ?? new DailyStatDocument[0])
+            {
+                results.Add(new MemberDailyStat(
+                    ParseLocalDate(item.local_date),
+                    item.attendance_seconds,
+                    item.work_seconds,
+                    item.break_seconds,
+                    item.meal_seconds));
+            }
+
+            return new ReadOnlyCollection<MemberDailyStat>(results);
+        }
+
+        public async Task<IReadOnlyList<TeamRankingEntry>> GetWorkRankingAsync(
+            DateTime fromLocalDate,
+            DateTime toLocalDate,
+            CancellationToken cancellationToken)
+        {
+            var body = JsonUtility.ToJson(new RankingRequest
+            {
+                p_from = FormatLocalDate(fromLocalDate),
+                p_to = FormatLocalDate(toLocalDate)
+            });
+            var response = await CallRpcAsync("team_work_ranking", body, cancellationToken);
+
+            RankingArrayDocument document;
+            try
+            {
+                document = JsonUtility.FromJson<RankingArrayDocument>(
+                    "{\"items\":" + response.Body + "}");
+            }
+            catch (ArgumentException exception)
+            {
+                throw new InvalidOperationException("Supabase 랭킹 응답을 읽지 못했습니다.", exception);
+            }
+
+            var results = new List<TeamRankingEntry>(document?.items?.Length ?? 0);
+            foreach (var item in document?.items ?? new RankingDocument[0])
+            {
+                results.Add(new TeamRankingEntry(
+                    item.member_id,
+                    item.display_name,
+                    item.sort_order,
+                    item.work_seconds,
+                    item.attendance_seconds));
+            }
+
+            return new ReadOnlyCollection<TeamRankingEntry>(results);
         }
 
         public async Task SetStatusNoteAsync(string note, CancellationToken cancellationToken)
@@ -450,6 +526,27 @@ namespace TeamOverlay.Supabase
             return Guid.TryParse(value, out var parsed) ? parsed : (Guid?)null;
         }
 
+        /// <summary>
+        /// The server takes a local calendar date, so this must not go through UTC:
+        /// converting would shift the day for anyone east of Greenwich.
+        /// </summary>
+        private static string FormatLocalDate(DateTime localDate)
+        {
+            return localDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+
+        private static DateTime ParseLocalDate(string value)
+        {
+            return DateTime.TryParseExact(
+                value,
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var parsed)
+                ? parsed
+                : throw new InvalidOperationException("Supabase 날짜 값을 읽지 못했습니다: " + value);
+        }
+
         private static string ToServerActivity(ActivityStatus status)
         {
             switch (status)
@@ -529,6 +626,53 @@ namespace TeamOverlay.Supabase
         {
             public string p_member_id;
             public string p_reason;
+        }
+
+        [Serializable]
+        private sealed class DailyStatsRequest
+        {
+            public string p_member_id;
+            public string p_from;
+            public string p_to;
+        }
+
+        [Serializable]
+        private sealed class RankingRequest
+        {
+            public string p_from;
+            public string p_to;
+        }
+
+        [Serializable]
+        private sealed class DailyStatArrayDocument
+        {
+            public DailyStatDocument[] items;
+        }
+
+        [Serializable]
+        private sealed class DailyStatDocument
+        {
+            public string local_date;
+            public int attendance_seconds;
+            public int work_seconds;
+            public int break_seconds;
+            public int meal_seconds;
+        }
+
+        [Serializable]
+        private sealed class RankingArrayDocument
+        {
+            public RankingDocument[] items;
+        }
+
+        [Serializable]
+        private sealed class RankingDocument
+        {
+            public string member_id;
+            public string display_name;
+            public int sort_order;
+            public int work_seconds;
+            public int attendance_seconds;
         }
 
         [Serializable]
