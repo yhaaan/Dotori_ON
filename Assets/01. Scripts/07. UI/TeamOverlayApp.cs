@@ -112,6 +112,7 @@ namespace TeamOverlay.UI
 
             _window = gameObject.AddComponent<WindowsOverlayWindow>();
             _window.ClockOutAndExitRequested += HandleClockOutAndExitRequested;
+            _window.SessionEndingRequested += HandleSessionEndingRequested;
             _window.Configure();
             _window.SetAlwaysOnTop(true);
             _tonePlayer = gameObject.AddComponent<NotificationTonePlayer>();
@@ -589,6 +590,42 @@ namespace TeamOverlay.UI
             _window.HideToTray();
         }
 
+        /// <summary>
+        /// Windows is signing out. The shell is holding the shutdown open for us,
+        /// so the last checkout gets a real attempt and is recorded as
+        /// <see cref="CheckoutReason.OsShutdown"/> instead of being swept up three
+        /// minutes later as a stale session.
+        /// </summary>
+        private async void HandleSessionEndingRequested()
+        {
+            if (_quitting)
+            {
+                return;
+            }
+
+            _quitting = true;
+            try
+            {
+                if (_backend != null)
+                {
+                    await _backend.CheckOutAsync(CheckoutReason.OsShutdown, _lifetime.Token);
+                }
+            }
+            catch (Exception exception) when (!(exception is OperationCanceledException))
+            {
+                Debug.LogWarning("Best-effort checkout on session end failed: " + exception.Message);
+            }
+            finally
+            {
+                // Release the block first: the person is waiting on a shutdown
+                // screen, and the server closes the session on its own if this
+                // attempt failed.
+                _window.CompleteSessionEnd();
+                _window.PrepareForExit();
+                Application.Quit();
+            }
+        }
+
         private async void HandleClockOutAndExitRequested()
         {
             if (_quitting)
@@ -800,6 +837,7 @@ namespace TeamOverlay.UI
             if (_window != null)
             {
                 _window.ClockOutAndExitRequested -= HandleClockOutAndExitRequested;
+                _window.SessionEndingRequested -= HandleSessionEndingRequested;
             }
 
             _lifetime?.Cancel();

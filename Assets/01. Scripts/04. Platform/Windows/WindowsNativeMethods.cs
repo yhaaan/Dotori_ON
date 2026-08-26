@@ -30,6 +30,8 @@ namespace TeamOverlay.Platform.Windows
 
         internal const uint WmNull = 0x0000;
         internal const uint WmClose = 0x0010;
+        internal const uint WmQueryEndSession = 0x0011;
+        internal const uint WmEndSession = 0x0016;
         internal const uint WmContextMenu = 0x007B;
         internal const uint WmGetIcon = 0x007F;
         internal const uint WmNcLButtonDown = 0x00A1;
@@ -192,6 +194,18 @@ namespace TeamOverlay.Platform.Windows
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool ReleaseCapture();
+
+        // Windows kills a process a few seconds after WM_ENDSESSION. Registering a
+        // block reason during WM_QUERYENDSESSION asks the shell to keep waiting and
+        // shows the person why, which is the only supported way to buy enough time
+        // for a network round trip on the way down.
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ShutdownBlockReasonCreate(IntPtr windowHandle, string reason);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ShutdownBlockReasonDestroy(IntPtr windowHandle);
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         internal static extern IntPtr SendMessage(

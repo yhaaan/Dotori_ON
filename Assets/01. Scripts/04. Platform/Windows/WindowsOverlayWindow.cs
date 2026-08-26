@@ -32,6 +32,13 @@ namespace TeamOverlay.Platform.Windows
 
         public event Action ClockOutAndExitRequested;
 
+        /// <summary>
+        /// Windows is shutting down or signing the user out. The handler has until
+        /// <see cref="CompleteSessionEnd"/> is called to finish a last checkout;
+        /// a shutdown block reason keeps the shell waiting in the meantime.
+        /// </summary>
+        public event Action SessionEndingRequested;
+
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
         private const uint NotifyIconVersion4 = 4;
         private const uint NimSetVersion = 0x00000004;
@@ -55,6 +62,8 @@ namespace TeamOverlay.Platform.Windows
         private int _hidePending;
         private int _menuPending;
         private int _recreateTrayPending;
+        private int _sessionEndPending;
+        private bool _sessionEndReported;
 #endif
 
         public bool Configure()
@@ -161,6 +170,20 @@ namespace TeamOverlay.Platform.Windows
         }
 
         /// <summary>
+        /// Releases the shutdown block so Windows can finish signing out. Safe to
+        /// call when no shutdown is in progress and on non-Windows platforms.
+        /// </summary>
+        public void CompleteSessionEnd()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            if (_windowHandle != IntPtr.Zero)
+            {
+                WindowsNativeMethods.ShutdownBlockReasonDestroy(_windowHandle);
+            }
+#endif
+        }
+
+        /// <summary>
         /// Call before Application.Quit so WM_CLOSE is no longer converted to a
         /// tray hide and all native resources are released deterministically.
         /// </summary>
@@ -200,6 +223,21 @@ namespace TeamOverlay.Platform.Windows
             if (Interlocked.Exchange(ref _menuPending, 0) != 0)
             {
                 ShowTrayMenu();
+            }
+
+            // Raised from Update rather than the window procedure so the handler
+            // can await a network call without blocking the message pump, which
+            // would stop Update from running at all.
+            var sessionEnding = Interlocked.CompareExchange(ref _sessionEndPending, 0, 0) == 1;
+            if (sessionEnding && !_sessionEndReported)
+            {
+                _sessionEndReported = true;
+                SessionEndingRequested?.Invoke();
+            }
+            else if (!sessionEnding && _sessionEndReported)
+            {
+                // Another application vetoed the shutdown, so allow a later one.
+                _sessionEndReported = false;
             }
 #endif
         }
@@ -357,6 +395,33 @@ namespace TeamOverlay.Platform.Windows
             if (message == _taskbarCreatedMessage && _taskbarCreatedMessage != 0)
             {
                 Interlocked.Exchange(ref _recreateTrayPending, 1);
+            }
+            else if (message == WindowsNativeMethods.WmQueryEndSession)
+            {
+                // Agree to the shutdown, but register a reason so the shell waits
+                // while Update runs the final checkout. The window procedure has to
+                // return promptly, so no work happens here.
+                if (Interlocked.Exchange(ref _sessionEndPending, 1) == 0)
+                {
+                    _allowNativeClose = true;
+                    WindowsNativeMethods.ShutdownBlockReasonCreate(
+                        windowHandle,
+                        "퇴근 기록을 저장하는 중입니다.");
+                }
+
+                return new IntPtr(1);
+            }
+            else if (message == WindowsNativeMethods.WmEndSession)
+            {
+                if (wordParameter == IntPtr.Zero)
+                {
+                    // The shutdown was cancelled by another application.
+                    Interlocked.Exchange(ref _sessionEndPending, 0);
+                    _allowNativeClose = false;
+                    WindowsNativeMethods.ShutdownBlockReasonDestroy(windowHandle);
+                }
+
+                return IntPtr.Zero;
             }
             else if (message == WindowsNativeMethods.WmClose && !_allowNativeClose)
             {
