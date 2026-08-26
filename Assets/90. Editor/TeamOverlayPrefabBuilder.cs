@@ -138,20 +138,18 @@ namespace TeamOverlay.Editor
                 topBar.rectTransform.sizeDelta = new Vector2(0f, 32f);
 
                 var dragArea = UiFactory.CreateImage("WindowDragArea", topBar.transform, new Color(1f, 1f, 1f, 0.001f));
-                UiFactory.Stretch(dragArea.rectTransform, 0f, 0f, 280f, 0f);
+                UiFactory.Stretch(dragArea.rectTransform, 0f, 0f, 235f, 0f);
                 var dragHandle = dragArea.gameObject.AddComponent<WindowDragHandle>();
                 var title = UiFactory.CreateText("Title", dragArea.transform, font, 12,
                     TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
                 title.text = "TEAM OVERLAY";
                 UiFactory.Stretch(title.rectTransform, 10f, 0f, 0f, 0f);
 
-                var fake = TopButton(topBar.transform, font, "FakeCheckIn", "가짜 출근", 204f, 72f);
-                var switchAccount = TopButton(topBar.transform, font, "SwitchAccount", "이름변경", 150f, 54f);
+                var fake = TopButton(topBar.transform, font, "FakeCheckIn", "가짜 출근", 159f, 72f);
+                var switchAccount = TopButton(topBar.transform, font, "SwitchAccount", "이름변경", 105f, 54f);
                 switchAccount.GetComponentInChildren<Text>().fontSize = 9;
-                var topmost = TopButton(topBar.transform, font, "AlwaysOnTop", "TOP", 108f, 38f);
-                var minimize = TopButton(topBar.transform, font, "Minimize", "—", 77f, 28f);
-                var tray = TopButton(topBar.transform, font, "HideToTray", "숨김", 32f, 42f);
-                tray.GetComponentInChildren<Text>().fontSize = 9;
+                var topmost = TopButton(topBar.transform, font, "AlwaysOnTop", "TOP", 63f, 38f);
+                var minimize = TopButton(topBar.transform, font, "Minimize", "—", 32f, 28f);
                 var exit = TopButton(topBar.transform, font, "Exit", "×", 3f, 27f, TeamOverlayPalette.Danger);
 
                 var cardsRoot = UiFactory.CreateRect("MemberCards", background.transform);
@@ -196,7 +194,6 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_fakeEventButton", fake);
                 Set(serialized, "_topmostButton", topmost);
                 Set(serialized, "_minimizeButton", minimize);
-                Set(serialized, "_hideToTrayButton", tray);
                 Set(serialized, "_exitButton", exit);
                 Set(serialized, "_switchAccountButton", switchAccount);
                 Set(serialized, "_topmostLabel", topmost.GetComponentInChildren<Text>());

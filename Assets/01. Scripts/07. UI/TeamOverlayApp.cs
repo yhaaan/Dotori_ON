@@ -479,7 +479,6 @@ namespace TeamOverlay.UI
             _view.FakeCheckInRequested += HandleFakeCheckInRequested;
             _view.AlwaysOnTopToggleRequested += HandleAlwaysOnTopToggleRequested;
             _view.MinimizeRequested += HandleMinimizeRequested;
-            _view.CloseToTrayRequested += HandleCloseToTrayRequested;
             _view.ExitRequested += HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
@@ -542,7 +541,6 @@ namespace TeamOverlay.UI
             _view.FakeCheckInRequested -= HandleFakeCheckInRequested;
             _view.AlwaysOnTopToggleRequested -= HandleAlwaysOnTopToggleRequested;
             _view.MinimizeRequested -= HandleMinimizeRequested;
-            _view.CloseToTrayRequested -= HandleCloseToTrayRequested;
             _view.ExitRequested -= HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested -= HandleSwitchAccountRequested;
         }
@@ -604,11 +602,6 @@ namespace TeamOverlay.UI
         private void HandleMinimizeRequested()
         {
             _window.Minimize();
-        }
-
-        private void HandleCloseToTrayRequested()
-        {
-            _window.HideToTray();
         }
 
         /// <summary>

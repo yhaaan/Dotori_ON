@@ -20,16 +20,13 @@ namespace TeamOverlay.Platform.Windows
 
         public bool IsInitialized { get; private set; }
 
-        public bool IsHiddenToTray { get; private set; }
-
         public bool IsMinimized { get; private set; }
 
         public event Action Initialized;
 
         public event Action StateChanged;
 
-        public event Action RestoreRequested;
-
+        /// <summary>Raised for the tray-menu exit and for Alt+F4.</summary>
         public event Action ClockOutAndExitRequested;
 
         /// <summary>
@@ -40,11 +37,6 @@ namespace TeamOverlay.Platform.Windows
         public event Action SessionEndingRequested;
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-        private const uint NotifyIconVersion4 = 4;
-        private const uint NimSetVersion = 0x00000004;
-        private const uint MenuShow = 1;
-        private const uint MenuClockOutAndExit = 2;
-
         private static WindowsOverlayWindow _activeInstance;
 
         private WindowsNativeMethods.WindowProcedure _windowProcedure;
@@ -52,16 +44,10 @@ namespace TeamOverlay.Platform.Windows
         private IntPtr _windowHandle;
         private IntPtr _previousWindowProcedure;
         private IntPtr _windowProcedurePointer;
-        private uint _taskbarCreatedMessage;
-        private WindowsNativeMethods.NotifyIconData _trayData;
         private bool _configurationRequested;
-        private bool _trayAdded;
         private bool _allowNativeClose;
         private float _nextInitializationAttempt;
-        private int _restorePending;
-        private int _hidePending;
-        private int _menuPending;
-        private int _recreateTrayPending;
+        private int _exitPending;
         private int _sessionEndPending;
         private bool _sessionEndReported;
 #endif
@@ -129,42 +115,6 @@ namespace TeamOverlay.Platform.Windows
 
             WindowsNativeMethods.ShowWindow(_windowHandle, WindowsNativeMethods.SwMinimize);
             IsMinimized = true;
-            IsHiddenToTray = false;
-            StateChanged?.Invoke();
-#endif
-        }
-
-        public void HideToTray()
-        {
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            if (!EnsureWindowHandle())
-            {
-                return;
-            }
-
-            AddTrayIcon();
-            WindowsNativeMethods.ShowWindow(_windowHandle, WindowsNativeMethods.SwHide);
-            IsHiddenToTray = true;
-            IsMinimized = false;
-            StateChanged?.Invoke();
-#endif
-        }
-
-        public void ShowFromTray()
-        {
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            if (!EnsureWindowHandle())
-            {
-                return;
-            }
-
-            WindowsNativeMethods.ShowWindow(_windowHandle, WindowsNativeMethods.SwRestore);
-            WindowsNativeMethods.ShowWindow(_windowHandle, WindowsNativeMethods.SwShow);
-            SetAlwaysOnTop(IsAlwaysOnTop);
-            WindowsNativeMethods.SetForegroundWindow(_windowHandle);
-            IsHiddenToTray = false;
-            IsMinimized = false;
-            RestoreRequested?.Invoke();
             StateChanged?.Invoke();
 #endif
         }
@@ -204,30 +154,11 @@ namespace TeamOverlay.Platform.Windows
                 TryInitialize();
             }
 
-            if (Interlocked.Exchange(ref _recreateTrayPending, 0) != 0)
+            if (Interlocked.Exchange(ref _exitPending, 0) != 0)
             {
-                _trayAdded = false;
-                AddTrayIcon();
+                ClockOutAndExitRequested?.Invoke();
             }
 
-            if (Interlocked.Exchange(ref _hidePending, 0) != 0)
-            {
-                HideToTray();
-            }
-
-            if (Interlocked.Exchange(ref _restorePending, 0) != 0)
-            {
-                ShowFromTray();
-            }
-
-            if (Interlocked.Exchange(ref _menuPending, 0) != 0)
-            {
-                ShowTrayMenu();
-            }
-
-            // Raised from Update rather than the window procedure so the handler
-            // can await a network call without blocking the message pump, which
-            // would stop Update from running at all.
             var sessionEnding = Interlocked.CompareExchange(ref _sessionEndPending, 0, 0) == 1;
             if (sessionEnding && !_sessionEndReported)
             {
@@ -267,12 +198,9 @@ namespace TeamOverlay.Platform.Windows
 
             ApplyOverlayWindowStyle();
             HookWindowProcedure();
-            _taskbarCreatedMessage = WindowsNativeMethods.RegisterWindowMessage("TaskbarCreated");
-            AddTrayIcon();
             SetAlwaysOnTop(IsAlwaysOnTop);
 
             IsInitialized = true;
-            IsHiddenToTray = false;
             IsMinimized = false;
             Initialized?.Invoke();
             StateChanged?.Invoke();
@@ -392,11 +320,7 @@ namespace TeamOverlay.Platform.Windows
             IntPtr wordParameter,
             IntPtr longParameter)
         {
-            if (message == _taskbarCreatedMessage && _taskbarCreatedMessage != 0)
-            {
-                Interlocked.Exchange(ref _recreateTrayPending, 1);
-            }
-            else if (message == WindowsNativeMethods.WmQueryEndSession)
+            if (message == WindowsNativeMethods.WmQueryEndSession)
             {
                 // Agree to the shutdown, but register a reason so the shell waits
                 // while Update runs the final checkout. The window procedure has to
@@ -425,24 +349,12 @@ namespace TeamOverlay.Platform.Windows
             }
             else if (message == WindowsNativeMethods.WmClose && !_allowNativeClose)
             {
-                Interlocked.Exchange(ref _hidePending, 1);
+                // This used to hide the window to the tray. With no tray icon that
+                // would strand a running process nothing can restore, and
+                // forceSingleInstance would then block every later launch, so a
+                // close now goes down the normal clock-out-and-exit path.
+                Interlocked.Exchange(ref _exitPending, 1);
                 return IntPtr.Zero;
-            }
-            else if (message == WindowsNativeMethods.TrayCallbackMessage)
-            {
-                var rawMessage = unchecked((uint)longParameter.ToInt64());
-                var trayMessage = rawMessage & 0xFFFFu;
-                switch (trayMessage)
-                {
-                    case WindowsNativeMethods.WmLButtonUp:
-                    case WindowsNativeMethods.WmLButtonDoubleClick:
-                        Interlocked.Exchange(ref _restorePending, 1);
-                        return IntPtr.Zero;
-                    case WindowsNativeMethods.WmRButtonUp:
-                    case WindowsNativeMethods.WmContextMenu:
-                        Interlocked.Exchange(ref _menuPending, 1);
-                        return IntPtr.Zero;
-                }
             }
 
             return _previousWindowProcedure != IntPtr.Zero
@@ -455,138 +367,8 @@ namespace TeamOverlay.Platform.Windows
                 : WindowsNativeMethods.DefWindowProc(windowHandle, message, wordParameter, longParameter);
         }
 
-        private void AddTrayIcon()
-        {
-            if (_windowHandle == IntPtr.Zero || _trayAdded)
-            {
-                return;
-            }
-
-            var icon = WindowsNativeMethods.SendMessage(
-                _windowHandle,
-                WindowsNativeMethods.WmGetIcon,
-                new IntPtr(WindowsNativeMethods.IconSmall2),
-                IntPtr.Zero);
-            if (icon == IntPtr.Zero)
-            {
-                icon = WindowsNativeMethods.SendMessage(
-                    _windowHandle,
-                    WindowsNativeMethods.WmGetIcon,
-                    new IntPtr(WindowsNativeMethods.IconSmall),
-                    IntPtr.Zero);
-            }
-
-            if (icon == IntPtr.Zero)
-            {
-                icon = WindowsNativeMethods.GetClassLongPointer(
-                    _windowHandle,
-                    WindowsNativeMethods.GclpHIconSmall);
-            }
-
-            if (icon == IntPtr.Zero)
-            {
-                icon = WindowsNativeMethods.LoadIcon(
-                    IntPtr.Zero,
-                    new IntPtr(WindowsNativeMethods.IdiApplication));
-            }
-
-            _trayData = new WindowsNativeMethods.NotifyIconData
-            {
-                cbSize = (uint)Marshal.SizeOf(typeof(WindowsNativeMethods.NotifyIconData)),
-                hWnd = _windowHandle,
-                uID = 1,
-                uFlags = WindowsNativeMethods.NifMessage |
-                         WindowsNativeMethods.NifIcon |
-                         WindowsNativeMethods.NifTip,
-                uCallbackMessage = WindowsNativeMethods.TrayCallbackMessage,
-                hIcon = icon,
-                szTip = "Team Overlay",
-                uTimeoutOrVersion = NotifyIconVersion4
-            };
-
-            _trayAdded = WindowsNativeMethods.ShellNotifyIcon(
-                WindowsNativeMethods.NimAdd,
-                ref _trayData);
-            if (_trayAdded)
-            {
-                WindowsNativeMethods.ShellNotifyIcon(NimSetVersion, ref _trayData);
-            }
-        }
-
-        private void ShowTrayMenu()
-        {
-            if (!EnsureWindowHandle())
-            {
-                return;
-            }
-
-            var menu = WindowsNativeMethods.CreatePopupMenu();
-            if (menu == IntPtr.Zero)
-            {
-                return;
-            }
-
-            try
-            {
-                WindowsNativeMethods.AppendMenu(
-                    menu,
-                    WindowsNativeMethods.MfString,
-                    new UIntPtr(MenuShow),
-                    "열기");
-                WindowsNativeMethods.AppendMenu(
-                    menu,
-                    WindowsNativeMethods.MfSeparator,
-                    UIntPtr.Zero,
-                    string.Empty);
-                WindowsNativeMethods.AppendMenu(
-                    menu,
-                    WindowsNativeMethods.MfString,
-                    new UIntPtr(MenuClockOutAndExit),
-                    "퇴근 후 종료");
-
-                WindowsNativeMethods.GetCursorPos(out var point);
-                WindowsNativeMethods.SetForegroundWindow(_windowHandle);
-                var command = WindowsNativeMethods.TrackPopupMenu(
-                    menu,
-                    WindowsNativeMethods.TpmRightButton |
-                    WindowsNativeMethods.TpmNoNotify |
-                    WindowsNativeMethods.TpmReturnCommand,
-                    point.X,
-                    point.Y,
-                    0,
-                    _windowHandle,
-                    IntPtr.Zero);
-                WindowsNativeMethods.PostMessage(
-                    _windowHandle,
-                    WindowsNativeMethods.WmNull,
-                    IntPtr.Zero,
-                    IntPtr.Zero);
-
-                if (command == MenuShow)
-                {
-                    ShowFromTray();
-                }
-                else if (command == MenuClockOutAndExit)
-                {
-                    ClockOutAndExitRequested?.Invoke();
-                }
-            }
-            finally
-            {
-                WindowsNativeMethods.DestroyMenu(menu);
-            }
-        }
-
         private void CleanupNativeResources()
         {
-            if (_trayAdded)
-            {
-                WindowsNativeMethods.ShellNotifyIcon(
-                    WindowsNativeMethods.NimDelete,
-                    ref _trayData);
-                _trayAdded = false;
-            }
-
             if (_windowHandle != IntPtr.Zero &&
                 _previousWindowProcedure != IntPtr.Zero &&
                 WindowsNativeMethods.IsWindow(_windowHandle))

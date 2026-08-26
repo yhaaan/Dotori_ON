@@ -24,7 +24,6 @@ namespace TeamOverlay.UI
         [SerializeField] private Button _fakeEventButton;
         [SerializeField] private Button _topmostButton;
         [SerializeField] private Button _minimizeButton;
-        [SerializeField] private Button _hideToTrayButton;
         [SerializeField] private Button _exitButton;
         [SerializeField] private Button _switchAccountButton;
         [SerializeField] private Text _topmostLabel;
@@ -40,7 +39,6 @@ namespace TeamOverlay.UI
         public event Action FakeCheckInRequested;
         public event Action AlwaysOnTopToggleRequested;
         public event Action MinimizeRequested;
-        public event Action CloseToTrayRequested;
         public event Action ExitRequested;
         public event Action SwitchAccountRequested;
 
@@ -61,7 +59,6 @@ namespace TeamOverlay.UI
             AddListener(_fakeEventButton, () => FakeCheckInRequested?.Invoke());
             AddListener(_topmostButton, () => AlwaysOnTopToggleRequested?.Invoke());
             AddListener(_minimizeButton, () => MinimizeRequested?.Invoke());
-            AddListener(_hideToTrayButton, () => CloseToTrayRequested?.Invoke());
             AddListener(_exitButton, () => ExitRequested?.Invoke());
             AddListener(_switchAccountButton, () => SwitchAccountRequested?.Invoke());
 

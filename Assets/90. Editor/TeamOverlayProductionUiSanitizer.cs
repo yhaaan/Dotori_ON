@@ -29,7 +29,7 @@ namespace TeamOverlay.Editor
 
                 Object.DestroyImmediate(fake.gameObject);
                 var drag = root.transform.Find("WindowBackground/TopBar/WindowDragArea") as RectTransform;
-                if (drag != null) drag.offsetMax = new Vector2(-208f, drag.offsetMax.y);
+                if (drag != null) drag.offsetMax = new Vector2(-163f, drag.offsetMax.y);
                 PrefabUtility.SaveAsPrefabAsset(root, TeamOverlayPrefabBuilder.MainViewPath);
                 Debug.Log("Removed development-only fake check-in from the production TeamOverlayCanvas prefab.");
             }
