@@ -80,16 +80,24 @@ be exercised without a network. Identity still uses the real project either way.
 
 ## Verification
 
-- All three assemblies compile clean against the Unity 6000.3.8f1 Roslyn
-  toolchain with the project's own compile arguments.
-- `SupabaseTeamBackendTests` covers state mapping, inactive-member filtering,
-  first-snapshot silence, check-in and activity-change event derivation, session
-  capture for heartbeats, heartbeat suppression without a session, session
-  forgetting on a closed session, and the server-only checkout reason guard.
-- **The EditMode suite has not been executed for this milestone.** The Unity
-  Editor held the project lock, so batch-mode test execution was unavailable. Run
-  Test Runner before treating this milestone as verified.
-- No live request has been made against the hosted project yet.
+- Unity EditMode tests: **34 passed, 0 failed** (batch mode, Unity 6000.3.8f1).
+  No compile errors, and the import left no asset reserialized.
+- The 11 new `SupabaseTeamBackendTests` cover state mapping, inactive-member
+  filtering, first-snapshot silence, check-in and activity-change event
+  derivation, session capture for heartbeats, heartbeat suppression without a
+  session, session forgetting on a closed session, and the server-only checkout
+  reason guard.
+- `PrefabAssetTests` passing also confirms the recovered UI scripts kept their
+  original GUIDs, that the hand-edited `_switchAccountButton` reference in
+  `TeamOverlayCanvas.prefab` resolves, and that the app prefab is reachable at its
+  new `Assets/Resources/TeamOverlay` path.
+- No live request has been made against the hosted project yet. The first real
+  check-in against Supabase is still unexercised.
+
+Evidence is stored under ignored `Logs/TeamOverlayValidation`:
+
+- `editmode-m4.xml`
+- `editmode-m4.log`
 
 ## Current boundary
 
