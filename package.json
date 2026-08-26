@@ -1,0 +1,12 @@
+{
+  "name": "project-ddd-team-overlay",
+  "private": true,
+  "scripts": {
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:reset": "supabase db reset"
+  },
+  "devDependencies": {
+    "supabase": "2.115.0"
+  }
+}
