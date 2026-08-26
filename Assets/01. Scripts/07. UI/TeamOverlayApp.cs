@@ -376,16 +376,31 @@ namespace TeamOverlay.UI
             }
 
             AdoptLegacyCredentialIfUnclaimed(validation.UniqueNameKey);
+            var sessionStore = new WindowsCredentialSupabaseAuthSessionStore(
+                CredentialTargetFor(validation.UniqueNameKey));
             _supabaseIdentity = new SupabaseIdentityClient(
                 SupabaseProjectConfig.ProjectUrl,
                 SupabaseProjectConfig.PublishableKey,
                 _supabaseTransport,
-                new WindowsCredentialSupabaseAuthSessionStore(CredentialTargetFor(validation.UniqueNameKey)));
+                sessionStore);
 
             var bootstrap = await _supabaseIdentity.InitializeAsync(cancellationToken);
             if (bootstrap.Member == null)
             {
-                return await _supabaseIdentity.ClaimMemberNameAsync(validation.DisplayName, cancellationToken);
+                try
+                {
+                    return await _supabaseIdentity.ClaimMemberNameAsync(validation.DisplayName, cancellationToken);
+                }
+                catch (SupabaseApiException) when (bootstrap.CreatedAnonymousUser)
+                {
+                    // Signing in has to happen before a name can be claimed, so a
+                    // rejected name leaves behind an anonymous user that owns
+                    // nothing. Drop its credential instead of keeping one dead
+                    // entry per rejected attempt; the client cannot delete the Auth
+                    // user itself.
+                    DiscardUnclaimedCredential(sessionStore);
+                    throw;
+                }
             }
 
             var claimedKey = DisplayNamePolicy.Validate(bootstrap.Member.DisplayName).UniqueNameKey;
@@ -845,6 +860,20 @@ namespace TeamOverlay.UI
             (_backend as IDisposable)?.Dispose();
             _supabaseTransport?.Dispose();
             _lifetime?.Dispose();
+        }
+
+        private static void DiscardUnclaimedCredential(ISupabaseAuthSessionStore sessionStore)
+        {
+            try
+            {
+                sessionStore.Delete();
+            }
+            catch (Exception exception)
+            {
+                // Losing the cleanup must never mask the claim failure the caller
+                // is about to report.
+                Debug.LogWarning("Could not discard the unclaimed Auth credential: " + exception.Message);
+            }
         }
 
         private static string CredentialTargetFor(string uniqueNameKey)
