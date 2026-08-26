@@ -37,6 +37,10 @@ namespace TeamOverlay.Platform.Windows
         public event Action SessionEndingRequested;
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        public const int OverlayWindowWidth = 480;
+        public const int CompactWindowHeight = 220;
+        public const int StatisticsWindowHeight = 620;
+
         private static WindowsOverlayWindow _activeInstance;
 
         private WindowsNativeMethods.WindowProcedure _windowProcedure;
@@ -51,6 +55,27 @@ namespace TeamOverlay.Platform.Windows
         private int _sessionEndPending;
         private bool _sessionEndReported;
 #endif
+
+        public void SetWindowHeight(int height)
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            if (!EnsureWindowHandle())
+            {
+                return;
+            }
+
+            WindowsNativeMethods.SetWindowPos(
+                _windowHandle,
+                IntPtr.Zero,
+                0,
+                0,
+                OverlayWindowWidth,
+                Math.Max(1, height),
+                WindowsNativeMethods.SwpNoMove |
+                WindowsNativeMethods.SwpNoZOrder |
+                WindowsNativeMethods.SwpNoActivate);
+#endif
+        }
 
         public bool Configure()
         {
@@ -277,8 +302,8 @@ namespace TeamOverlay.Platform.Windows
                 IntPtr.Zero,
                 0,
                 0,
-                480,
-                220,
+                OverlayWindowWidth,
+                CompactWindowHeight,
                 WindowsNativeMethods.SwpNoMove |
                 WindowsNativeMethods.SwpNoZOrder |
                 WindowsNativeMethods.SwpNoActivate |
