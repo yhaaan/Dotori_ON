@@ -163,7 +163,12 @@ namespace TeamOverlay.UI
                 }
 
                 var profile = loadResult.Profile;
-                var member = await SignInAsync(DisplayNamePolicy.Validate(profile.DisplayName), _lifetime.Token);
+                // Only the profile this PC is already signed in as may inherit the
+                // pre-upgrade credential.
+                var member = await SignInAsync(
+                    DisplayNamePolicy.Validate(profile.DisplayName),
+                    adoptLegacyCredential: true,
+                    _lifetime.Token);
                 ActivateIdentity(profile, member);
                 await RefreshStateAsync();
                 _view.ShowFeedback(RestoredProfileFeedback(loadResult));
@@ -241,7 +246,7 @@ namespace TeamOverlay.UI
             _firstRunNameView.SetBusy(true);
             try
             {
-                var remoteMember = await SignInAsync(validation, _lifetime.Token);
+                var remoteMember = await SignInAsync(validation, adoptLegacyCredential: false, _lifetime.Token);
                 var profile = EnsureLocalProfile(validation, remoteMember);
                 ActivateIdentity(profile, remoteMember);
                 await RefreshStateAsync();
@@ -368,6 +373,7 @@ namespace TeamOverlay.UI
         /// </summary>
         private async Task<SupabaseMemberRecord> SignInAsync(
             DisplayNameValidationResult validation,
+            bool adoptLegacyCredential,
             CancellationToken cancellationToken)
         {
             if (!validation.IsValid)
@@ -375,7 +381,8 @@ namespace TeamOverlay.UI
                 throw new ArgumentException("The display name is invalid.", nameof(validation));
             }
 
-            AdoptLegacyCredentialIfUnclaimed(validation.UniqueNameKey);
+            var adopted = adoptLegacyCredential
+                          && AdoptLegacyCredentialIfUnclaimed(validation.UniqueNameKey);
             var sessionStore = new WindowsCredentialSupabaseAuthSessionStore(
                 CredentialTargetFor(validation.UniqueNameKey));
             _supabaseIdentity = new SupabaseIdentityClient(
@@ -406,6 +413,14 @@ namespace TeamOverlay.UI
             var claimedKey = DisplayNamePolicy.Validate(bootstrap.Member.DisplayName).UniqueNameKey;
             if (!string.Equals(claimedKey, validation.UniqueNameKey, StringComparison.Ordinal))
             {
+                if (adopted)
+                {
+                    // The adopted session turned out to belong to another name, so
+                    // undo the copy instead of leaving a credential filed under a
+                    // name it does not own.
+                    DiscardUnclaimedCredential(sessionStore);
+                }
+
                 throw new SupabaseIdentityRecoveryException(
                     "이 PC에 저장된 로그인 세션은 '" + bootstrap.Member.DisplayName +
                     "' 계정입니다. 자동으로 덮어쓰지 않았습니다.",
@@ -886,25 +901,35 @@ namespace TeamOverlay.UI
         /// The first sign-in after upgrading adopts it so the existing member is not
         /// stranded, and later names get their own credential.
         /// </summary>
-        private static void AdoptLegacyCredentialIfUnclaimed(string uniqueNameKey)
+        /// <summary>
+        /// The legacy credential belongs to whichever name it already claimed, so
+        /// it may only be adopted for that same name. Copying it under a different
+        /// name would resolve every new sign-in back to the old member and make
+        /// signing in as somebody else impossible.
+        /// </summary>
+        private static bool AdoptLegacyCredentialIfUnclaimed(string uniqueNameKey)
         {
             try
             {
                 var scoped = new WindowsCredentialSupabaseAuthSessionStore(CredentialTargetFor(uniqueNameKey));
                 if (scoped.TryLoad(out _))
                 {
-                    return;
+                    return false;
                 }
 
                 var legacy = new WindowsCredentialSupabaseAuthSessionStore(SupabaseProjectConfig.CredentialTarget);
-                if (legacy.TryLoad(out var legacySession))
+                if (!legacy.TryLoad(out var legacySession))
                 {
-                    scoped.Save(legacySession);
+                    return false;
                 }
+
+                scoped.Save(legacySession);
+                return true;
             }
             catch (Exception exception)
             {
                 Debug.LogWarning("Could not migrate the legacy Auth credential: " + exception.Message);
+                return false;
             }
         }
 
