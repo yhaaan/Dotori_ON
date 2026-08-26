@@ -114,6 +114,32 @@ namespace TeamOverlay.Tests.EditMode
             Assert.That(transport.Requests[1].Body, Does.Contain("김 하늘"));
         }
 
+        [Test]
+        public async Task GetTeamCapacity_ReadsSlotUsageWithoutASession()
+        {
+            var transport = new QueueTransport(Ok("[{\"occupied\":4,\"capacity\":4}]"));
+            var client = CreateClient(transport, new MemorySessionStore());
+
+            var capacity = await client.GetTeamCapacityAsync(CancellationToken.None);
+
+            Assert.That(capacity.Occupied, Is.EqualTo(4));
+            Assert.That(capacity.Capacity, Is.EqualTo(4));
+            Assert.That(capacity.HasRoom, Is.False);
+            Assert.That(transport.Requests[0].Url, Does.EndWith("/rest/v1/rpc/team_capacity"));
+            Assert.That(transport.Requests[0].Headers.ContainsKey("Authorization"), Is.False);
+        }
+
+        [Test]
+        public async Task GetTeamCapacity_ReportsRoomWhenSlotsRemain()
+        {
+            var transport = new QueueTransport(Ok("[{\"occupied\":1,\"capacity\":4}]"));
+            var client = CreateClient(transport, new MemorySessionStore());
+
+            var capacity = await client.GetTeamCapacityAsync(CancellationToken.None);
+
+            Assert.That(capacity.HasRoom, Is.True);
+        }
+
         private static SupabaseIdentityClient CreateClient(
             QueueTransport transport,
             MemorySessionStore store)

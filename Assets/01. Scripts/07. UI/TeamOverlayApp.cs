@@ -391,6 +391,21 @@ namespace TeamOverlay.UI
                 _supabaseTransport,
                 sessionStore);
 
+            // Without a stored session InitializeAsync will create an anonymous Auth
+            // user, and a rejected claim afterwards strands it: the client has no
+            // permission to delete it, and only the scheduled server sweep can.
+            // Checking capacity first removes the common rejection entirely.
+            if (!HasStoredSession(sessionStore))
+            {
+                var capacity = await _supabaseIdentity.GetTeamCapacityAsync(cancellationToken);
+                if (!capacity.HasRoom)
+                {
+                    throw new SupabaseIdentityRecoveryException(
+                        "팀의 " + capacity.Capacity + "자리가 모두 찼습니다. 기존 팀원이 나가야 합류할 수 있습니다.",
+                        null);
+                }
+            }
+
             var bootstrap = await _supabaseIdentity.InitializeAsync(cancellationToken);
             if (bootstrap.Member == null)
             {
@@ -875,6 +890,21 @@ namespace TeamOverlay.UI
             (_backend as IDisposable)?.Dispose();
             _supabaseTransport?.Dispose();
             _lifetime?.Dispose();
+        }
+
+        private static bool HasStoredSession(ISupabaseAuthSessionStore sessionStore)
+        {
+            try
+            {
+                return sessionStore.TryLoad(out _);
+            }
+            catch (Exception exception)
+            {
+                // A corrupt or unreadable credential is handled by InitializeAsync;
+                // here it only means we cannot promise a session already exists.
+                Debug.LogWarning("Could not read the stored Auth session: " + exception.Message);
+                return false;
+            }
         }
 
         private static void DiscardUnclaimedCredential(ISupabaseAuthSessionStore sessionStore)

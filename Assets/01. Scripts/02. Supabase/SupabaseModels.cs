@@ -73,6 +73,26 @@ namespace TeamOverlay.Supabase
         public int SortOrder { get; }
     }
 
+    /// <summary>
+    /// Slot usage for the team, readable before joining. A client that knows the
+    /// team is full can refuse to sign up rather than creating an anonymous Auth
+    /// user that <c>claim_member_name</c> is guaranteed to reject.
+    /// </summary>
+    public sealed class SupabaseTeamCapacity
+    {
+        public SupabaseTeamCapacity(int occupied, int capacity)
+        {
+            Occupied = occupied;
+            Capacity = capacity;
+        }
+
+        public int Occupied { get; }
+
+        public int Capacity { get; }
+
+        public bool HasRoom => Occupied < Capacity;
+    }
+
     public sealed class SupabaseIdentityBootstrap
     {
         public SupabaseIdentityBootstrap(

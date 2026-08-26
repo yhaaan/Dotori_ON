@@ -82,6 +82,41 @@ namespace TeamOverlay.Supabase
         }
 
         /// <summary>
+        /// Reads the team's slot usage without a session. Callable before signup so
+        /// a full team can be reported without leaving an anonymous Auth user
+        /// behind, which the client has no permission to delete afterwards.
+        /// </summary>
+        public async Task<SupabaseTeamCapacity> GetTeamCapacityAsync(
+            CancellationToken cancellationToken)
+        {
+            var response = await _transport.SendAsync(
+                CreatePublicRequest(
+                    "POST",
+                    _projectUrl + "/rest/v1/rpc/team_capacity",
+                    "{}"),
+                cancellationToken);
+            EnsureSuccess(response);
+
+            TeamCapacityArrayDocument document;
+            try
+            {
+                document = JsonUtility.FromJson<TeamCapacityArrayDocument>(
+                    "{\"items\":" + response.Body + "}");
+            }
+            catch (ArgumentException exception)
+            {
+                throw new InvalidOperationException("Supabase 팀 정원 응답을 읽지 못했습니다.", exception);
+            }
+
+            if (document?.items == null || document.items.Length == 0)
+            {
+                throw new InvalidOperationException("Supabase 팀 정원 응답이 비어 있습니다.");
+            }
+
+            return new SupabaseTeamCapacity(document.items[0].occupied, document.items[0].capacity);
+        }
+
+        /// <summary>
         /// Returns a session whose access token is still valid, rotating it first
         /// when it is inside the refresh window. Every authorized caller goes
         /// through here so only one component ever spends a refresh token.
@@ -346,6 +381,19 @@ namespace TeamOverlay.Supabase
         private sealed class MemberArrayDocument
         {
             public MemberDocument[] items;
+        }
+
+        [Serializable]
+        private sealed class TeamCapacityArrayDocument
+        {
+            public TeamCapacityDocument[] items;
+        }
+
+        [Serializable]
+        private sealed class TeamCapacityDocument
+        {
+            public int occupied;
+            public int capacity;
         }
 
         [Serializable]
