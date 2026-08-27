@@ -33,13 +33,14 @@ namespace TeamOverlay.Tests.EditMode
             AssertReference(cardData, "_nudgeButton");
             AssertReference(cardData, "_avatarButton");
             AssertReference(cardData, "_avatarIcon");
+            AssertReference(cardData, "_nameDoubleClick");
             var cards = mainData.FindProperty("_cards");
             Assert.That(cards.arraySize, Is.EqualTo(4));
             for (var index = 0; index < cards.arraySize; index++)
                 Assert.That(cards.GetArrayElementAtIndex(index).objectReferenceValue, Is.Not.Null);
             AssertReference(mainData, "_checkInButton");
             AssertReference(mainData, "_exitButton");
-            AssertReference(mainData, "_switchAccountButton");
+            AssertReference(mainData, "_miniModeButton");
             AssertReference(mainData, "_statsButton");
             AssertReference(mainData, "_statisticsPanel");
             var statisticsPanel = mainData.FindProperty("_statisticsPanel").objectReferenceValue;
@@ -104,6 +105,41 @@ namespace TeamOverlay.Tests.EditMode
             Assert.That(
                 main.transform.Find("AvatarPickerPanel/Viewport/Content/OptionTemplate").gameObject.activeSelf,
                 Is.False);
+            AssertReference(mainData, "_miniPanel");
+            var miniPanel = mainData.FindProperty("_miniPanel").objectReferenceValue;
+            var miniData = new SerializedObject(miniPanel);
+            AssertReference(miniData, "_dragHandle");
+            Assert.That(miniData.FindProperty("_rows").arraySize, Is.EqualTo(4));
+            foreach (var row in main.GetComponentsInChildren<MiniMemberRowView>(true))
+            {
+                var rowData = new SerializedObject(row);
+                AssertReference(rowData, "_nameText");
+                AssertReference(rowData, "_pill");
+                AssertReference(rowData, "_dot");
+                AssertReference(rowData, "_statusText");
+            }
+            Assert.That(main.GetComponentsInChildren<MiniMemberRowView>(true).Length, Is.EqualTo(4));
+            // A sibling of the window background, which it replaces rather than
+            // folds out of, and switched off until someone asks for it.
+            var miniRect = main.transform.Find("MiniOverlayPanel").GetComponent<RectTransform>();
+            Assert.That(miniRect.gameObject.activeSelf, Is.False);
+            // Keep in sync with WindowsOverlayWindow.MiniWindowWidth and
+            // MiniWindowHeight: the window is resized to exactly this, so a panel
+            // that drifted would come back clipped or ringed with dead space.
+            Assert.That(miniRect.sizeDelta, Is.EqualTo(new Vector2(130f, 150f)));
+            // Exactly two things in the mini overlay take clicks: the body,
+            // whose double click restores the full overlay, and the strip that
+            // drags the window. A row that ate a click would be a dead spot the
+            // overlay cannot be restored from.
+            Assert.That(miniRect.GetComponent<Image>().raycastTarget, Is.True);
+            Assert.That(
+                main.transform.Find("MiniOverlayPanel/MiniDragStrip").GetComponent<Image>().raycastTarget,
+                Is.True);
+            foreach (var row in main.GetComponentsInChildren<MiniMemberRowView>(true))
+            {
+                foreach (var graphic in row.GetComponentsInChildren<Graphic>(true))
+                    Assert.That(graphic.raycastTarget, Is.False, graphic.name);
+            }
             AssertReference(mainData, "_versionLabel");
             AssertReference(mainData, "_teamNudgeButton");
             AssertReference(mainData, "_statusNoteInput");
