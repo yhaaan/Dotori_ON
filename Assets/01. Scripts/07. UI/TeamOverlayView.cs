@@ -39,7 +39,10 @@ namespace TeamOverlay.UI
         [SerializeField] private MiniOverlayPanelView _miniPanel;
 
         private readonly List<Button> _interactiveButtons = new List<Button>();
+        private Canvas _canvas;
         private CanvasScaler _canvasScaler;
+        private float _lastScaleFactor;
+        private int _pendingTextRefreshes;
         private CanvasScaler.ScaleMode _fullScaleMode;
         private Vector2 _fullReferenceResolution;
         private float _fullScaleFactor;
@@ -104,6 +107,8 @@ namespace TeamOverlay.UI
             UiFactory.EnsureEventSystem();
             // Captured rather than hardcoded so tuning the scaler in the prefab
             // survives a trip through the mini overlay.
+            _canvas = GetComponent<Canvas>();
+            _lastScaleFactor = _canvas != null ? _canvas.scaleFactor : 1f;
             _canvasScaler = GetComponent<CanvasScaler>();
             if (_canvasScaler != null)
             {
@@ -201,6 +206,8 @@ namespace TeamOverlay.UI
                 _windowBackground.gameObject.SetActive(!visible);
             }
 
+            RefreshTextRenderingSoon();
+
             if (_canvasScaler == null)
             {
                 return;
@@ -216,6 +223,54 @@ namespace TeamOverlay.UI
             _canvasScaler.uiScaleMode = _fullScaleMode;
             _canvasScaler.referenceResolution = _fullReferenceResolution;
             _canvasScaler.scaleFactor = _fullScaleFactor;
+        }
+
+        /// <summary>
+        /// A dynamic font atlas is repacked whenever glyphs are wanted at a size
+        /// it does not hold yet, which moves every glyph already in it. uGUI
+        /// keeps the vertices it built for text that has not changed, so those
+        /// keep pointing at where their glyph used to be and the text comes back
+        /// smeared while everything else looks right. Swapping in the mini
+        /// overlay does exactly that: it asks for smaller type while the full
+        /// overlay is switched off and cannot notice.
+        ///
+        /// Two things make the size change, and both are covered here: the swap
+        /// itself, and the window resize Unity applies a frame or two later,
+        /// which briefly leaves the full layout scaled to a 130 wide window.
+        /// </summary>
+        private void Update()
+        {
+            if (_canvas == null)
+            {
+                return;
+            }
+
+            var scaleFactor = _canvas.scaleFactor;
+            if (!Mathf.Approximately(scaleFactor, _lastScaleFactor))
+            {
+                _lastScaleFactor = scaleFactor;
+                RefreshTextRenderingSoon();
+            }
+
+            if (_pendingTextRefreshes <= 0)
+            {
+                return;
+            }
+
+            _pendingTextRefreshes--;
+            foreach (var text in GetComponentsInChildren<Text>(true))
+            {
+                text.FontTextureChanged();
+            }
+        }
+
+        /// <summary>
+        /// Spread over a few frames rather than done once, because the resize
+        /// that settles the scale has not landed yet on the frame that asks.
+        /// </summary>
+        private void RefreshTextRenderingSoon()
+        {
+            _pendingTextRefreshes = 3;
         }
 
         /// <summary>Hands the icon artwork to the cards and the picker.</summary>

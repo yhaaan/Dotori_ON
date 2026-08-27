@@ -56,6 +56,8 @@
 
 반투명은 `WS_EX_LAYERED` + `SetLayeredWindowAttributes`로 창 전체에 균일하게 겁니다(`MiniWindowAlpha = 225`). 글자까지 같이 비치는 방식이며, 배경만 투명하게 하려면 프레임버퍼 알파가 필요해서 URP 쪽 작업이 따로 붙습니다. **레이어드 창은 DXGI 플립 모델과 같이 못 쓰기 때문에 Player Settings의 `Use DXGI Flip Model Swapchain`이 꺼져 있어야 합니다.** 다시 켜면 반투명이 조용히 사라집니다.
 
+소형 모드를 오갈 때는 `TeamOverlayView`가 몇 프레임에 걸쳐 모든 `Text`의 정점 캐시를 버립니다. 동적 폰트 아틀라스는 새 크기의 글리프를 요청받으면 다시 패킹되면서 이미 들어 있던 글리프 위치를 전부 바꾸는데, uGUI는 내용이 그대로면 예전 정점을 재사용하기 때문에 UV가 옛 자리를 가리켜 **텍스트만** 뭉개집니다. 실제로 그렇게 한 번 깨졌습니다. 이 무효화를 지우면 다시 재현됩니다.
+
 Windows는 시스템 최소 창 폭(보통 130~140px) 아래로는 창을 줄여 주지 않습니다. `WindowsOverlayWindow`가 `WM_GETMINMAXINFO`에서 그 하한을 낮추기 때문에 130이 통과합니다.
 
 마지막 상태는 `PlayerPrefs`의 `TeamOverlay.MiniMode`에 남아 다음 실행 때 그대로 켜집니다. 이름변경으로 최초 이름 화면에 돌아갈 때는 창만 원래 크기로 되돌리고 이 값은 건드리지 않으므로, 다시 로그인하면 남겨 둔 대로 뜹니다.
