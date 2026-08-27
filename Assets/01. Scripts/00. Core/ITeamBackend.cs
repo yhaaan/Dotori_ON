@@ -26,6 +26,12 @@ namespace TeamOverlay.Core
         /// <summary>Sets the local member's card note; null or blank clears it.</summary>
         Task SetStatusNoteAsync(string note, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Sets the local member's profile icon to a catalog key. Null or blank
+        /// restores the default, which draws the name initial instead.
+        /// </summary>
+        Task SetAvatarKeyAsync(string avatarKey, CancellationToken cancellationToken);
+
         Task SendHeartbeatAsync(CancellationToken cancellationToken);
     }
 }

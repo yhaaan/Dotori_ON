@@ -41,6 +41,9 @@ namespace TeamOverlay.UI
 
         [Tooltip("효과음 설정 에셋. 비워 두면 코드로 만든 기본 알림음만 납니다.")]
         [SerializeField] private TeamOverlaySounds _sounds;
+
+        [Tooltip("프로필 아이콘 목록 에셋. 비워 두면 아이콘 대신 이름 첫 글자만 보입니다.")]
+        [SerializeField] private TeamAvatarCatalog _avatarCatalog;
         [Header("Development")]
         [Tooltip("Runs the overlay against the in-memory roster instead of Supabase. Identity still uses the real project.")]
         [SerializeField] private bool _useMockBackend;
@@ -502,6 +505,10 @@ namespace TeamOverlay.UI
             _view.StatisticsPeriodChangeRequested += HandleStatisticsPeriodChangeRequested;
             _view.NudgeRequested += HandleNudgeRequested;
             _view.StatusNoteSubmitted += HandleStatusNoteSubmitted;
+            _view.AvatarPickerRequested += HandleAvatarPickerRequested;
+            _view.AvatarPickerCloseRequested += CloseAvatarPicker;
+            _view.AvatarPicked += HandleAvatarPicked;
+            _view.SetAvatarCatalog(_avatarCatalog);
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _firstRunNameView.Hide();
         }
@@ -529,6 +536,7 @@ namespace TeamOverlay.UI
         private void TeardownSession()
         {
             CloseStatisticsPanel();
+            CloseAvatarPicker();
             // Nothing still in flight may bind into the next session's panel.
             _statisticsRequestId++;
             if (_view != null)
@@ -571,6 +579,9 @@ namespace TeamOverlay.UI
             _view.StatisticsPeriodChangeRequested -= HandleStatisticsPeriodChangeRequested;
             _view.NudgeRequested -= HandleNudgeRequested;
             _view.StatusNoteSubmitted -= HandleStatusNoteSubmitted;
+            _view.AvatarPickerRequested -= HandleAvatarPickerRequested;
+            _view.AvatarPickerCloseRequested -= CloseAvatarPicker;
+            _view.AvatarPicked -= HandleAvatarPicked;
         }
 
         private bool IsLocalMemberClockedIn()
@@ -767,6 +778,46 @@ namespace TeamOverlay.UI
         {
             _view?.SetStatisticsVisible(false);
             _window?.RestoreCompactHeight();
+        }
+
+        /// <summary>
+        /// The two panels are mutually exclusive because each one moves the window
+        /// itself: opening both would leave the statistics panel's downward growth
+        /// and the picker's upward growth fighting over the same window rect.
+        /// </summary>
+        private void HandleAvatarPickerRequested()
+        {
+            if (_view == null || _backend == null || _quitting || _signOutInProgress)
+            {
+                return;
+            }
+
+            if (_view.IsAvatarPickerVisible)
+            {
+                CloseAvatarPicker();
+                return;
+            }
+
+            if (_view.IsStatisticsVisible)
+            {
+                CloseStatisticsPanel();
+            }
+
+            _view.SetAvatarPickerVisible(true);
+            _window.ExpandForAvatarPicker();
+        }
+
+        private void CloseAvatarPicker()
+        {
+            _view?.SetAvatarPickerVisible(false);
+            _window?.CollapseAvatarPicker();
+        }
+
+        private void HandleAvatarPicked(string avatarKey)
+        {
+            RunMutation(
+                token => _backend.SetAvatarKeyAsync(avatarKey, token),
+                "프로필 아이콘을 바꿨습니다.");
         }
 
         /// <summary>

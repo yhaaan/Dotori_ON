@@ -378,6 +378,18 @@ namespace TeamOverlay.Supabase
             await CallRpcAsync("set_status_note", body, cancellationToken);
         }
 
+        public async Task SetAvatarKeyAsync(string avatarKey, CancellationToken cancellationToken)
+        {
+            var body = JsonUtility.ToJson(new AvatarKeyRequest
+            {
+                p_member_id = _memberId.ToString("D"),
+                // The server normalises an empty key back to 'default', so
+                // clearing the icon does not need a call of its own.
+                p_avatar_key = string.IsNullOrWhiteSpace(avatarKey) ? string.Empty : avatarKey.Trim()
+            });
+            await CallRpcAsync("set_avatar_key", body, cancellationToken);
+        }
+
         public async Task SendHeartbeatAsync(CancellationToken cancellationToken)
         {
             Guid sessionId;
@@ -875,6 +887,13 @@ namespace TeamOverlay.Supabase
         {
             public string p_member_id;
             public string p_note;
+        }
+
+        [Serializable]
+        private sealed class AvatarKeyRequest
+        {
+            public string p_member_id;
+            public string p_avatar_key;
         }
 
         [Serializable]

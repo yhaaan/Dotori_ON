@@ -62,6 +62,17 @@ namespace TeamOverlay.Platform.Windows
             internal uint dwTimeout;
         }
 
+        internal const uint MonitorDefaultToNearest = 0x00000002;
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct MonitorInfo
+        {
+            internal uint cbSize;
+            internal Rect rcMonitor;
+            internal Rect rcWork;
+            internal uint dwFlags;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         internal struct Rect
         {
@@ -78,6 +89,13 @@ namespace TeamOverlay.Platform.Windows
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool EnumWindows(EnumerateWindowsProcedure procedure, IntPtr state);
+
+        [DllImport("user32.dll")]
+        internal static extern IntPtr MonitorFromWindow(IntPtr windowHandle, uint flags);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetMonitorInfoW(IntPtr monitor, ref MonitorInfo info);
 
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern uint GetWindowThreadProcessId(IntPtr windowHandle, out uint processId);

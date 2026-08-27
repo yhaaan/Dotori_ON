@@ -29,7 +29,10 @@ namespace TeamOverlay.Tests.EditMode
             Assert.That(app, Is.Not.Null);
 
             var mainData = new SerializedObject(main);
-            AssertReference(new SerializedObject(card), "_nudgeButton");
+            var cardData = new SerializedObject(card);
+            AssertReference(cardData, "_nudgeButton");
+            AssertReference(cardData, "_avatarButton");
+            AssertReference(cardData, "_avatarIcon");
             var cards = mainData.FindProperty("_cards");
             Assert.That(cards.arraySize, Is.EqualTo(4));
             for (var index = 0; index < cards.arraySize; index++)
@@ -81,6 +84,26 @@ namespace TeamOverlay.Tests.EditMode
             // The window grows by exactly the panel height, so the two constants
             // have to agree or the compact layout comes back clipped.
             Assert.That(panelRect.sizeDelta.y, Is.EqualTo(424f));
+            AssertReference(mainData, "_avatarPickerPanel");
+            AssertReference(mainData, "_windowBackground");
+            var avatarPanel = mainData.FindProperty("_avatarPickerPanel").objectReferenceValue;
+            var avatarData = new SerializedObject(avatarPanel);
+            AssertReference(avatarData, "_grid");
+            AssertReference(avatarData, "_optionTemplate");
+            AssertReference(avatarData, "_confirmButton");
+            // A sibling of the window background, not a child of it: the picker
+            // owns the top strip and the background is pushed down under it,
+            // which is what lets the window grow upwards.
+            var avatarRect = main.transform.Find("AvatarPickerPanel").GetComponent<RectTransform>();
+            Assert.That(avatarRect.anchoredPosition.y, Is.EqualTo(0f));
+            // Keep in sync with WindowsOverlayWindow.AvatarPickerPanelHeight: the
+            // window grows upwards by exactly this much when the picker opens.
+            Assert.That(avatarRect.sizeDelta.y, Is.EqualTo(160f));
+            // The grid cells are cloned at runtime, so the template must ship
+            // switched off or the prefab shows a cell that belongs to no icon.
+            Assert.That(
+                main.transform.Find("AvatarPickerPanel/Viewport/Content/OptionTemplate").gameObject.activeSelf,
+                Is.False);
             AssertReference(mainData, "_versionLabel");
             AssertReference(mainData, "_teamNudgeButton");
             AssertReference(mainData, "_statusNoteInput");

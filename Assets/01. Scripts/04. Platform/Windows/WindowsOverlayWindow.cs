@@ -46,6 +46,13 @@ namespace TeamOverlay.Platform.Windows
         /// </summary>
         public const int StatisticsPanelHeight = 424;
 
+        /// <summary>
+        /// Extra height the avatar picker needs. Unlike the statistics panel this
+        /// one is taken off the top of the window, so it also mirrors the panel's
+        /// height in the prefab; PrefabAssetTests pins the pair.
+        /// </summary>
+        public const int AvatarPickerPanelHeight = 160;
+
         /// <summary>Backstop for a window whose messages no longer reach us.</summary>
         private const float WindowAuditIntervalSeconds = 5f;
 
@@ -63,6 +70,8 @@ namespace TeamOverlay.Platform.Windows
         private int _sessionEndPending;
         private bool _sessionEndReported;
         private bool _statisticsExpanded;
+        private bool _avatarPickerExpanded;
+        private bool _growsUpward;
         private int _windowStateDirty;
         private float _nextWindowAudit;
 #endif
@@ -72,6 +81,32 @@ namespace TeamOverlay.Platform.Windows
         {
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
             _statisticsExpanded = true;
+            _growsUpward = false;
+            ApplyContentSize();
+#endif
+        }
+
+        /// <summary>
+        /// Grows the window upwards so the avatar picker fits above the overlay.
+        /// It opens over the cards rather than under the controls because that is
+        /// where the icon being changed is; the bottom edge stays where the person
+        /// put the window.
+        /// </summary>
+        public void ExpandForAvatarPicker()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _avatarPickerExpanded = true;
+            _growsUpward = true;
+            ApplyContentSize();
+#endif
+        }
+
+        /// <summary>Shrinks the window back down from the avatar picker.</summary>
+        public void CollapseAvatarPicker()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _avatarPickerExpanded = false;
+            _growsUpward = true;
             ApplyContentSize();
 #endif
         }
@@ -107,6 +142,7 @@ namespace TeamOverlay.Platform.Windows
         {
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
             _statisticsExpanded = false;
+            _growsUpward = false;
             ApplyContentSize();
 #endif
         }
@@ -132,7 +168,9 @@ namespace TeamOverlay.Platform.Windows
                 return;
             }
 
-            var contentHeight = CompactWindowHeight + (_statisticsExpanded ? StatisticsPanelHeight : 0);
+            var contentHeight = CompactWindowHeight +
+                (_statisticsExpanded ? StatisticsPanelHeight : 0) +
+                (_avatarPickerExpanded ? AvatarPickerPanelHeight : 0);
             var widthDelta = OverlayWindowWidth - client.Width;
             var heightDelta = contentHeight - client.Height;
             if (widthDelta == 0 && heightDelta == 0)
@@ -140,16 +178,61 @@ namespace TeamOverlay.Platform.Windows
                 return;
             }
 
+            var left = window.Left;
+            var top = window.Top;
+            var flags = WindowsNativeMethods.SwpNoZOrder | WindowsNativeMethods.SwpNoActivate;
+            if (_growsUpward)
+            {
+                // Holding the bottom edge still is what makes the picker look like
+                // it unfolds upwards: every pixel gained is taken off the top.
+                // Correcting by the same delta the height moves by keeps this
+                // idempotent, so a second pass on the next tick is a no-op.
+                top -= heightDelta;
+                if (TryGetWorkArea(out var workArea) && top < workArea.Top)
+                {
+                    // Against the top of the screen there is nowhere to unfold
+                    // into, and a panel above the desktop cannot be clicked. Pin
+                    // the window there and let it grow down instead.
+                    top = workArea.Top;
+                }
+            }
+            else
+            {
+                flags |= WindowsNativeMethods.SwpNoMove;
+            }
+
             WindowsNativeMethods.SetWindowPos(
                 _windowHandle,
                 IntPtr.Zero,
-                0,
-                0,
+                left,
+                top,
                 Math.Max(1, window.Width + widthDelta),
                 Math.Max(1, window.Height + heightDelta),
-                WindowsNativeMethods.SwpNoMove |
-                WindowsNativeMethods.SwpNoZOrder |
-                WindowsNativeMethods.SwpNoActivate);
+                flags);
+        }
+
+        private bool TryGetWorkArea(out WindowsNativeMethods.Rect workArea)
+        {
+            workArea = default;
+            var monitor = WindowsNativeMethods.MonitorFromWindow(
+                _windowHandle,
+                WindowsNativeMethods.MonitorDefaultToNearest);
+            if (monitor == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            var info = new WindowsNativeMethods.MonitorInfo
+            {
+                cbSize = (uint)Marshal.SizeOf(typeof(WindowsNativeMethods.MonitorInfo))
+            };
+            if (!WindowsNativeMethods.GetMonitorInfoW(monitor, ref info))
+            {
+                return false;
+            }
+
+            workArea = info.rcWork;
+            return true;
         }
 
         /// <summary>

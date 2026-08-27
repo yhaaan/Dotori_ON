@@ -220,6 +220,44 @@ namespace TeamOverlay.Backend.Mock
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Unlike a note, an icon is not tied to a session, so this works while
+        /// clocked out. It publishes no event: the picture is not something a
+        /// teammate should be told about, only something they see next refresh.
+        /// </summary>
+        public Task SetAvatarKeyAsync(string avatarKey, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            lock (_gate)
+            {
+                ThrowIfDisposed();
+                var index = FindMemberIndex(LocalMemberId);
+                var current = _members[index];
+                var key = string.IsNullOrWhiteSpace(avatarKey) ? "default" : avatarKey.Trim();
+                if (string.Equals(current.AvatarKey, key, StringComparison.Ordinal))
+                {
+                    return Task.CompletedTask;
+                }
+
+                _members[index] = new MemberState(
+                    current.MemberId,
+                    current.DisplayName,
+                    key,
+                    current.SortOrder,
+                    current.AttendanceStatus,
+                    current.ActivityStatus,
+                    current.ConnectionStatus,
+                    current.CheckedInAtUtc,
+                    current.ActivityStartedAtUtc,
+                    current.LastHeartbeatAtUtc,
+                    current.LastCheckedOutAtUtc,
+                    GetUtcNow(),
+                    current.StatusNote);
+            }
+
+            return Task.CompletedTask;
+        }
+
         public Task SendHeartbeatAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();

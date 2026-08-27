@@ -76,6 +76,11 @@ namespace TeamOverlay.Backend.Mock
             return _inner.SetStatusNoteAsync(note, cancellationToken);
         }
 
+        public Task SetAvatarKeyAsync(string avatarKey, CancellationToken cancellationToken)
+        {
+            return _inner.SetAvatarKeyAsync(avatarKey, cancellationToken);
+        }
+
         public Task SendHeartbeatAsync(CancellationToken cancellationToken)
         {
             return _inner.SendHeartbeatAsync(cancellationToken);

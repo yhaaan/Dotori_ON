@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using TeamOverlay.Audio;
 using TeamOverlay.UI;
@@ -21,6 +22,42 @@ namespace TeamOverlay.Editor
         public const string ResourceFolder = "Assets/Resources/TeamOverlay";
         public const string AppPath = ResourceFolder + "/TeamOverlayApp.prefab";
         public const string SoundsPath = ResourceFolder + "/TeamOverlaySounds.asset";
+        public const string AvatarCatalogPath = ResourceFolder + "/TeamAvatarCatalog.asset";
+
+        /// <summary>Where the team drops profile icon images.</summary>
+        public const string AvatarSpriteFolder = "Assets/04. Avatars";
+
+        /// <summary>
+        /// The avatar picker's own height in the prefab. The window grows upwards
+        /// by exactly this much, so it has to match
+        /// <c>WindowsOverlayWindow.AvatarPickerPanelHeight</c>; PrefabAssetTests
+        /// pins the pair. Two rows of cells plus the heading fit in it.
+        /// </summary>
+        public const float AvatarPickerPanelHeight = 160f;
+
+        /// <summary>
+        /// How large a profile icon is drawn, on the card and in the picker
+        /// alike. The icon fills its tile edge to edge, so this is also the tile
+        /// size on the card. Pixel art divides into it cleanly at 24 (x2) and 16
+        /// (x3); 32 would land on a half pixel.
+        /// </summary>
+        internal const float AvatarIconSize = 48f;
+
+        /// <summary>Card geometry, in pixels from the top of the card.</summary>
+        internal const float CardAvatarTop = 24f;
+        internal const float CardNameTop = 73f;
+        internal const float CardStatusTop = 91f;
+        internal const float CardDetailTop = 109f;
+
+        /// <summary>
+        /// The picker cell is a little larger than the icon so the selected
+        /// colour survives as a ring around it. An icon that filled the cell
+        /// would hide the only mark saying which one is yours.
+        /// </summary>
+        internal const float AvatarCellPadding = 2f;
+        internal const float AvatarCellSize = AvatarIconSize + (AvatarCellPadding * 2f);
+        internal const float AvatarCellSpacing = 4f;
+        internal const int AvatarGridColumns = 8;
 
         [MenuItem("Team Overlay/Create Missing Editable UI Prefabs")]
         public static void CreateMissingPrefabs()
@@ -105,8 +142,9 @@ namespace TeamOverlay.Editor
                 var avatarRect = avatar.rectTransform;
                 avatarRect.anchorMin = avatarRect.anchorMax = new Vector2(0.5f, 1f);
                 avatarRect.pivot = new Vector2(0.5f, 1f);
-                avatarRect.anchoredPosition = new Vector2(0f, -25f);
-                avatarRect.sizeDelta = new Vector2(38f, 38f);
+                avatarRect.anchoredPosition = new Vector2(0f, -CardAvatarTop);
+                avatarRect.sizeDelta = new Vector2(AvatarIconSize, AvatarIconSize);
+                AttachAvatarPicking(avatar, out var avatarButton, out var avatarIcon);
                 var initial = UiFactory.CreateText("Initial", avatar.transform, font, 17,
                     TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
                 initial.text = "김";
@@ -114,11 +152,11 @@ namespace TeamOverlay.Editor
 
                 var name = UiFactory.CreateText("Name", root.transform, font, 13,
                     TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
-                SetCardLine(name, 66f, 18f);
+                SetCardLine(name, CardNameTop, 18f);
                 name.text = "김하늘";
                 var status = UiFactory.CreateText("Status", root.transform, font, 11,
                     TextAnchor.MiddleCenter, TeamOverlayPalette.Working, FontStyle.Bold);
-                SetCardLine(status, 84f, 18f);
+                SetCardLine(status, CardStatusTop, 18f);
                 status.text = "작업중";
                 var nudge = UiFactory.CreateButton("Nudge", root.transform, font, "\uCF55");
                 nudge.GetComponentInChildren<Text>().fontSize = 9;
@@ -130,12 +168,13 @@ namespace TeamOverlay.Editor
 
                 var detail = UiFactory.CreateText("Detail", root.transform, font, 9,
                     TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary);
-                SetCardLine(detail, 103f, 27f);
+                SetCardLine(detail, CardDetailTop, 27f);
                 detail.horizontalOverflow = HorizontalWrapMode.Wrap;
                 detail.text = "출근 09:00";
 
                 Assign(view,
                     ("_background", rootImage), ("_avatarBackground", avatar),
+                    ("_avatarIcon", avatarIcon), ("_avatarButton", avatarButton),
                     ("_avatarText", initial), ("_timerText", timer), ("_nameText", name),
                     ("_statusText", status), ("_detailText", detail), ("_nudgeButton", nudge));
                 return PrefabUtility.SaveAsPrefabAsset(root, CardPath).GetComponent<TeamMemberCardView>();
@@ -245,6 +284,11 @@ namespace TeamOverlay.Editor
                 UiFactory.Stretch(feedback.rectTransform, 4f, 0f, 4f, 31f);
 
                 var statisticsPanel = BuildStatisticsPanel(background.transform, font);
+                // A sibling of the window background rather than a child of it:
+                // the picker owns the top strip of the canvas and the background
+                // is pushed down under it, which is what lets the window grow
+                // upwards without moving anything inside the compact layout.
+                var avatarPicker = BuildAvatarPickerPanel(root.transform, font);
                 var view = root.GetComponent<TeamOverlayView>();
                 var serialized = new SerializedObject(view);
                 serialized.FindProperty("_cards").arraySize = cards.Length;
@@ -267,10 +311,127 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_teamNudgeButton", teamNudge);
                 Set(serialized, "_windowDragHandle", dragHandle);
                 Set(serialized, "_statisticsPanel", statisticsPanel);
+                Set(serialized, "_windowBackground", background.rectTransform);
+                Set(serialized, "_avatarPickerPanel", avatarPicker);
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 return PrefabUtility.SaveAsPrefabAsset(root, MainViewPath).GetComponent<TeamOverlayView>();
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        /// <summary>
+        /// Makes a card's avatar tile clickable and gives it somewhere to draw a
+        /// picked icon. Shared with the migration command so a prefab that was
+        /// hand-tweaked can gain the feature without being regenerated.
+        /// </summary>
+        internal static void AttachAvatarPicking(Image avatar, out Button button, out Image icon)
+        {
+            // The tile keeps its status colour, so the button must not tint it: a
+            // hover that repainted the tile would read as a status change. The
+            // picked icon is inset instead of filling the tile, which leaves the
+            // status colour as a frame around it.
+            button = avatar.GetComponent<Button>();
+            if (button == null)
+            {
+                button = avatar.gameObject.AddComponent<Button>();
+            }
+
+            button.transition = Selectable.Transition.None;
+            button.targetGraphic = avatar;
+
+            var existing = avatar.transform.Find("Icon");
+            icon = existing != null
+                ? existing.GetComponent<Image>()
+                : UiFactory.CreateImage("Icon", avatar.transform, Color.white);
+            // Edge to edge: a margin inside the tile reads as the picture being
+            // smaller than the space made for it.
+            UiFactory.Stretch(icon.rectTransform);
+            icon.raycastTarget = false;
+            icon.preserveAspect = true;
+            icon.enabled = false;
+            // Above the tile but under the initial, which is what shows when
+            // nobody has picked an icon yet.
+            icon.transform.SetSiblingIndex(0);
+        }
+
+        /// <summary>
+        /// The icon grid. The cells are not built here: the catalog is an asset
+        /// the team keeps adding to, so the panel clones one template at runtime
+        /// as many times as the catalog is long.
+        /// </summary>
+        internal static AvatarPickerPanelView BuildAvatarPickerPanel(Transform parent, Font font)
+        {
+            var panel = UiFactory.CreateImage("AvatarPickerPanel", parent, TeamOverlayPalette.TopBar);
+            var panelRect = panel.rectTransform;
+            panelRect.anchorMin = new Vector2(0f, 1f);
+            panelRect.anchorMax = new Vector2(1f, 1f);
+            panelRect.pivot = new Vector2(0.5f, 1f);
+            panelRect.anchoredPosition = Vector2.zero;
+            panelRect.sizeDelta = new Vector2(0f, AvatarPickerPanelHeight);
+            var panelView = panel.gameObject.AddComponent<AvatarPickerPanelView>();
+
+            var heading = UiFactory.CreateText("Heading", panel.transform, font, 12,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+            heading.text = "\uD504\uB85C\uD544 \uC544\uC774\uCF58";
+            UiFactory.AnchorTop(heading.rectTransform, 12f, 8f, 200f, 20f);
+
+            var confirm = UiFactory.CreateButton("Confirm", panel.transform, font, "\uD655\uC778",
+                null, TeamOverlayPalette.Accent);
+            UiFactory.AnchorRight(confirm.GetComponent<RectTransform>(), 10f, 6f, 56f, 24f);
+
+            // RectMask2D clips without needing a mask sprite, and the scroll rect
+            // uses the viewport as its own so there is one fewer object to keep
+            // in sync with the panel height.
+            var viewport = UiFactory.CreateImage("Viewport", panel.transform, new Color(0f, 0f, 0f, 0.001f));
+            UiFactory.Stretch(viewport.rectTransform, 10f, 8f, 10f, 34f);
+            viewport.gameObject.AddComponent<RectMask2D>();
+
+            var content = UiFactory.CreateRect("Content", viewport.transform);
+            var contentRect = content.GetComponent<RectTransform>();
+            contentRect.anchorMin = new Vector2(0f, 1f);
+            contentRect.anchorMax = new Vector2(1f, 1f);
+            contentRect.pivot = new Vector2(0.5f, 1f);
+            contentRect.anchoredPosition = Vector2.zero;
+            contentRect.sizeDelta = Vector2.zero;
+            var grid = content.AddComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(AvatarCellSize, AvatarCellSize);
+            grid.spacing = new Vector2(AvatarCellSpacing, AvatarCellSpacing);
+            grid.padding = new RectOffset(2, 2, 2, 2);
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = AvatarGridColumns;
+            var fitter = content.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var scroll = viewport.gameObject.AddComponent<ScrollRect>();
+            scroll.viewport = viewport.rectTransform;
+            scroll.content = contentRect;
+            scroll.horizontal = false;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 20f;
+
+            var template = UiFactory.CreateButton("OptionTemplate", content.transform, font, string.Empty);
+            UnityEngine.Object.DestroyImmediate(template.transform.Find("Label").gameObject);
+            var templateIcon = UiFactory.CreateImage("Icon", template.transform, Color.white);
+            // Same drawn size as the card tile, so pixel art lands on whole
+            // pixels in both places instead of being resampled in one of them.
+            UiFactory.Stretch(
+                templateIcon.rectTransform,
+                AvatarCellPadding, AvatarCellPadding, AvatarCellPadding, AvatarCellPadding);
+            templateIcon.raycastTarget = false;
+            templateIcon.preserveAspect = true;
+            template.gameObject.SetActive(false);
+
+            var feedback = UiFactory.CreateText("Feedback", panel.transform, font, 10,
+                TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary);
+            feedback.horizontalOverflow = HorizontalWrapMode.Wrap;
+            feedback.verticalOverflow = VerticalWrapMode.Overflow;
+            UiFactory.Stretch(feedback.rectTransform, 16f, 8f, 16f, 34f);
+            feedback.gameObject.SetActive(false);
+
+            Assign(panelView,
+                ("_grid", contentRect), ("_optionTemplate", template),
+                ("_confirmButton", confirm), ("_feedbackText", feedback));
+            return panelView;
         }
 
         private static TeamStatisticsPanelView BuildStatisticsPanel(Transform parent, Font font)
@@ -536,7 +697,8 @@ namespace TeamOverlay.Editor
                     root.GetComponent<TeamOverlayApp>(),
                     ("_mainViewPrefab", mainPrefab),
                     ("_firstRunNamePrefab", namePrefab),
-                    ("_sounds", EnsureSoundsAsset()));
+                    ("_sounds", EnsureSoundsAsset()),
+                    ("_avatarCatalog", EnsureAvatarCatalogAsset()));
                 PrefabUtility.SaveAsPrefabAsset(root, AppPath);
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
@@ -567,7 +729,77 @@ namespace TeamOverlay.Editor
             return created;
         }
 
-        private static Font PreviewFont() => Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        /// <summary>
+        /// Creates the icon catalog the first time and never touches it again, for
+        /// the same reason as the sound asset: it holds hand-picked artwork, so a
+        /// prefab rebuild must not empty it.
+        /// </summary>
+        [MenuItem("Team Overlay/Create Missing Avatar Catalog Asset")]
+        public static TeamAvatarCatalog EnsureAvatarCatalogAsset()
+        {
+            EnsureFolder("Assets", "Resources");
+            EnsureFolder("Assets/Resources", "TeamOverlay");
+            var existing = AssetDatabase.LoadAssetAtPath<TeamAvatarCatalog>(AvatarCatalogPath);
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            var created = ScriptableObject.CreateInstance<TeamAvatarCatalog>();
+            AssetDatabase.CreateAsset(created, AvatarCatalogPath);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Created " + AvatarCatalogPath + ". Drop the team's profile icons into it.");
+            return created;
+        }
+
+        /// <summary>
+        /// Fills the catalog with every sprite in <see cref="AvatarSpriteFolder"/>,
+        /// so adding an icon is dropping a file in a folder rather than also
+        /// remembering to drag it into a list.
+        /// </summary>
+        [MenuItem("Team Overlay/Refresh Avatar Catalog From Folder")]
+        public static void RefreshAvatarCatalogFromFolder()
+        {
+            var catalog = EnsureAvatarCatalogAsset();
+            if (!AssetDatabase.IsValidFolder(AvatarSpriteFolder))
+            {
+                Debug.LogWarning(AvatarSpriteFolder + " does not exist yet. Create it and drop the icons in.");
+                return;
+            }
+
+            var sprites = new List<Sprite>();
+            foreach (var guid in AssetDatabase.FindAssets("t:Sprite", new[] { AvatarSpriteFolder }))
+            {
+                var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GUIDToAssetPath(guid));
+                if (sprite != null)
+                {
+                    sprites.Add(sprite);
+                }
+            }
+
+            sprites.Sort((left, right) => string.CompareOrdinal(left.name, right.name));
+            var serialized = new SerializedObject(catalog);
+            var icons = serialized.FindProperty("_icons");
+            icons.arraySize = sprites.Count;
+            for (var index = 0; index < sprites.Count; index++)
+            {
+                icons.GetArrayElementAtIndex(index).objectReferenceValue = sprites[index];
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(catalog);
+            AssetDatabase.SaveAssets();
+            catalog.Refresh();
+
+            foreach (var problem in catalog.Problems())
+            {
+                Debug.LogWarning("\uc544\ubc14\ud0c0 \uce74\ud0c8\ub85c\uadf8: " + problem);
+            }
+
+            Debug.Log("Avatar catalog now lists " + catalog.Count + " icon(s) from " + AvatarSpriteFolder + ".");
+        }
+
+        internal static Font PreviewFont() => Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         private static void ConfigureScaler(CanvasScaler scaler)
         {
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -575,7 +807,7 @@ namespace TeamOverlay.Editor
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = 0f;
         }
-        private static void SetCardLine(Text text, float top, float height)
+        internal static void SetCardLine(Text text, float top, float height)
         {
             UiFactory.AnchorTop(text.rectTransform, 4f, top, 100f, height);
             text.rectTransform.anchorMax = new Vector2(1f, 1f);
@@ -599,7 +831,7 @@ namespace TeamOverlay.Editor
             rect.sizeDelta = new Vector2(width, 27f);
             return button;
         }
-        private static void Assign(UnityEngine.Object target, params (string name, UnityEngine.Object value)[] values)
+        internal static void Assign(UnityEngine.Object target, params (string name, UnityEngine.Object value)[] values)
         {
             var serialized = new SerializedObject(target);
             foreach (var value in values) Set(serialized, value.name, value.value);

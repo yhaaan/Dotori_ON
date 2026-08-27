@@ -13,6 +13,8 @@ namespace TeamOverlay.UI
         [Header("Prefab references")]
         [SerializeField] private Image _background;
         [SerializeField] private Image _avatarBackground;
+        [SerializeField] private Image _avatarIcon;
+        [SerializeField] private Button _avatarButton;
         [SerializeField] private Text _avatarText;
         [SerializeField] private Text _timerText;
         [SerializeField] private Text _nameText;
@@ -21,19 +23,49 @@ namespace TeamOverlay.UI
         [SerializeField] private Button _nudgeButton;
 
         private string _memberId;
+        private TeamAvatarCatalog _avatarCatalog;
 
         /// <summary>Raised with the bound member's id when the poke button is used.</summary>
         public event Action<string> NudgeRequested;
 
+        /// <summary>Raised when the person clicks their own profile icon to change it.</summary>
+        public event Action AvatarEditRequested;
+
         public void Initialize()
         {
-            if (_nudgeButton == null || _initialized)
+            if (_initialized)
             {
                 return;
             }
 
             _initialized = true;
-            _nudgeButton.onClick.AddListener(() => NudgeRequested?.Invoke(_memberId));
+            if (_nudgeButton != null)
+            {
+                _nudgeButton.onClick.AddListener(() => NudgeRequested?.Invoke(_memberId));
+            }
+
+            if (_avatarButton != null)
+            {
+                _avatarButton.onClick.AddListener(() => AvatarEditRequested?.Invoke());
+            }
+        }
+
+        /// <summary>Supplies the artwork the card draws stored avatar keys with.</summary>
+        public void SetAvatarCatalog(TeamAvatarCatalog catalog)
+        {
+            _avatarCatalog = catalog;
+        }
+
+        /// <summary>
+        /// Only your own icon is clickable. A teammate's is not something you get
+        /// to change, and a button that does nothing still eats the click.
+        /// </summary>
+        public void SetAvatarEditable(bool editable)
+        {
+            if (_avatarButton != null)
+            {
+                _avatarButton.enabled = editable;
+            }
         }
 
         /// <summary>
@@ -59,7 +91,7 @@ namespace TeamOverlay.UI
 
             _background.color = isOnline ? TeamOverlayPalette.Card : TeamOverlayPalette.CardOffline;
             _avatarBackground.color = accent;
-            _avatarText.text = InitialFor(member.DisplayName);
+            BindAvatar(member, isOnline);
             _nameText.text = member.DisplayName;
             _nameText.color = isLocalMember ? TeamOverlayPalette.Accent : TeamOverlayPalette.TextPrimary;
             _statusText.text = StatusLabel(member, isOnline);
@@ -89,6 +121,31 @@ namespace TeamOverlay.UI
                     : "출근 기록 없음";
                 _detailText.color = TeamOverlayPalette.TextSecondary;
             }
+        }
+
+        /// <summary>
+        /// Draws the picked icon over the status-coloured tile, so the icon never
+        /// costs the card its at-a-glance status colour. An unknown key - one
+        /// whose sprite a later build dropped - falls back to the name initial
+        /// rather than to an empty tile.
+        /// </summary>
+        private void BindAvatar(MemberState member, bool isOnline)
+        {
+            var sprite = _avatarCatalog != null ? _avatarCatalog.Find(member.AvatarKey) : null;
+            if (_avatarIcon != null)
+            {
+                _avatarIcon.sprite = sprite;
+                _avatarIcon.enabled = sprite != null;
+                // Offline cards are dimmed everywhere else too, and a
+                // full-strength icon would be the brightest thing on a card that
+                // is asleep. Only far enough to read as dimmed, though: the icon
+                // is a picture someone chose, so it still has to be recognisable.
+                _avatarIcon.color = isOnline ? Color.white : new Color(1f, 1f, 1f, 0.7f);
+            }
+
+            var showInitial = sprite == null;
+            _avatarText.text = showInitial ? InitialFor(member.DisplayName) : string.Empty;
+            _avatarText.enabled = showInitial;
         }
 
         private static string StatusLabel(MemberState member, bool isOnline)

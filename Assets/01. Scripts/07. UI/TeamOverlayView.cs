@@ -34,6 +34,8 @@ namespace TeamOverlay.UI
         [SerializeField] private Text _versionLabel;
         [SerializeField] private WindowDragHandle _windowDragHandle;
         [SerializeField] private TeamStatisticsPanelView _statisticsPanel;
+        [SerializeField] private RectTransform _windowBackground;
+        [SerializeField] private AvatarPickerPanelView _avatarPickerPanel;
 
         private readonly List<Button> _interactiveButtons = new List<Button>();
         private bool _initialized;
@@ -53,7 +55,27 @@ namespace TeamOverlay.UI
         /// <summary>Carries the member id to poke, or null for the whole team.</summary>
         public event Action<string> NudgeRequested;
 
+        /// <summary>Raised when the local member clicks their own profile icon.</summary>
+        public event Action AvatarPickerRequested;
+
+        public event Action AvatarPickerCloseRequested;
+
+        /// <summary>Carries the catalog key the local member picked.</summary>
+        public event Action<string> AvatarPicked;
+
         public bool IsStatisticsVisible => _statisticsPanel != null && _statisticsPanel.gameObject.activeSelf;
+
+        public bool IsAvatarPickerVisible => _avatarPickerPanel != null && _avatarPickerPanel.gameObject.activeSelf;
+
+        /// <summary>
+        /// How much taller the window has to be while the picker is open. Read
+        /// from the prefab rather than repeated as a constant, so moving the panel
+        /// in the Inspector cannot leave the window the wrong size.
+        /// </summary>
+        public float AvatarPickerHeight =>
+            _avatarPickerPanel != null
+                ? ((RectTransform)_avatarPickerPanel.transform).sizeDelta.y
+                : 0f;
 
         public void Initialize(Action beginWindowDrag)
         {
@@ -83,7 +105,11 @@ namespace TeamOverlay.UI
             {
                 if (card == null) continue;
                 card.Initialize();
+                // Every tile stays inert until a Bind says whose card it is; the
+                // one belonging to the local member is the only clickable one.
+                card.SetAvatarEditable(false);
                 card.NudgeRequested += memberId => NudgeRequested?.Invoke(memberId);
+                card.AvatarEditRequested += () => AvatarPickerRequested?.Invoke();
             }
 
             AddInteractive(_checkInButton);
@@ -104,10 +130,55 @@ namespace TeamOverlay.UI
                 _statisticsPanel.gameObject.SetActive(false);
             }
 
+            if (_avatarPickerPanel != null)
+            {
+                _avatarPickerPanel.Initialize();
+                _avatarPickerPanel.AvatarPicked += key => AvatarPicked?.Invoke(key);
+                _avatarPickerPanel.CloseRequested += () => AvatarPickerCloseRequested?.Invoke();
+                SetAvatarPickerVisible(false);
+            }
+
             if (_statusNoteInput != null)
             {
                 _statusNoteInput.onEndEdit.AddListener(note => StatusNoteSubmitted?.Invoke(note));
             }
+        }
+
+        /// <summary>Hands the icon artwork to the cards and the picker.</summary>
+        public void SetAvatarCatalog(TeamAvatarCatalog catalog)
+        {
+            foreach (var card in _cards)
+            {
+                if (card != null) card.SetAvatarCatalog(catalog);
+            }
+
+            _avatarPickerPanel?.SetCatalog(catalog);
+        }
+
+        /// <summary>
+        /// Opens the picker above the rest of the overlay. The panel sits at the
+        /// top of the canvas and the window background is pushed down under it, so
+        /// the window can grow upwards without any of the existing layout moving
+        /// relative to itself.
+        /// </summary>
+        public void SetAvatarPickerVisible(bool visible)
+        {
+            if (_avatarPickerPanel == null)
+            {
+                return;
+            }
+
+            _avatarPickerPanel.gameObject.SetActive(visible);
+            if (_windowBackground != null)
+            {
+                var inset = visible ? AvatarPickerHeight : 0f;
+                _windowBackground.offsetMax = new Vector2(_windowBackground.offsetMax.x, -inset);
+            }
+        }
+
+        public void SetAvatarPickerSelection(string avatarKey)
+        {
+            _avatarPickerPanel?.SetSelected(avatarKey);
         }
 
         public void Bind(IReadOnlyList<MemberState> members, string localMemberId, DateTimeOffset nowUtc)
@@ -131,6 +202,13 @@ namespace TeamOverlay.UI
                 }
             }
 
+            for (var index = 0; index < _cards.Length; index++)
+            {
+                var card = _cards[index];
+                if (card == null || index >= orderedMembers.Length) continue;
+                card.SetAvatarEditable(orderedMembers[index].MemberId == localMemberId);
+            }
+
             var localMember = orderedMembers.FirstOrDefault(member => member.MemberId == localMemberId);
             var isClockedIn = localMember != null && localMember.AttendanceStatus == AttendanceStatus.ClockedIn;
             for (var index = 0; index < _cards.Length; index++)
@@ -152,6 +230,7 @@ namespace TeamOverlay.UI
             SetActive(_mealButton, isClockedIn);
             if (isClockedIn) SetActivitySelection(localMember.ActivityStatus.GetValueOrDefault());
             BindStatusNote(localMember, isClockedIn);
+            if (localMember != null) SetAvatarPickerSelection(localMember.AvatarKey);
         }
 
         /// <summary>
@@ -183,6 +262,7 @@ namespace TeamOverlay.UI
         public void SetBusy(bool busy)
         {
             foreach (var button in _interactiveButtons) button.interactable = !busy;
+            _avatarPickerPanel?.SetBusy(busy);
             if (busy) _feedbackText.text = "상태를 반영하는 중…";
         }
 
