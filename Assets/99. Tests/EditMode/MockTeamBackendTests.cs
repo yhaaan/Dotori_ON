@@ -204,6 +204,23 @@ namespace TeamOverlay.Tests.EditMode
             }
         }
 
+        [Test]
+        public async Task SetAvatarKey_ChangesTheLocalMemberWhileClockedOut()
+        {
+            // An icon describes the person, not the session, so unlike a note it
+            // must not need a check-in first.
+            await _backend.SetAvatarKeyAsync("smile-01", CancellationToken.None);
+
+            var local = await GetMemberAsync(_backend.LocalMemberId);
+            Assert.That(local.AvatarKey, Is.EqualTo("smile-01"));
+            Assert.That(local.AttendanceStatus, Is.EqualTo(AttendanceStatus.ClockedOut));
+
+            await _backend.SetAvatarKeyAsync(null, CancellationToken.None);
+
+            local = await GetMemberAsync(_backend.LocalMemberId);
+            Assert.That(local.AvatarKey, Is.EqualTo("default"));
+        }
+
         private async Task<MemberState> GetMemberAsync(string memberId)
         {
             var states = await _backend.GetTeamStateAsync(CancellationToken.None);

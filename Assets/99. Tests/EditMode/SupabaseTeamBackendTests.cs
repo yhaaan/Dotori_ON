@@ -359,6 +359,24 @@ namespace TeamOverlay.Tests.EditMode
             Assert.That(transport.Requests[1].Body, Does.Not.Contain("p_target_member_id"));
         }
 
+        [Test]
+        public async Task SetAvatarKey_PostsTheCatalogKeyForTheLocalMember()
+        {
+            var transport = new QueueTransport(Ok("null"), Ok("null"));
+            var backend = CreateBackend(transport);
+
+            await backend.SetAvatarKeyAsync("smile-01", CancellationToken.None);
+            // Blank is how the picker clears an icon; the server normalises it
+            // back to 'default', so it must not need an RPC of its own.
+            await backend.SetAvatarKeyAsync("   ", CancellationToken.None);
+
+            Assert.That(transport.Requests[0].Url, Does.EndWith("/rest/v1/rpc/set_avatar_key"));
+            Assert.That(transport.Requests[0].Body, Does.Contain("smile-01"));
+            Assert.That(transport.Requests[0].Body, Does.Contain(LocalMemberId.ToString("D")));
+            Assert.That(transport.Requests[1].Url, Does.EndWith("/rest/v1/rpc/set_avatar_key"));
+            Assert.That(transport.Requests[1].Body, Does.Contain("\"p_avatar_key\":\"\""));
+        }
+
         private static SupabaseTeamBackend CreateBackend(ISupabaseHttpTransport transport)
         {
             return new SupabaseTeamBackend(
