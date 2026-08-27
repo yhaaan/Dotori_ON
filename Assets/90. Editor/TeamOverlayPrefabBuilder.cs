@@ -159,6 +159,10 @@ namespace TeamOverlay.Editor
                     TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
                 title.text = "Dotori ON";
                 UiFactory.Stretch(title.rectTransform, 10f, 0f, 0f, 0f);
+                var version = UiFactory.CreateText("Version", dragArea.transform, font, 9,
+                    TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+                version.text = "v0.0";
+                UiFactory.AnchorTop(version.rectTransform, 82f, 0f, 60f, 32f);
 
                 Button fake = null;
                 var switchAccount = TopButton(topBar.transform, font, "SwitchAccount", "이름변경", 105f, 54f);
@@ -247,6 +251,7 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_statsButton", stats);
                 Set(serialized, "_topmostLabel", topmost.GetComponentInChildren<Text>());
                 Set(serialized, "_feedbackText", feedback);
+                Set(serialized, "_versionLabel", version);
                 Set(serialized, "_windowDragHandle", dragHandle);
                 Set(serialized, "_statisticsPanel", statisticsPanel);
                 serialized.ApplyModifiedPropertiesWithoutUndo();

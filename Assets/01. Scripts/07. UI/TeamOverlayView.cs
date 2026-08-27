@@ -30,6 +30,7 @@ namespace TeamOverlay.UI
         [SerializeField] private InputField _statusNoteInput;
         [SerializeField] private Text _topmostLabel;
         [SerializeField] private Text _feedbackText;
+        [SerializeField] private Text _versionLabel;
         [SerializeField] private WindowDragHandle _windowDragHandle;
         [SerializeField] private TeamStatisticsPanelView _statisticsPanel;
 
@@ -58,6 +59,9 @@ namespace TeamOverlay.UI
             UiFactory.EnsureEventSystem();
             UiFactory.ApplyApplicationFont(transform, _fontOverride);
             if (_windowDragHandle != null) _windowDragHandle.Initialize(beginWindowDrag);
+            // Application.version is the bundleVersion the build was stamped with,
+            // so a teammate can read which zip they are running off the title bar.
+            if (_versionLabel != null) _versionLabel.text = "v" + Application.version;
 
             AddListener(_checkInButton, () => CheckInRequested?.Invoke());
             AddListener(_checkOutButton, () => CheckOutRequested?.Invoke());

@@ -80,6 +80,7 @@ namespace TeamOverlay.Tests.EditMode
             // The window grows by exactly the panel height, so the two constants
             // have to agree or the compact layout comes back clipped.
             Assert.That(panelRect.sizeDelta.y, Is.EqualTo(424f));
+            AssertReference(mainData, "_versionLabel");
             AssertReference(mainData, "_statusNoteInput");
             AssertReference(mainData, "_windowDragHandle");
 
