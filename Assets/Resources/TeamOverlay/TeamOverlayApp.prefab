@@ -46,4 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: TeamOverlay.Runtime::TeamOverlay.UI.TeamOverlayApp
   _mainViewPrefab: {fileID: 2135190404135899458, guid: 1a6543019b12bf3498581c376625934d, type: 3}
   _firstRunNamePrefab: {fileID: 910186508334100652, guid: 14f346e48942508478593b678c89d7e6, type: 3}
+  _sounds: {fileID: 11400000, guid: e9596c0c2135c784ab260791839c3cc8, type: 2}
   _useMockBackend: 0
