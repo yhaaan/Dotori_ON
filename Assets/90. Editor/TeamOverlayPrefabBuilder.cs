@@ -120,6 +120,14 @@ namespace TeamOverlay.Editor
                     TextAnchor.MiddleCenter, TeamOverlayPalette.Working, FontStyle.Bold);
                 SetCardLine(status, 84f, 18f);
                 status.text = "작업중";
+                var nudge = UiFactory.CreateButton("Nudge", root.transform, font, "\uCF55");
+                nudge.GetComponentInChildren<Text>().fontSize = 9;
+                var nudgeRect = nudge.GetComponent<RectTransform>();
+                nudgeRect.anchorMin = nudgeRect.anchorMax = new Vector2(1f, 1f);
+                nudgeRect.pivot = new Vector2(1f, 1f);
+                nudgeRect.anchoredPosition = new Vector2(-3f, -3f);
+                nudgeRect.sizeDelta = new Vector2(22f, 18f);
+
                 var detail = UiFactory.CreateText("Detail", root.transform, font, 9,
                     TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary);
                 SetCardLine(detail, 103f, 27f);
@@ -129,7 +137,7 @@ namespace TeamOverlay.Editor
                 Assign(view,
                     ("_background", rootImage), ("_avatarBackground", avatar),
                     ("_avatarText", initial), ("_timerText", timer), ("_nameText", name),
-                    ("_statusText", status), ("_detailText", detail));
+                    ("_statusText", status), ("_detailText", detail), ("_nudgeButton", nudge));
                 return PrefabUtility.SaveAsPrefabAsset(root, CardPath).GetComponent<TeamMemberCardView>();
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
@@ -155,7 +163,7 @@ namespace TeamOverlay.Editor
                 topBar.rectTransform.sizeDelta = new Vector2(0f, 32f);
 
                 var dragArea = UiFactory.CreateImage("WindowDragArea", topBar.transform, new Color(1f, 1f, 1f, 0.001f));
-                UiFactory.Stretch(dragArea.rectTransform, 0f, 0f, 215f, 0f);
+                UiFactory.Stretch(dragArea.rectTransform, 0f, 0f, 271f, 0f);
                 var dragHandle = dragArea.gameObject.AddComponent<WindowDragHandle>();
                 var title = UiFactory.CreateText("Title", dragArea.transform, font, 12,
                     TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
@@ -167,8 +175,10 @@ namespace TeamOverlay.Editor
                 UiFactory.AnchorTop(version.rectTransform, 82f, 0f, 60f, 32f);
 
                 Button fake = null;
-                var switchAccount = TopButton(topBar.transform, font, "SwitchAccount", "이름변경", 105f, 54f);
-                var stats = TopButton(topBar.transform, font, "Statistics", "\uD1B5\uACC4", 163f, 48f);
+                var teamNudge = TopButton(topBar.transform, font, "TeamNudge", "전체호출", 105f, 52f);
+                teamNudge.GetComponentInChildren<Text>().fontSize = 9;
+                var switchAccount = TopButton(topBar.transform, font, "SwitchAccount", "이름변경", 161f, 54f);
+                var stats = TopButton(topBar.transform, font, "Statistics", "\uD1B5\uACC4", 219f, 48f);
                 switchAccount.GetComponentInChildren<Text>().fontSize = 9;
                 var topmost = TopButton(topBar.transform, font, "AlwaysOnTop", "TOP", 63f, 38f);
                 var minimize = TopButton(topBar.transform, font, "Minimize", "—", 32f, 28f);
@@ -254,6 +264,7 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_topmostLabel", topmost.GetComponentInChildren<Text>());
                 Set(serialized, "_feedbackText", feedback);
                 Set(serialized, "_versionLabel", version);
+                Set(serialized, "_teamNudgeButton", teamNudge);
                 Set(serialized, "_windowDragHandle", dragHandle);
                 Set(serialized, "_statisticsPanel", statisticsPanel);
                 serialized.ApplyModifiedPropertiesWithoutUndo();

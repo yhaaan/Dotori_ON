@@ -18,9 +18,42 @@ namespace TeamOverlay.UI
         [SerializeField] private Text _nameText;
         [SerializeField] private Text _statusText;
         [SerializeField] private Text _detailText;
+        [SerializeField] private Button _nudgeButton;
+
+        private string _memberId;
+
+        /// <summary>Raised with the bound member's id when the poke button is used.</summary>
+        public event Action<string> NudgeRequested;
+
+        public void Initialize()
+        {
+            if (_nudgeButton == null || _initialized)
+            {
+                return;
+            }
+
+            _initialized = true;
+            _nudgeButton.onClick.AddListener(() => NudgeRequested?.Invoke(_memberId));
+        }
+
+        /// <summary>
+        /// Shows the poke button only when a poke would actually arrive: not on
+        /// your own card, not for a teammate who has gone home, and not while you
+        /// are clocked out yourself, which the server refuses anyway.
+        /// </summary>
+        public void SetNudgeAvailable(bool available)
+        {
+            if (_nudgeButton != null)
+            {
+                _nudgeButton.gameObject.SetActive(available);
+            }
+        }
+
+        private bool _initialized;
 
         public void Bind(MemberState member, bool isLocalMember, DateTimeOffset nowUtc)
         {
+            _memberId = member.MemberId;
             var isOnline = member.AttendanceStatus == AttendanceStatus.ClockedIn;
             var accent = StatusColor(member, isOnline);
 

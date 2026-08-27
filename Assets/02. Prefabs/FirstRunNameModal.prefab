@@ -154,8 +154,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\uC774\uB984\uC740 \uBC14\uAFB8\uAE30 \uC5B4\uB824\uC6B0\uB2C8 \uC2E0\uC911\uD558\uAC8C
-    \uC801\uC5B4\uC8FC\uC138\uC694."
+  m_Text: "\uC774\uB984\uC744 \uC785\uB825\uD558\uBA74 \uD300 \uC624\uBC84\uB808\uC774\uB97C
+    \uC2DC\uC791\uD560 \uC218 \uC788\uC5B4\uC694."
 --- !u!1 &851782730735621160
 GameObject:
   m_ObjectHideFlags: 0
@@ -430,7 +430,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uB2E4\uB978 \uD300\uC6D0\uC5D0\uAC8C \uD45C\uC2DC\uB418\uB294 \uC774\uB984\uC785\uB2C8\uB2E4."
+  m_Text: "\uB2E4\uB978 \uD300\uC6D0\uC5D0\uAC8C \uD45C\uC2DC\uB418\uB294 \uC774\uB984\uC785\uB2C8\uB2E4.
+    \uD55C\uAE00 \uC774\uB984\uB3C4 \uC0AC\uC6A9\uD560 \uC218 \uC788\uC5B4\uC694."
 --- !u!1 &3762030428704086757
 GameObject:
   m_ObjectHideFlags: 0
@@ -588,7 +589,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uC608: \uD584\uCD08"
+  m_Text: "\uC608: \uAE40\uD558\uB298"
 --- !u!1 &6055593795195687226
 GameObject:
   m_ObjectHideFlags: 0
@@ -827,7 +828,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 480, y: 220}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0.5
+  m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96

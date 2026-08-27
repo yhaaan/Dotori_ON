@@ -43,6 +43,9 @@ namespace TeamOverlay.Core
     {
         MemberCheckedIn = 0,
         MemberActivityChanged = 1,
-        MemberCheckedOut = 2
+        MemberCheckedOut = 2,
+
+        /// <summary>Someone poked a teammate, or the whole team.</summary>
+        MemberNudged = 3
     }
 }

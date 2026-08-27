@@ -27,6 +27,7 @@ namespace TeamOverlay.UI
         [SerializeField] private Button _exitButton;
         [SerializeField] private Button _switchAccountButton;
         [SerializeField] private Button _statsButton;
+        [SerializeField] private Button _teamNudgeButton;
         [SerializeField] private InputField _statusNoteInput;
         [SerializeField] private Text _topmostLabel;
         [SerializeField] private Text _feedbackText;
@@ -48,6 +49,9 @@ namespace TeamOverlay.UI
         public event Action<string> StatusNoteSubmitted;
         public event Action StatsToggleRequested;
         public event Action<StatisticsPeriod> StatisticsPeriodChangeRequested;
+
+        /// <summary>Carries the member id to poke, or null for the whole team.</summary>
+        public event Action<string> NudgeRequested;
 
         public bool IsStatisticsVisible => _statisticsPanel != null && _statisticsPanel.gameObject.activeSelf;
 
@@ -74,6 +78,13 @@ namespace TeamOverlay.UI
             AddListener(_exitButton, () => ExitRequested?.Invoke());
             AddListener(_switchAccountButton, () => SwitchAccountRequested?.Invoke());
             AddListener(_statsButton, () => StatsToggleRequested?.Invoke());
+            AddListener(_teamNudgeButton, () => NudgeRequested?.Invoke(null));
+            foreach (var card in _cards)
+            {
+                if (card == null) continue;
+                card.Initialize();
+                card.NudgeRequested += memberId => NudgeRequested?.Invoke(memberId);
+            }
 
             AddInteractive(_checkInButton);
             AddInteractive(_checkOutButton);
@@ -83,6 +94,7 @@ namespace TeamOverlay.UI
             AddInteractive(_fakeEventButton);
             AddInteractive(_switchAccountButton);
             AddInteractive(_statsButton);
+            AddInteractive(_teamNudgeButton);
 
             if (_statisticsPanel != null)
             {
@@ -121,6 +133,18 @@ namespace TeamOverlay.UI
 
             var localMember = orderedMembers.FirstOrDefault(member => member.MemberId == localMemberId);
             var isClockedIn = localMember != null && localMember.AttendanceStatus == AttendanceStatus.ClockedIn;
+            for (var index = 0; index < _cards.Length; index++)
+            {
+                var card = _cards[index];
+                if (card == null || index >= orderedMembers.Length) continue;
+                var member = orderedMembers[index];
+                card.SetNudgeAvailable(
+                    isClockedIn
+                    && member.MemberId != localMemberId
+                    && member.AttendanceStatus == AttendanceStatus.ClockedIn);
+            }
+
+            SetActive(_teamNudgeButton, isClockedIn);
             SetActive(_checkInButton, !isClockedIn);
             SetActive(_checkOutButton, isClockedIn);
             SetActive(_workingButton, isClockedIn);

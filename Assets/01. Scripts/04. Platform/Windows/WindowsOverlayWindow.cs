@@ -76,6 +76,32 @@ namespace TeamOverlay.Platform.Windows
 #endif
         }
 
+        /// <summary>
+        /// Blinks the taskbar button until the person looks at the window. A nudge
+        /// that only plays a sound is missed whenever the overlay is behind
+        /// something, and stealing focus instead would interrupt whatever they are
+        /// doing, which is exactly what a nudge must not do.
+        /// </summary>
+        public void FlashTaskbar()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            if (!EnsureWindowHandle())
+            {
+                return;
+            }
+
+            var info = new WindowsNativeMethods.FlashWindowInfo
+            {
+                cbSize = (uint)Marshal.SizeOf(typeof(WindowsNativeMethods.FlashWindowInfo)),
+                hwnd = _windowHandle,
+                dwFlags = WindowsNativeMethods.FlashwTray | WindowsNativeMethods.FlashwTimerNoFg,
+                uCount = 3,
+                dwTimeout = 0
+            };
+            WindowsNativeMethods.FlashWindowEx(ref info);
+#endif
+        }
+
         /// <summary>Shrinks the window back to the compact layout.</summary>
         public void RestoreCompactHeight()
         {

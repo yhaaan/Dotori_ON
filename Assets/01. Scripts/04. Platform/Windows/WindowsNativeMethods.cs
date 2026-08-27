@@ -49,6 +49,19 @@ namespace TeamOverlay.Platform.Windows
         [return: MarshalAs(UnmanagedType.Bool)]
         internal delegate bool EnumerateWindowsProcedure(IntPtr windowHandle, IntPtr state);
 
+        internal const uint FlashwTray = 0x00000002;
+        internal const uint FlashwTimerNoFg = 0x0000000C;
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct FlashWindowInfo
+        {
+            internal uint cbSize;
+            internal IntPtr hwnd;
+            internal uint dwFlags;
+            internal uint uCount;
+            internal uint dwTimeout;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         internal struct Rect
         {
@@ -97,6 +110,10 @@ namespace TeamOverlay.Platform.Windows
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool IsIconic(IntPtr windowHandle);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool FlashWindowEx(ref FlashWindowInfo info);
 
         [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
         private static extern IntPtr GetWindowLongPtr64(IntPtr windowHandle, int index);

@@ -29,6 +29,7 @@ namespace TeamOverlay.Tests.EditMode
             Assert.That(app, Is.Not.Null);
 
             var mainData = new SerializedObject(main);
+            AssertReference(new SerializedObject(card), "_nudgeButton");
             var cards = mainData.FindProperty("_cards");
             Assert.That(cards.arraySize, Is.EqualTo(4));
             for (var index = 0; index < cards.arraySize; index++)
@@ -81,6 +82,7 @@ namespace TeamOverlay.Tests.EditMode
             // have to agree or the compact layout comes back clipped.
             Assert.That(panelRect.sizeDelta.y, Is.EqualTo(424f));
             AssertReference(mainData, "_versionLabel");
+            AssertReference(mainData, "_teamNudgeButton");
             AssertReference(mainData, "_statusNoteInput");
             AssertReference(mainData, "_windowDragHandle");
 

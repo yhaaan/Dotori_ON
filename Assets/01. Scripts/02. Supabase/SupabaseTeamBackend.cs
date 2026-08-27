@@ -18,8 +18,10 @@ namespace TeamOverlay.Supabase
     /// a missed poll degrades into a late event instead of a lost one. Swapping in
     /// a Realtime subscription later only has to replace <see cref="Poll"/>.
     /// </summary>
-    public sealed class SupabaseTeamBackend : ITeamBackend, ITeamStatistics, IDisposable
+    public sealed class SupabaseTeamBackend : ITeamBackend, ITeamStatistics, ITeamNudges, IDisposable
     {
+        private const string NudgeSelect = "id,actor_member_id,target_member_id,created_at";
+
         private const string StateSelect =
             "member_id,attendance_session_id,attendance_status,activity_status," +
             "connection_status,checked_in_at,status_started_at,last_heartbeat_at," +
@@ -35,6 +37,7 @@ namespace TeamOverlay.Supabase
         private readonly Guid _clientInstanceId;
 
         private Dictionary<string, MemberState> _previousSnapshot;
+        private string _nudgeCursorUtc;
         private Guid? _openAttendanceSessionId;
         private bool _disposed;
 
@@ -103,7 +106,121 @@ namespace TeamOverlay.Supabase
 
             var members = ParseStates(response.Body);
             PublishTransitions(members);
+            await PublishNudgesAsync(members, cancellationToken);
             return members;
+        }
+
+        public async Task SendNudgeAsync(string targetMemberId, CancellationToken cancellationToken)
+        {
+            // A null target is the whole team, and the server default resolves it;
+            // JsonUtility would write an empty string, which is not a uuid.
+            var body = string.IsNullOrWhiteSpace(targetMemberId)
+                ? "{}"
+                : JsonUtility.ToJson(new NudgeRequest { p_target_member_id = targetMemberId });
+            await CallRpcAsync("send_nudge", body, cancellationToken);
+        }
+
+        /// <summary>
+        /// Nudges are read from <c>team_events</c> instead of being derived like
+        /// the other events: a poke changes no state, so consecutive snapshots are
+        /// identical and there is nothing to diff.
+        ///
+        /// The first pass only records where the log currently ends, so launching
+        /// the app does not replay every nudge sent while it was closed. The cursor
+        /// is a server timestamp copied straight back, so a client clock that is
+        /// minutes off never skips or repeats one.
+        /// </summary>
+        private async Task PublishNudgesAsync(
+            IReadOnlyList<MemberState> members,
+            CancellationToken cancellationToken)
+        {
+            string cursor;
+            lock (_gate)
+            {
+                cursor = _nudgeCursorUtc;
+            }
+
+            var self = _memberId.ToString("D");
+            var query = _projectUrl + "/rest/v1/team_events?select=" + NudgeSelect +
+                        "&event_type=eq.nudge&actor_member_id=neq." + self;
+            query += cursor == null
+                ? "&order=created_at.desc&limit=1"
+                : "&created_at=gt." + Uri.EscapeDataString(cursor) +
+                  "&or=(target_member_id.eq." + self + ",target_member_id.is.null)" +
+                  "&order=created_at.asc&limit=20";
+
+            NudgeEventArrayDocument document;
+            try
+            {
+                var response = await SendAuthorizedAsync("GET", query, null, cancellationToken);
+                document = JsonUtility.FromJson<NudgeEventArrayDocument>(
+                    "{\"items\":" + response.Body + "}");
+            }
+            catch (Exception exception) when (!(exception is OperationCanceledException))
+            {
+                // The roster is the part that matters; a failed nudge read leaves
+                // the cursor alone and simply tries again on the next poll.
+                return;
+            }
+
+            var items = document?.items ?? new NudgeEventDocument[0];
+            var newest = cursor;
+            foreach (var item in items)
+            {
+                if (item == null || string.IsNullOrEmpty(item.created_at))
+                {
+                    continue;
+                }
+
+                if (newest == null || string.CompareOrdinal(item.created_at, newest) > 0)
+                {
+                    newest = item.created_at;
+                }
+
+                if (cursor == null)
+                {
+                    continue;
+                }
+
+                var actor = FindMember(members, item.actor_member_id);
+                if (actor != null)
+                {
+                    _events.Publish(new TeamEvent(
+                        item.id,
+                        TeamEventType.MemberNudged,
+                        actor.MemberId,
+                        ParseTimestamp(item.created_at) ?? DateTimeOffset.UtcNow,
+                        actor,
+                        targetMemberId: string.IsNullOrEmpty(item.target_member_id)
+                            ? null
+                            : item.target_member_id));
+                }
+            }
+
+            lock (_gate)
+            {
+                // An empty first pass still has to leave the window closed, or every
+                // later poll would keep asking for the whole log.
+                _nudgeCursorUtc = newest ?? DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture);
+            }
+        }
+
+        private static MemberState FindMember(IReadOnlyList<MemberState> members, string memberId)
+        {
+            if (string.IsNullOrEmpty(memberId))
+            {
+                return null;
+            }
+
+            foreach (var member in members)
+            {
+                if (string.Equals(member.MemberId, memberId, StringComparison.OrdinalIgnoreCase))
+                {
+                    return member;
+                }
+            }
+
+            return null;
         }
 
         public async Task CheckInAsync(CancellationToken cancellationToken)
@@ -730,6 +847,27 @@ namespace TeamOverlay.Supabase
             public int attendance_seconds;
             public int break_seconds;
             public int meal_seconds;
+        }
+
+        [Serializable]
+        private sealed class NudgeRequest
+        {
+            public string p_target_member_id;
+        }
+
+        [Serializable]
+        private sealed class NudgeEventArrayDocument
+        {
+            public NudgeEventDocument[] items;
+        }
+
+        [Serializable]
+        private sealed class NudgeEventDocument
+        {
+            public string id;
+            public string actor_member_id;
+            public string target_member_id;
+            public string created_at;
         }
 
         [Serializable]

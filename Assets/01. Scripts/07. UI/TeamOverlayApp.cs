@@ -215,6 +215,16 @@ namespace TeamOverlay.UI
                 {
                     _tonePlayer.Play(TeamSound.TeammateCheckedOut);
                 }
+                else if (teamEvent.Type == TeamEventType.MemberNudged)
+                {
+                    _tonePlayer.Play(TeamSound.NudgeReceived);
+                    _view.ShowFeedback(teamEvent.State.DisplayName + (teamEvent.TargetMemberId == null
+                        ? "님이 팀을 호출했습니다."
+                        : "님이 콕 찔렀습니다."));
+                    // The overlay is usually behind something when a nudge lands,
+                    // so the sound alone would be missed.
+                    _window.FlashTaskbar();
+                }
             }
 
             var now = Time.unscaledTime;
@@ -490,6 +500,7 @@ namespace TeamOverlay.UI
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
             _view.StatsToggleRequested += HandleStatsToggleRequested;
             _view.StatisticsPeriodChangeRequested += HandleStatisticsPeriodChangeRequested;
+            _view.NudgeRequested += HandleNudgeRequested;
             _view.StatusNoteSubmitted += HandleStatusNoteSubmitted;
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _firstRunNameView.Hide();
@@ -558,6 +569,7 @@ namespace TeamOverlay.UI
             _view.SwitchAccountRequested -= HandleSwitchAccountRequested;
             _view.StatsToggleRequested -= HandleStatsToggleRequested;
             _view.StatisticsPeriodChangeRequested -= HandleStatisticsPeriodChangeRequested;
+            _view.NudgeRequested -= HandleNudgeRequested;
             _view.StatusNoteSubmitted -= HandleStatusNoteSubmitted;
         }
 
@@ -669,6 +681,20 @@ namespace TeamOverlay.UI
             _view.SetStatisticsVisible(true);
             _window.ExpandForStatistics();
             LoadStatistics(_statisticsPeriod);
+        }
+
+        private void HandleNudgeRequested(string targetMemberId)
+        {
+            if (_backend is ITeamNudges nudges)
+            {
+                RunMutation(
+                    token => nudges.SendNudgeAsync(targetMemberId, token),
+                    targetMemberId == null ? "팀을 호출했습니다." : "콕 찔렀습니다.");
+            }
+            else
+            {
+                _view.ShowFeedback("현재 백엔드는 호출을 지원하지 않습니다.", true);
+            }
         }
 
         private void HandleStatisticsPeriodChangeRequested(StatisticsPeriod period)
@@ -1043,6 +1069,10 @@ namespace TeamOverlay.UI
         {
             switch (exception.ServerMessage)
             {
+                case "nudge_too_soon":
+                    return "너무 자주 호출했습니다. 잠시 뒤에 다시 해 주세요.";
+                case "member_not_clocked_in":
+                    return "출근 중일 때만 호출할 수 있습니다.";
                 case "member_name_taken":
                     return "이미 다른 사람이 사용 중인 이름입니다.";
                 case "member_name_already_claimed":
