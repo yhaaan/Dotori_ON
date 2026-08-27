@@ -307,6 +307,58 @@ namespace TeamOverlay.Tests.EditMode
             Assert.That(transport.Requests[0].Body, Does.Not.Contain("p_from"));
         }
 
+        [Test]
+        public async Task FirstPoll_SeedsTheNudgeCursorWithoutReplayingOldNudges()
+        {
+            // Opening the app must not ring the bell for every poke sent while it
+            // was closed, so the first read only records where the log ends.
+            var transport = new QueueTransport(
+                Ok("[" + ClockedIn(TeammateId, "하늘", 0) + "]"),
+                Ok("[" + ClockedIn(TeammateId, "하늘", 0) + "]"));
+            transport.NudgeResponses.Enqueue(Ok(
+                "[{\"id\":\"old\",\"actor_member_id\":\"" + TeammateId.ToString("D") + "\","
+                + "\"target_member_id\":null,\"created_at\":\"2026-08-28T01:00:00+00:00\"}]"));
+            var backend = CreateBackend(transport);
+            var observer = new RecordingObserver();
+            backend.Events.Subscribe(observer);
+
+            await backend.GetTeamStateAsync(CancellationToken.None);
+
+            Assert.That(observer.Events.Count, Is.Zero);
+
+            transport.NudgeResponses.Enqueue(Ok(
+                "[{\"id\":\"fresh\",\"actor_member_id\":\"" + TeammateId.ToString("D") + "\","
+                + "\"target_member_id\":\"" + LocalMemberId.ToString("D") + "\","
+                + "\"created_at\":\"2026-08-28T02:00:00+00:00\"}]"));
+            await backend.GetTeamStateAsync(CancellationToken.None);
+
+            Assert.That(observer.Events.Count, Is.EqualTo(1));
+            Assert.That(observer.Events[0].Type, Is.EqualTo(TeamEventType.MemberNudged));
+            Assert.That(observer.Events[0].ActorMemberId, Is.EqualTo(TeammateId.ToString("D")));
+            Assert.That(observer.Events[0].TargetMemberId, Is.EqualTo(LocalMemberId.ToString("D")));
+            Assert.That(observer.Events[0].State.DisplayName, Is.EqualTo("하늘"));
+
+            // The second read is a window that opens where the first one closed.
+            var nudgeReads = transport.Requests.FindAll(request => request.Url.Contains("/team_events"));
+            Assert.That(nudgeReads[0].Url, Does.Contain("order=created_at.desc"));
+            Assert.That(nudgeReads[1].Url, Does.Contain("created_at=gt."));
+            Assert.That(nudgeReads[1].Url, Does.Contain("2026-08-28T01"));
+        }
+
+        [Test]
+        public async Task SendNudge_OmitsTheTargetForTheWholeTeam()
+        {
+            var transport = new QueueTransport(Ok("null"), Ok("null"));
+            var backend = CreateBackend(transport);
+
+            await backend.SendNudgeAsync(TeammateId.ToString("D"), CancellationToken.None);
+            await backend.SendNudgeAsync(null, CancellationToken.None);
+
+            Assert.That(transport.Requests[0].Url, Does.EndWith("/rest/v1/rpc/send_nudge"));
+            Assert.That(transport.Requests[0].Body, Does.Contain(TeammateId.ToString("D")));
+            Assert.That(transport.Requests[1].Body, Does.Not.Contain("p_target_member_id"));
+        }
+
         private static SupabaseTeamBackend CreateBackend(ISupabaseHttpTransport transport)
         {
             return new SupabaseTeamBackend(
@@ -442,11 +494,21 @@ namespace TeamOverlay.Tests.EditMode
             public List<SupabaseHttpRequest> Requests { get; } =
                 new List<SupabaseHttpRequest>();
 
+            /// <summary>Nudge reads queued separately; an empty queue answers "no nudges".</summary>
+            public Queue<SupabaseHttpResponse> NudgeResponses { get; } =
+                new Queue<SupabaseHttpResponse>();
+
             public Task<SupabaseHttpResponse> SendAsync(
                 SupabaseHttpRequest request,
                 CancellationToken cancellationToken)
             {
                 Requests.Add(request);
+                if (request.Url.Contains("/team_events"))
+                {
+                    return Task.FromResult(
+                        NudgeResponses.Count > 0 ? NudgeResponses.Dequeue() : Ok("[]"));
+                }
+
                 if (_responses.Count == 0)
                 {
                     throw new InvalidOperationException("No fake response was queued.");
