@@ -365,11 +365,6 @@ namespace TeamOverlay.UI
         }
 
         /// <summary>
-        /// Resolves the Supabase member for a name. The Auth session is stored per
-        /// name, so re-entering a name used on this PC restores that member instead
-        /// of creating a second anonymous user.
-        /// </summary>
-        /// <summary>
         /// Signs in as the account the entered name designates. The name is the
         /// account, so the same name reaches the same member from any PC and the
         /// stored session is only a cache that saves one round trip.

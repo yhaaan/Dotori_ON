@@ -12,8 +12,6 @@ namespace TeamOverlay.Audio
         private AudioClip _notificationClip;
         private AudioSource _audioSource;
 
-        public int PlayCount { get; private set; }
-
         private void Awake()
         {
             _audioSource = gameObject.AddComponent<AudioSource>();
@@ -31,7 +29,6 @@ namespace TeamOverlay.Audio
                 return;
             }
 
-            PlayCount++;
             _audioSource.PlayOneShot(_notificationClip);
         }
 

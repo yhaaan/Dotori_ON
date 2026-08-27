@@ -47,8 +47,6 @@ namespace TeamOverlay.Supabase
             }
         }
 
-        public SupabaseAuthSession CurrentSession => _session;
-
         /// <summary>
         /// Signs in as the account the name itself designates, creating it on first
         /// use. The same name resolves to the same Auth user on every machine, so a
@@ -101,7 +99,7 @@ namespace TeamOverlay.Supabase
                 member = await GetCurrentMemberAsync(_session, cancellationToken);
             }
 
-            return new SupabaseIdentityBootstrap(_session, member, createdUser);
+            return new SupabaseIdentityBootstrap(member, createdUser);
         }
 
         private async Task<NameSignInResult> SignInOrSignUpWithNameAsync(
@@ -337,7 +335,7 @@ namespace TeamOverlay.Supabase
         {
             var url = _projectUrl + "/rest/v1/members?id=eq." +
                       Uri.EscapeDataString(session.UserId.ToString("D")) +
-                      "&select=id,team_id,display_name,normalized_name,sort_order&limit=1";
+                      "&select=id,team_id,display_name,sort_order&limit=1";
             var response = await _transport.SendAsync(
                 CreateAuthorizedRequest("GET", url, null, session),
                 cancellationToken);
@@ -444,7 +442,6 @@ namespace TeamOverlay.Supabase
                 id,
                 teamId,
                 document.display_name,
-                document.normalized_name,
                 document.sort_order);
         }
 
@@ -514,7 +511,6 @@ namespace TeamOverlay.Supabase
             public string id;
             public string team_id;
             public string display_name;
-            public string normalized_name;
             public int sort_order;
         }
     }

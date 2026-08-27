@@ -52,13 +52,11 @@ namespace TeamOverlay.Supabase
             Guid id,
             Guid teamId,
             string displayName,
-            string normalizedName,
             int sortOrder)
         {
             Id = id;
             TeamId = teamId;
             DisplayName = displayName;
-            NormalizedName = normalizedName;
             SortOrder = sortOrder;
         }
 
@@ -67,8 +65,6 @@ namespace TeamOverlay.Supabase
         public Guid TeamId { get; }
 
         public string DisplayName { get; }
-
-        public string NormalizedName { get; }
 
         public int SortOrder { get; }
     }
@@ -96,16 +92,12 @@ namespace TeamOverlay.Supabase
     public sealed class SupabaseIdentityBootstrap
     {
         public SupabaseIdentityBootstrap(
-            SupabaseAuthSession session,
             SupabaseMemberRecord member,
             bool createdAnonymousUser)
         {
-            Session = session ?? throw new ArgumentNullException(nameof(session));
             Member = member;
             CreatedAnonymousUser = createdAnonymousUser;
         }
-
-        public SupabaseAuthSession Session { get; }
 
         public SupabaseMemberRecord Member { get; }
 

@@ -26,9 +26,6 @@ namespace TeamOverlay.UI
         private EventTrigger.Entry _submitEntry;
 
         public event Action<string> Submitted;
-        public bool IsVisible => gameObject.activeSelf;
-        public bool IsBusy => _isBusy;
-        public string CurrentName => _nameInput.text;
 
         public void Initialize()
         {

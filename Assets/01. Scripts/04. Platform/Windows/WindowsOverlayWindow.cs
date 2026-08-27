@@ -20,13 +20,11 @@ namespace TeamOverlay.Platform.Windows
 
         public bool IsInitialized { get; private set; }
 
-        public bool IsMinimized { get; private set; }
-
-        public event Action Initialized;
-
-        public event Action StateChanged;
-
-        /// <summary>Raised for the tray-menu exit and for Alt+F4.</summary>
+        // Both events below are raised only from the Windows-only message loop, so
+        // an Editor or non-Windows compile sees a declaration with no raise site.
+        // That is the intended shape here rather than an oversight.
+#pragma warning disable 67
+        /// <summary>Raised when the window is closed, by its close button or Alt+F4.</summary>
         public event Action ClockOutAndExitRequested;
 
         /// <summary>
@@ -35,6 +33,7 @@ namespace TeamOverlay.Platform.Windows
         /// a shutdown block reason keeps the shell waiting in the meantime.
         /// </summary>
         public event Action SessionEndingRequested;
+#pragma warning restore 67
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
         public const int OverlayWindowWidth = 480;
@@ -177,7 +176,6 @@ namespace TeamOverlay.Platform.Windows
                     WindowsNativeMethods.SwpNoActivate);
             }
 #endif
-            StateChanged?.Invoke();
         }
 
         public void ToggleAlwaysOnTop()
@@ -211,8 +209,6 @@ namespace TeamOverlay.Platform.Windows
             }
 
             WindowsNativeMethods.ShowWindow(_windowHandle, WindowsNativeMethods.SwMinimize);
-            IsMinimized = true;
-            StateChanged?.Invoke();
 #endif
         }
 
@@ -305,9 +301,6 @@ namespace TeamOverlay.Platform.Windows
             SetAlwaysOnTop(IsAlwaysOnTop);
 
             IsInitialized = true;
-            IsMinimized = false;
-            Initialized?.Invoke();
-            StateChanged?.Invoke();
             return true;
         }
 
