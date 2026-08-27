@@ -157,7 +157,7 @@ namespace TeamOverlay.Editor
                 var dragHandle = dragArea.gameObject.AddComponent<WindowDragHandle>();
                 var title = UiFactory.CreateText("Title", dragArea.transform, font, 12,
                     TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
-                title.text = "TEAM OVERLAY";
+                title.text = "Dotori ON";
                 UiFactory.Stretch(title.rectTransform, 10f, 0f, 0f, 0f);
 
                 Button fake = null;
@@ -217,7 +217,7 @@ namespace TeamOverlay.Editor
                 var notePlaceholder = UiFactory.CreateText("Placeholder", noteBackground.transform, font, 10,
                     TextAnchor.MiddleLeft, new Color(TeamOverlayPalette.TextSecondary.r,
                         TeamOverlayPalette.TextSecondary.g, TeamOverlayPalette.TextSecondary.b, 0.68f));
-                notePlaceholder.text = "메모를 입력하고 Enter";
+                notePlaceholder.text = "메모";
                 notePlaceholder.fontStyle = FontStyle.Italic;
                 UiFactory.Stretch(notePlaceholder.rectTransform, 8f, 2f, 8f, 2f);
                 noteInput.textComponent = noteText;
