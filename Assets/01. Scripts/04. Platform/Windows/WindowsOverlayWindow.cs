@@ -46,6 +46,9 @@ namespace TeamOverlay.Platform.Windows
         /// </summary>
         public const int StatisticsPanelHeight = 424;
 
+        /// <summary>Backstop for a window whose messages no longer reach us.</summary>
+        private const float WindowAuditIntervalSeconds = 5f;
+
         private static WindowsOverlayWindow _activeInstance;
 
         private WindowsNativeMethods.WindowProcedure _windowProcedure;
@@ -60,7 +63,8 @@ namespace TeamOverlay.Platform.Windows
         private int _sessionEndPending;
         private bool _sessionEndReported;
         private bool _statisticsExpanded;
-        private float _nextStyleGuard;
+        private int _windowStateDirty;
+        private float _nextWindowAudit;
 #endif
 
         /// <summary>Grows the window so the statistics panel fits under the compact layout.</summary>
@@ -125,8 +129,8 @@ namespace TeamOverlay.Platform.Windows
         /// <summary>
         /// Unity re-asserts its own windowed style whenever it touches the window,
         /// so stripping the frame once at startup loses the race and the title bar
-        /// comes back for good. Keeping it stripped, and the client area the right
-        /// size, costs two reads a second.
+        /// comes back for good. This runs on the frames the window actually
+        /// changed, and finds nothing to do on almost all of them.
         /// </summary>
         private void EnforceOverlayWindow()
         {
@@ -247,9 +251,16 @@ namespace TeamOverlay.Platform.Windows
                 TryInitialize();
             }
 
-            if (IsInitialized && Time.unscaledTime >= _nextStyleGuard)
+            // The window procedure flags the frames that actually changed the
+            // window, so nothing is polled while nothing happens. The slow audit
+            // is only there for the case the hook is gone - if Unity ever replaces
+            // the window procedure or the window itself, no message arrives to
+            // tell us the frame came back.
+            if (IsInitialized &&
+                (Interlocked.Exchange(ref _windowStateDirty, 0) != 0 ||
+                 Time.unscaledTime >= _nextWindowAudit))
             {
-                _nextStyleGuard = Time.unscaledTime + 0.5f;
+                _nextWindowAudit = Time.unscaledTime + WindowAuditIntervalSeconds;
                 EnforceOverlayWindow();
             }
 
@@ -418,7 +429,17 @@ namespace TeamOverlay.Platform.Windows
             IntPtr wordParameter,
             IntPtr longParameter)
         {
-            if (message == WindowsNativeMethods.WmQueryEndSession)
+            if (message == WindowsNativeMethods.WmStyleChanged ||
+                message == WindowsNativeMethods.WmWindowPosChanged ||
+                message == WindowsNativeMethods.WmDpiChanged)
+            {
+                // Re-applying the style from inside the window procedure would
+                // re-enter it, so Update does the work on the next frame. Our own
+                // SetWindowPos raises this too; that pass simply finds nothing to
+                // correct and stops.
+                Interlocked.Exchange(ref _windowStateDirty, 1);
+            }
+            else if (message == WindowsNativeMethods.WmQueryEndSession)
             {
                 // Agree to the shutdown, but register a reason so the shell waits
                 // while Update runs the final checkout. The window procedure has to

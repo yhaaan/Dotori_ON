@@ -28,6 +28,9 @@ namespace TeamOverlay.Platform.Windows
         internal const uint WmQueryEndSession = 0x0011;
         internal const uint WmEndSession = 0x0016;
         internal const uint WmNcLButtonDown = 0x00A1;
+        internal const uint WmWindowPosChanged = 0x0047;
+        internal const uint WmStyleChanged = 0x007D;
+        internal const uint WmDpiChanged = 0x02E0;
 
         internal const int HtCaption = 2;
         internal const uint GwOwner = 4;
