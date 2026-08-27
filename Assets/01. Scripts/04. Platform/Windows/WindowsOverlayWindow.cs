@@ -60,82 +60,92 @@ namespace TeamOverlay.Platform.Windows
         private int _exitPending;
         private int _sessionEndPending;
         private bool _sessionEndReported;
-        private int _compactWindowHeight;
+        private bool _statisticsExpanded;
+        private float _nextStyleGuard;
 #endif
 
-        /// <summary>
-        /// Grows the window by exactly the statistics panel's height, remembering
-        /// the height it grew from.
-        /// </summary>
+        /// <summary>Grows the window so the statistics panel fits under the compact layout.</summary>
         public void ExpandForStatistics()
         {
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            if (!TryGetWindowSize(out var width, out var height))
-            {
-                return;
-            }
-
-            if (_compactWindowHeight <= 0)
-            {
-                _compactWindowHeight = height;
-            }
-
-            // The canvas scales on width, so a window wider than the reference
-            // width renders the panel's design pixels proportionally taller.
-            var panelHeight = Mathf.RoundToInt(
-                StatisticsPanelHeight * (float)width / OverlayWindowWidth);
-            ResizeWindow(width, _compactWindowHeight + panelHeight);
+            _statisticsExpanded = true;
+            ApplyContentSize();
 #endif
         }
 
-        /// <summary>
-        /// Puts the window back to the exact height it had before the statistics
-        /// panel opened. Collapsing to the compact constant instead assumed the
-        /// window was still the size this class asked for at startup; Unity sizes
-        /// the client area rather than the window rect, so the window it hands us
-        /// can be taller than that constant and the compact layout came back
-        /// clipped.
-        /// </summary>
+        /// <summary>Shrinks the window back to the compact layout.</summary>
         public void RestoreCompactHeight()
         {
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            if (!TryGetWindowSize(out var width, out _))
-            {
-                return;
-            }
-
-            ResizeWindow(width, _compactWindowHeight > 0 ? _compactWindowHeight : CompactWindowHeight);
+            _statisticsExpanded = false;
+            ApplyContentSize();
 #endif
         }
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-        private bool TryGetWindowSize(out int width, out int height)
+        /// <summary>
+        /// Nudges the window until its client area - the part Unity actually
+        /// draws - is exactly as tall as the layout needs.
+        ///
+        /// It corrects by the difference rather than by a measured frame
+        /// thickness: right after a style change the frame Windows reports can
+        /// still be the old one, and trusting it once baked the dead title bar's
+        /// 39px into the window for good. Measuring again on the next tick
+        /// finishes the job instead.
+        /// </summary>
+        private void ApplyContentSize()
         {
-            width = OverlayWindowWidth;
-            height = CompactWindowHeight;
             if (!EnsureWindowHandle() ||
-                !WindowsNativeMethods.GetWindowRect(_windowHandle, out var bounds))
+                WindowsNativeMethods.IsIconic(_windowHandle) ||
+                !WindowsNativeMethods.GetWindowRect(_windowHandle, out var window) ||
+                !WindowsNativeMethods.GetClientRect(_windowHandle, out var client))
             {
-                return false;
+                return;
             }
 
-            width = bounds.Width;
-            height = bounds.Height;
-            return true;
-        }
+            var contentHeight = CompactWindowHeight + (_statisticsExpanded ? StatisticsPanelHeight : 0);
+            var widthDelta = OverlayWindowWidth - client.Width;
+            var heightDelta = contentHeight - client.Height;
+            if (widthDelta == 0 && heightDelta == 0)
+            {
+                return;
+            }
 
-        private void ResizeWindow(int width, int height)
-        {
             WindowsNativeMethods.SetWindowPos(
                 _windowHandle,
                 IntPtr.Zero,
                 0,
                 0,
-                Math.Max(1, width),
-                Math.Max(1, height),
+                Math.Max(1, window.Width + widthDelta),
+                Math.Max(1, window.Height + heightDelta),
                 WindowsNativeMethods.SwpNoMove |
                 WindowsNativeMethods.SwpNoZOrder |
                 WindowsNativeMethods.SwpNoActivate);
+        }
+
+        /// <summary>
+        /// Unity re-asserts its own windowed style whenever it touches the window,
+        /// so stripping the frame once at startup loses the race and the title bar
+        /// comes back for good. Keeping it stripped, and the client area the right
+        /// size, costs two reads a second.
+        /// </summary>
+        private void EnforceOverlayWindow()
+        {
+            if (!EnsureWindowHandle() || WindowsNativeMethods.IsIconic(_windowHandle))
+            {
+                return;
+            }
+
+            var style = WindowsNativeMethods.GetWindowLongPointer(
+                    _windowHandle,
+                    WindowsNativeMethods.GwlStyle)
+                .ToInt64();
+            if ((style & (WindowsNativeMethods.WsCaption | WindowsNativeMethods.WsThickFrame)) != 0)
+            {
+                ApplyOverlayWindowStyle();
+            }
+
+            ApplyContentSize();
         }
 #endif
 
@@ -241,6 +251,12 @@ namespace TeamOverlay.Platform.Windows
                 TryInitialize();
             }
 
+            if (IsInitialized && Time.unscaledTime >= _nextStyleGuard)
+            {
+                _nextStyleGuard = Time.unscaledTime + 0.5f;
+                EnforceOverlayWindow();
+            }
+
             if (Interlocked.Exchange(ref _exitPending, 0) != 0)
             {
                 ClockOutAndExitRequested?.Invoke();
@@ -284,6 +300,7 @@ namespace TeamOverlay.Platform.Windows
             }
 
             ApplyOverlayWindowStyle();
+            ApplyContentSize();
             HookWindowProcedure();
             SetAlwaysOnTop(IsAlwaysOnTop);
 
@@ -364,9 +381,10 @@ namespace TeamOverlay.Platform.Windows
                 IntPtr.Zero,
                 0,
                 0,
-                OverlayWindowWidth,
-                CompactWindowHeight,
+                0,
+                0,
                 WindowsNativeMethods.SwpNoMove |
+                WindowsNativeMethods.SwpNoSize |
                 WindowsNativeMethods.SwpNoZOrder |
                 WindowsNativeMethods.SwpNoActivate |
                 WindowsNativeMethods.SwpFrameChanged);

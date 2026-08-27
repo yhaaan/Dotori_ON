@@ -106,7 +106,6 @@ namespace TeamOverlay.UI
             Application.runInBackground = true;
             Application.targetFrameRate = 30;
             QualitySettings.vSyncCount = 0;
-            Screen.SetResolution(480, 220, FullScreenMode.Windowed);
 
             _lifetime = new CancellationTokenSource();
             _identityStore = new LocalIdentityProfileStore();

@@ -150,6 +150,14 @@ namespace TeamOverlay.Platform.Windows
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetWindowRect(IntPtr windowHandle, out Rect rect);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetClientRect(IntPtr windowHandle, out Rect rect);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool IsIconic(IntPtr windowHandle);
+
         [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
         private static extern IntPtr GetWindowLongPtr64(IntPtr windowHandle, int index);
 
