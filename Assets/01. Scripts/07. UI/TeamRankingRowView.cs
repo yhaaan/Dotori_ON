@@ -13,16 +13,58 @@ namespace TeamOverlay.UI
         [SerializeField] private Text _attendanceLabel;
         [SerializeField] private Image _workBar;
 
-        public void Bind(int rank, TeamRankingEntry entry, int maximumWorkSeconds, bool isLocalMember)
+        public void Bind(
+            int rank,
+            TeamRankingEntry entry,
+            RankingMetric metric,
+            int maximumSeconds,
+            bool isLocalMember)
         {
             _rankLabel.text = rank.ToString();
             _nameLabel.text = entry.DisplayName;
-            _workLabel.text = "\uC791\uC5C5 " + TeamDailyStatRowView.FormatDuration(entry.WorkSeconds);
-            TeamDailyStatRowView.SetBarRatio(_workBar, entry.WorkSeconds, maximumWorkSeconds);
+            _workLabel.text = MetricName(metric) + " "
+                + TeamPeriodStatRowView.FormatDuration(entry.SecondsFor(metric));
+            _workLabel.color = MetricColor(metric);
+            TeamPeriodStatRowView.SetBarRatio(_workBar, entry.SecondsFor(metric), maximumSeconds);
+            if (_workBar != null)
+            {
+                _workBar.color = MetricColor(metric);
+            }
+
             _background.color = isLocalMember
                 ? new Color(0.14f, 0.25f, 0.37f, 1f)
                 : TeamOverlayPalette.Card;
-            _attendanceLabel.text = "\uCD1D " + TeamDailyStatRowView.FormatDuration(entry.AttendanceSeconds);
+
+            // The second line is the number the ranked one is most often compared
+            // against: work against the whole session, anything else against work.
+            var comparison = metric == RankingMetric.Work
+                ? RankingMetric.Attendance
+                : RankingMetric.Work;
+            _attendanceLabel.text = MetricName(comparison) + " "
+                + TeamPeriodStatRowView.FormatDuration(entry.SecondsFor(comparison));
+            _attendanceLabel.color = MetricColor(comparison);
+        }
+
+        public static string MetricName(RankingMetric metric)
+        {
+            switch (metric)
+            {
+                case RankingMetric.Attendance: return "총";
+                case RankingMetric.Break: return "휴식";
+                case RankingMetric.Meal: return "식사";
+                default: return "작업";
+            }
+        }
+
+        public static Color MetricColor(RankingMetric metric)
+        {
+            switch (metric)
+            {
+                case RankingMetric.Attendance: return TeamOverlayPalette.Accent;
+                case RankingMetric.Break: return TeamOverlayPalette.Break;
+                case RankingMetric.Meal: return TeamOverlayPalette.Meal;
+                default: return TeamOverlayPalette.Working;
+            }
         }
     }
 }

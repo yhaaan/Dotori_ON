@@ -46,6 +46,7 @@ namespace TeamOverlay.UI
         public event Action SwitchAccountRequested;
         public event Action<string> StatusNoteSubmitted;
         public event Action StatsToggleRequested;
+        public event Action<StatisticsPeriod> StatisticsPeriodChangeRequested;
 
         public bool IsStatisticsVisible => _statisticsPanel != null && _statisticsPanel.gameObject.activeSelf;
 
@@ -82,6 +83,8 @@ namespace TeamOverlay.UI
             if (_statisticsPanel != null)
             {
                 _statisticsPanel.Initialize();
+                _statisticsPanel.PeriodChangeRequested +=
+                    period => StatisticsPeriodChangeRequested?.Invoke(period);
                 _statisticsPanel.gameObject.SetActive(false);
             }
 
@@ -180,29 +183,28 @@ namespace TeamOverlay.UI
             Tint(_statsButton, visible ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button);
         }
 
-        public void ShowStatisticsLoading(DateTime fromLocalDate, DateTime toLocalDate)
+        public void SetStatisticsPeriod(StatisticsPeriod period)
         {
-            _statisticsPanel?.ShowLoading(fromLocalDate, toLocalDate);
+            _statisticsPanel?.SetPeriod(period);
+        }
+
+        public void ShowStatisticsLoading(StatisticsRange range)
+        {
+            _statisticsPanel?.ShowLoading(range);
         }
 
         public void BindStatistics(
-            DateTime fromLocalDate,
-            DateTime toLocalDate,
-            IReadOnlyList<MemberDailyStat> dailyStats,
+            StatisticsRange range,
+            IReadOnlyList<MemberPeriodStat> stats,
             IReadOnlyList<TeamRankingEntry> ranking,
             string localMemberId)
         {
-            _statisticsPanel?.Bind(
-                fromLocalDate,
-                toLocalDate,
-                dailyStats,
-                ranking,
-                localMemberId);
+            _statisticsPanel?.Bind(range, stats, ranking, localMemberId);
         }
 
-        public void ShowStatisticsError(DateTime fromLocalDate, DateTime toLocalDate, string message)
+        public void ShowStatisticsError(StatisticsRange range, string message)
         {
-            _statisticsPanel?.ShowError(fromLocalDate, toLocalDate, message);
+            _statisticsPanel?.ShowError(range, message);
         }
 
         private void AddListener(Button button, UnityEngine.Events.UnityAction action)

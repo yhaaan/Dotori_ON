@@ -42,9 +42,12 @@ namespace TeamOverlay.Tests.EditMode
             var statisticsData = new SerializedObject(statisticsPanel);
             AssertReference(statisticsData, "_dailyTabButton");
             AssertReference(statisticsData, "_rankingTabButton");
-            Assert.That(statisticsData.FindProperty("_dailyRows").arraySize, Is.EqualTo(7));
+            AssertReference(statisticsData, "_summaryText");
+            Assert.That(statisticsData.FindProperty("_statRows").arraySize, Is.EqualTo(7));
             Assert.That(statisticsData.FindProperty("_rankingRows").arraySize, Is.EqualTo(4));
-            foreach (var row in main.GetComponentsInChildren<TeamDailyStatRowView>(true))
+            Assert.That(statisticsData.FindProperty("_periodButtons").arraySize, Is.EqualTo(3));
+            Assert.That(statisticsData.FindProperty("_metricButtons").arraySize, Is.EqualTo(4));
+            foreach (var row in main.GetComponentsInChildren<TeamPeriodStatRowView>(true))
             {
                 var rowData = new SerializedObject(row);
                 AssertReference(rowData, "_dateLabel");
@@ -54,7 +57,7 @@ namespace TeamOverlay.Tests.EditMode
                 AssertReference(rowData, "_workBar");
                 AssertReference(rowData, "_attendanceBar");
             }
-            Assert.That(main.GetComponentsInChildren<TeamDailyStatRowView>(true).Length, Is.EqualTo(7));
+            Assert.That(main.GetComponentsInChildren<TeamPeriodStatRowView>(true).Length, Is.EqualTo(7));
             foreach (var row in main.GetComponentsInChildren<TeamRankingRowView>(true))
             {
                 var rowData = new SerializedObject(row);
@@ -74,7 +77,9 @@ namespace TeamOverlay.Tests.EditMode
             Assert.That(main.transform.Find("WindowBackground/TopBar/FakeCheckIn"), Is.Null);
             var panelRect = main.transform.Find("WindowBackground/StatisticsPanel").GetComponent<RectTransform>();
             Assert.That(panelRect.anchoredPosition.y, Is.EqualTo(-220f));
-            Assert.That(panelRect.sizeDelta.y, Is.EqualTo(400f));
+            // The window grows by exactly the panel height, so the two constants
+            // have to agree or the compact layout comes back clipped.
+            Assert.That(panelRect.sizeDelta.y, Is.EqualTo(424f));
             AssertReference(mainData, "_statusNoteInput");
             AssertReference(mainData, "_windowDragHandle");
 
@@ -132,7 +137,7 @@ namespace TeamOverlay.Tests.EditMode
             int seconds,
             string expected)
         {
-            Assert.That(TeamDailyStatRowView.FormatDuration(seconds), Is.EqualTo(expected));
+            Assert.That(TeamPeriodStatRowView.FormatDuration(seconds), Is.EqualTo(expected));
         }
 
         [Test]
@@ -143,9 +148,14 @@ namespace TeamOverlay.Tests.EditMode
             var instance = Object.Instantiate(prefab);
             try
             {
-                var daily = instance.GetComponentsInChildren<TeamDailyStatRowView>(true)[0];
-                daily.Bind(new TeamOverlay.Core.MemberDailyStat(
-                    new System.DateTime(2026, 8, 27), 1800, 900, 300, 600), 1800, 3600);
+                var daily = instance.GetComponentsInChildren<TeamPeriodStatRowView>(true)[0];
+                daily.Bind(
+                    new TeamOverlay.Core.MemberPeriodStat(
+                        new System.DateTime(2026, 8, 27), new System.DateTime(2026, 8, 27),
+                        1800, 900, 300, 600),
+                    TeamOverlay.Core.StatisticsBucket.Day,
+                    1800,
+                    3600);
                 var dailyData = new SerializedObject(daily);
                 var totalLabel = (Text)dailyData.FindProperty("_attendanceLabel").objectReferenceValue;
                 var workBar = (Image)dailyData.FindProperty("_workBar").objectReferenceValue;
@@ -155,19 +165,75 @@ namespace TeamOverlay.Tests.EditMode
                 Assert.That(workBar.rectTransform.anchorMax.x, Is.EqualTo(0.5f).Within(0.001f));
                 Assert.That(attendanceBar.rectTransform.anchorMax.x, Is.EqualTo(0.5f).Within(0.001f));
 
-                daily.Bind(new TeamOverlay.Core.MemberDailyStat(
-                    new System.DateTime(2026, 8, 27), 0, 0, 0, 0), 1800, 3600);
+                daily.Bind(
+                    new TeamOverlay.Core.MemberPeriodStat(
+                        new System.DateTime(2026, 8, 27), new System.DateTime(2026, 8, 27),
+                        0, 0, 0, 0),
+                    TeamOverlay.Core.StatisticsBucket.Day,
+                    1800,
+                    3600);
                 Assert.That(workBar.rectTransform.anchorMax.x, Is.Zero);
                 Assert.That(attendanceBar.rectTransform.anchorMax.x, Is.Zero);
 
                 var ranking = instance.GetComponentsInChildren<TeamRankingRowView>(true)[0];
-                ranking.Bind(1, new TeamOverlay.Core.TeamRankingEntry(
-                    "member", "name", 0, 900, 1800), 1800, false);
+                ranking.Bind(
+                    1,
+                    new TeamOverlay.Core.TeamRankingEntry("member", "name", 0, 900, 1800, 300, 600),
+                    TeamOverlay.Core.RankingMetric.Work,
+                    1800,
+                    false);
                 var rankingData = new SerializedObject(ranking);
                 var rankingTotal = (Text)rankingData.FindProperty("_attendanceLabel").objectReferenceValue;
                 var rankingBar = (Image)rankingData.FindProperty("_workBar").objectReferenceValue;
                 Assert.That(rankingTotal.text, Is.EqualTo("\uCD1D 00:30"));
                 Assert.That(rankingBar.rectTransform.anchorMax.x, Is.EqualTo(0.5f).Within(0.001f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
+        }
+
+        [Test]
+        public void StatisticsPanel_ReordersTheRankingLocallyWhenTheMetricChanges()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/02. Prefabs/TeamOverlayCanvas.prefab");
+            var instance = Object.Instantiate(prefab);
+            try
+            {
+                var panel = instance.GetComponentInChildren<TeamStatisticsPanelView>(true);
+                panel.Initialize();
+                panel.Bind(
+                    TeamOverlay.Core.StatisticsRange.Resolve(
+                        TeamOverlay.Core.StatisticsPeriod.LastSevenDays,
+                        new System.DateTime(2026, 8, 27)),
+                    new[]
+                    {
+                        new TeamOverlay.Core.MemberPeriodStat(
+                            new System.DateTime(2026, 8, 27), new System.DateTime(2026, 8, 27),
+                            3600, 1800, 600, 1200)
+                    },
+                    new[]
+                    {
+                        new TeamOverlay.Core.TeamRankingEntry("worker", "일벌레", 0, 3600, 7200, 60, 60),
+                        new TeamOverlay.Core.TeamRankingEntry("eater", "먹보", 1, 600, 7200, 60, 3000)
+                    },
+                    "worker");
+
+                var rows = instance.GetComponentsInChildren<TeamRankingRowView>(true);
+                var topName = (Text)new SerializedObject(rows[0])
+                    .FindProperty("_nameLabel").objectReferenceValue;
+                Assert.That(topName.text, Is.EqualTo("\uC77C\uBC8C\uB808"));
+
+                // Every entry already carries all four numbers, so picking another
+                // metric must reorder the rows without asking the server again.
+                var mealButton = instance.transform
+                    .Find("WindowBackground/StatisticsPanel/RankingContent/MetricMeal")
+                    .GetComponent<Button>();
+                mealButton.onClick.Invoke();
+
+                Assert.That(topName.text, Is.EqualTo("\uBA39\uBCF4"));
             }
             finally
             {

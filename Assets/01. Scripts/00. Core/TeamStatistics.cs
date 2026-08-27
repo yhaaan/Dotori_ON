@@ -5,28 +5,112 @@ using System.Threading.Tasks;
 
 namespace TeamOverlay.Core
 {
+    /// <summary>How wide a slice of history the statistics panel is showing.</summary>
+    public enum StatisticsPeriod
+    {
+        LastSevenDays = 0,
+        ThisMonth = 1,
+        AllTime = 2
+    }
+
     /// <summary>
-    /// One local day of totals. Attendance is the whole open-to-close span, while
+    /// How the server folds days together before sending them. A month of daily
+    /// rows does not fit the overlay, so a wider period asks for wider buckets
+    /// instead of more rows.
+    /// </summary>
+    public enum StatisticsBucket
+    {
+        Day = 0,
+        Week = 1,
+        Month = 2
+    }
+
+    /// <summary>Which number the ranking is sorted and drawn by.</summary>
+    public enum RankingMetric
+    {
+        Work = 0,
+        Attendance = 1,
+        Break = 2,
+        Meal = 3
+    }
+
+    /// <summary>
+    /// A period turned into the dates and bucket size a request needs. A null
+    /// <see cref="FromLocalDate"/> means "everything on record": the client has no
+    /// way to know when the team started, so the server resolves that end.
+    /// </summary>
+    public sealed class StatisticsRange
+    {
+        private StatisticsRange(
+            StatisticsPeriod period,
+            DateTime? fromLocalDate,
+            DateTime toLocalDate,
+            StatisticsBucket bucket)
+        {
+            Period = period;
+            FromLocalDate = fromLocalDate?.Date;
+            ToLocalDate = toLocalDate.Date;
+            Bucket = bucket;
+        }
+
+        public StatisticsPeriod Period { get; }
+
+        public DateTime? FromLocalDate { get; }
+
+        public DateTime ToLocalDate { get; }
+
+        public StatisticsBucket Bucket { get; }
+
+        public static StatisticsRange Resolve(StatisticsPeriod period, DateTime todayLocal)
+        {
+            var today = todayLocal.Date;
+            switch (period)
+            {
+                case StatisticsPeriod.ThisMonth:
+                    return new StatisticsRange(
+                        period,
+                        new DateTime(today.Year, today.Month, 1),
+                        today,
+                        StatisticsBucket.Week);
+                case StatisticsPeriod.AllTime:
+                    return new StatisticsRange(period, null, today, StatisticsBucket.Month);
+                default:
+                    return new StatisticsRange(
+                        StatisticsPeriod.LastSevenDays,
+                        today.AddDays(-6),
+                        today,
+                        StatisticsBucket.Day);
+            }
+        }
+    }
+
+    /// <summary>
+    /// One bucket of totals. Attendance is the whole open-to-close span, while
     /// work counts only the working intervals inside it, so the two are different
     /// numbers on purpose: "how long the app was on" is not "how long I worked".
     /// </summary>
-    public sealed class MemberDailyStat
+    public sealed class MemberPeriodStat
     {
-        public MemberDailyStat(
-            DateTime localDate,
+        public MemberPeriodStat(
+            DateTime bucketStart,
+            DateTime bucketEnd,
             int attendanceSeconds,
             int workSeconds,
             int breakSeconds,
             int mealSeconds)
         {
-            LocalDate = localDate.Date;
+            BucketStart = bucketStart.Date;
+            BucketEnd = bucketEnd.Date < BucketStart ? BucketStart : bucketEnd.Date;
             AttendanceSeconds = Math.Max(0, attendanceSeconds);
             WorkSeconds = Math.Max(0, workSeconds);
             BreakSeconds = Math.Max(0, breakSeconds);
             MealSeconds = Math.Max(0, mealSeconds);
         }
 
-        public DateTime LocalDate { get; }
+        public DateTime BucketStart { get; }
+
+        /// <summary>Inclusive. Equal to <see cref="BucketStart"/> for a daily bucket.</summary>
+        public DateTime BucketEnd { get; }
 
         public int AttendanceSeconds { get; }
 
@@ -37,9 +121,24 @@ namespace TeamOverlay.Core
         public int MealSeconds { get; }
 
         public bool HasActivity => AttendanceSeconds > 0;
+
+        public int SecondsFor(RankingMetric metric)
+        {
+            switch (metric)
+            {
+                case RankingMetric.Attendance: return AttendanceSeconds;
+                case RankingMetric.Break: return BreakSeconds;
+                case RankingMetric.Meal: return MealSeconds;
+                default: return WorkSeconds;
+            }
+        }
     }
 
-    /// <summary>A member's place in the work-time ranking for a date range.</summary>
+    /// <summary>
+    /// A member's totals for a date range. Every metric travels with the entry so
+    /// switching the ranked metric re-sorts four members locally instead of
+    /// costing another round trip.
+    /// </summary>
     public sealed class TeamRankingEntry
     {
         public TeamRankingEntry(
@@ -47,7 +146,9 @@ namespace TeamOverlay.Core
             string displayName,
             int sortOrder,
             int workSeconds,
-            int attendanceSeconds)
+            int attendanceSeconds,
+            int breakSeconds,
+            int mealSeconds)
         {
             if (string.IsNullOrWhiteSpace(memberId))
             {
@@ -59,6 +160,8 @@ namespace TeamOverlay.Core
             SortOrder = sortOrder;
             WorkSeconds = Math.Max(0, workSeconds);
             AttendanceSeconds = Math.Max(0, attendanceSeconds);
+            BreakSeconds = Math.Max(0, breakSeconds);
+            MealSeconds = Math.Max(0, mealSeconds);
         }
 
         public string MemberId { get; }
@@ -70,6 +173,21 @@ namespace TeamOverlay.Core
         public int WorkSeconds { get; }
 
         public int AttendanceSeconds { get; }
+
+        public int BreakSeconds { get; }
+
+        public int MealSeconds { get; }
+
+        public int SecondsFor(RankingMetric metric)
+        {
+            switch (metric)
+            {
+                case RankingMetric.Attendance: return AttendanceSeconds;
+                case RankingMetric.Break: return BreakSeconds;
+                case RankingMetric.Meal: return MealSeconds;
+                default: return WorkSeconds;
+            }
+        }
     }
 
     /// <summary>
@@ -80,19 +198,17 @@ namespace TeamOverlay.Core
     public interface ITeamStatistics
     {
         /// <summary>
-        /// Per-day totals for one member, inclusive of both dates. Dates are team
-        /// local dates, not UTC.
+        /// Totals for one member, bucketed as the range asks. Dates are team local
+        /// dates, not UTC.
         /// </summary>
-        Task<IReadOnlyList<MemberDailyStat>> GetDailyStatsAsync(
+        Task<IReadOnlyList<MemberPeriodStat>> GetPeriodStatsAsync(
             string memberId,
-            DateTime fromLocalDate,
-            DateTime toLocalDate,
+            StatisticsRange range,
             CancellationToken cancellationToken);
 
-        /// <summary>Work-time ranking for the team, highest first.</summary>
-        Task<IReadOnlyList<TeamRankingEntry>> GetWorkRankingAsync(
-            DateTime fromLocalDate,
-            DateTime toLocalDate,
+        /// <summary>Every member's totals for the range, work time first.</summary>
+        Task<IReadOnlyList<TeamRankingEntry>> GetRankingAsync(
+            StatisticsRange range,
             CancellationToken cancellationToken);
     }
 }

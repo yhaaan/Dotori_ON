@@ -194,27 +194,29 @@ namespace TeamOverlay.Tests.EditMode
         }
 
         [Test]
-        public async Task DailyStats_ParsesEachDayAndKeepsLocalDates()
+        public async Task PeriodStats_ParsesEachBucketAndKeepsLocalDates()
         {
             var transport = new QueueTransport(Ok(
-                "[{\"local_date\":\"2026-08-25\",\"attendance_seconds\":0,"
+                "[{\"bucket_start\":\"2026-08-25\",\"bucket_end\":\"2026-08-25\","
+                + "\"attendance_seconds\":0,"
                 + "\"work_seconds\":0,\"break_seconds\":0,\"meal_seconds\":0},"
-                + "{\"local_date\":\"2026-08-27\",\"attendance_seconds\":3097,"
+                + "{\"bucket_start\":\"2026-08-27\",\"bucket_end\":\"2026-08-27\","
+                + "\"attendance_seconds\":3097,"
                 + "\"work_seconds\":482,\"break_seconds\":1628,\"meal_seconds\":987}]"));
             var backend = CreateBackend(transport);
 
-            var stats = await backend.GetDailyStatsAsync(
+            var stats = await backend.GetPeriodStatsAsync(
                 LocalMemberId.ToString("D"),
-                new DateTime(2026, 8, 25),
-                new DateTime(2026, 8, 27),
+                StatisticsRange.Resolve(StatisticsPeriod.LastSevenDays, new DateTime(2026, 8, 27)),
                 CancellationToken.None);
 
             Assert.That(stats.Count, Is.EqualTo(2));
-            Assert.That(stats[0].LocalDate, Is.EqualTo(new DateTime(2026, 8, 25)));
+            Assert.That(stats[0].BucketStart, Is.EqualTo(new DateTime(2026, 8, 25)));
             Assert.That(stats[0].HasActivity, Is.False);
 
             var busy = stats[1];
-            Assert.That(busy.LocalDate, Is.EqualTo(new DateTime(2026, 8, 27)));
+            Assert.That(busy.BucketStart, Is.EqualTo(new DateTime(2026, 8, 27)));
+            Assert.That(busy.BucketEnd, Is.EqualTo(new DateTime(2026, 8, 27)));
             Assert.That(busy.AttendanceSeconds, Is.EqualTo(3097));
             Assert.That(busy.WorkSeconds, Is.EqualTo(482));
             Assert.That(
@@ -222,23 +224,25 @@ namespace TeamOverlay.Tests.EditMode
                 Is.EqualTo(busy.AttendanceSeconds),
                 "activity must account for the whole attendance span");
 
-            Assert.That(transport.Requests[0].Url, Does.EndWith("/rest/v1/rpc/member_daily_stats"));
-            Assert.That(transport.Requests[0].Body, Does.Contain("2026-08-25"));
+            Assert.That(transport.Requests[0].Url, Does.EndWith("/rest/v1/rpc/member_period_stats"));
+            Assert.That(transport.Requests[0].Body, Does.Contain("2026-08-21"));
             Assert.That(transport.Requests[0].Body, Does.Contain("2026-08-27"));
+            Assert.That(transport.Requests[0].Body, Does.Contain("\"p_bucket\":\"day\""));
         }
 
         [Test]
-        public async Task DailyStats_SendsTheLocalDateWithoutShiftingThroughUtc()
+        public async Task PeriodStats_SendsTheLocalDateWithoutShiftingThroughUtc()
         {
             // A date converted through UTC would land on the previous day for
             // anyone east of Greenwich, quietly reporting the wrong day.
             var transport = new QueueTransport(Ok("[]"));
             var backend = CreateBackend(transport);
 
-            await backend.GetDailyStatsAsync(
+            await backend.GetPeriodStatsAsync(
                 null,
-                new DateTime(2026, 1, 1, 0, 30, 0),
-                new DateTime(2026, 1, 1, 0, 30, 0),
+                StatisticsRange.Resolve(
+                    StatisticsPeriod.LastSevenDays,
+                    new DateTime(2026, 1, 1, 0, 30, 0)),
                 CancellationToken.None);
 
             Assert.That(transport.Requests[0].Body, Does.Contain("2026-01-01"));
@@ -246,27 +250,61 @@ namespace TeamOverlay.Tests.EditMode
         }
 
         [Test]
-        public async Task WorkRanking_ParsesEntriesInServerOrder()
+        public async Task PeriodStats_LeavesTheStartDateOutWhenAskingForEverything()
+        {
+            // An empty string is not a date to Postgres, so the all-time request
+            // has to omit p_from and let the server default resolve it.
+            var transport = new QueueTransport(Ok("[]"));
+            var backend = CreateBackend(transport);
+
+            await backend.GetPeriodStatsAsync(
+                null,
+                StatisticsRange.Resolve(StatisticsPeriod.AllTime, new DateTime(2026, 8, 27)),
+                CancellationToken.None);
+
+            Assert.That(transport.Requests[0].Body, Does.Not.Contain("p_from"));
+            Assert.That(transport.Requests[0].Body, Does.Contain("\"p_bucket\":\"month\""));
+            Assert.That(transport.Requests[0].Body, Does.Contain("2026-08-27"));
+        }
+
+        [Test]
+        public async Task Ranking_ParsesEveryMetricInServerOrder()
         {
             var transport = new QueueTransport(Ok(
                 "[{\"member_id\":\"" + TeammateId.ToString("D") + "\","
                 + "\"display_name\":\"하늘\",\"sort_order\":0,"
-                + "\"work_seconds\":482,\"attendance_seconds\":3097},"
+                + "\"work_seconds\":482,\"attendance_seconds\":3097,"
+                + "\"break_seconds\":1628,\"meal_seconds\":987},"
                 + "{\"member_id\":\"" + LocalMemberId.ToString("D") + "\","
                 + "\"display_name\":\"길동\",\"sort_order\":1,"
-                + "\"work_seconds\":278,\"attendance_seconds\":2879}]"));
+                + "\"work_seconds\":278,\"attendance_seconds\":2879,"
+                + "\"break_seconds\":2000,\"meal_seconds\":601}]"));
             var backend = CreateBackend(transport);
 
-            var ranking = await backend.GetWorkRankingAsync(
-                new DateTime(2026, 8, 21),
-                new DateTime(2026, 8, 27),
+            var ranking = await backend.GetRankingAsync(
+                StatisticsRange.Resolve(StatisticsPeriod.LastSevenDays, new DateTime(2026, 8, 27)),
                 CancellationToken.None);
 
             Assert.That(ranking.Count, Is.EqualTo(2));
             Assert.That(ranking[0].DisplayName, Is.EqualTo("하늘"));
             Assert.That(ranking[0].WorkSeconds, Is.EqualTo(482));
+            Assert.That(ranking[0].SecondsFor(RankingMetric.Break), Is.EqualTo(1628));
             Assert.That(ranking[1].DisplayName, Is.EqualTo("길동"));
-            Assert.That(transport.Requests[0].Url, Does.EndWith("/rest/v1/rpc/team_work_ranking"));
+            Assert.That(ranking[1].SecondsFor(RankingMetric.Meal), Is.EqualTo(601));
+            Assert.That(transport.Requests[0].Url, Does.EndWith("/rest/v1/rpc/team_activity_ranking"));
+        }
+
+        [Test]
+        public async Task Ranking_LeavesTheStartDateOutWhenAskingForEverything()
+        {
+            var transport = new QueueTransport(Ok("[]"));
+            var backend = CreateBackend(transport);
+
+            await backend.GetRankingAsync(
+                StatisticsRange.Resolve(StatisticsPeriod.AllTime, new DateTime(2026, 8, 27)),
+                CancellationToken.None);
+
+            Assert.That(transport.Requests[0].Body, Does.Not.Contain("p_from"));
         }
 
         private static SupabaseTeamBackend CreateBackend(ISupabaseHttpTransport transport)

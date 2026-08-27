@@ -9,17 +9,48 @@ namespace TeamOverlay.UI
 {
     public sealed class TeamStatisticsPanelView : MonoBehaviour
     {
+        private static readonly StatisticsPeriod[] Periods =
+        {
+            StatisticsPeriod.LastSevenDays,
+            StatisticsPeriod.ThisMonth,
+            StatisticsPeriod.AllTime
+        };
+
+        private static readonly RankingMetric[] Metrics =
+        {
+            RankingMetric.Work,
+            RankingMetric.Attendance,
+            RankingMetric.Break,
+            RankingMetric.Meal
+        };
+
         [SerializeField] private Button _dailyTabButton;
         [SerializeField] private Button _rankingTabButton;
+        [SerializeField] private Button[] _periodButtons = new Button[3];
+        [SerializeField] private Button[] _metricButtons = new Button[4];
         [SerializeField] private GameObject _dailyContent;
         [SerializeField] private GameObject _rankingContent;
         [SerializeField] private Text _periodLabel;
+        [SerializeField] private Text _summaryText;
         [SerializeField] private Text _feedbackText;
-        [SerializeField] private TeamDailyStatRowView[] _dailyRows;
+        [SerializeField] private TeamPeriodStatRowView[] _statRows;
         [SerializeField] private TeamRankingRowView[] _rankingRows;
 
         private bool _initialized;
         private bool _showRanking;
+        private StatisticsPeriod _period = StatisticsPeriod.LastSevenDays;
+        private StatisticsBucket _bucket = StatisticsBucket.Day;
+        private RankingMetric _metric = RankingMetric.Work;
+        private IReadOnlyList<TeamRankingEntry> _ranking;
+        private string _localMemberId;
+
+        /// <summary>
+        /// Raised when the person picks a different period. Only the app can serve
+        /// it, because a new period is a new request.
+        /// </summary>
+        public event Action<StatisticsPeriod> PeriodChangeRequested;
+
+        public StatisticsPeriod Period => _period;
 
         public void Initialize()
         {
@@ -31,67 +62,152 @@ namespace TeamOverlay.UI
             _initialized = true;
             _dailyTabButton?.onClick.AddListener(() => SelectTab(false));
             _rankingTabButton?.onClick.AddListener(() => SelectTab(true));
+
+            for (var index = 0; index < _periodButtons.Length && index < Periods.Length; index++)
+            {
+                var period = Periods[index];
+                _periodButtons[index]?.onClick.AddListener(() => PeriodChangeRequested?.Invoke(period));
+            }
+
+            // The metric never leaves this panel: every entry already carries all
+            // four numbers, so switching one is a re-sort, not another request.
+            for (var index = 0; index < _metricButtons.Length && index < Metrics.Length; index++)
+            {
+                var metric = Metrics[index];
+                _metricButtons[index]?.onClick.AddListener(() => SelectMetric(metric));
+            }
+
             SelectTab(false);
+            SetPeriod(_period);
+            SelectMetric(_metric);
         }
 
-        public void ShowLoading(DateTime fromLocalDate, DateTime toLocalDate)
+        /// <summary>Marks which period is showing. The app owns the actual load.</summary>
+        public void SetPeriod(StatisticsPeriod period)
         {
-            SetPeriod(fromLocalDate, toLocalDate);
-            SetRowsVisible(false);
-            ShowFeedback("\uCD5C\uADFC 7\uC77C \uD1B5\uACC4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\u2026", false);
+            _period = period;
+            for (var index = 0; index < _periodButtons.Length && index < Periods.Length; index++)
+            {
+                Tint(
+                    _periodButtons[index],
+                    Periods[index] == period ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button);
+            }
         }
 
-        public void ShowError(DateTime fromLocalDate, DateTime toLocalDate, string message)
+        public void ShowLoading(StatisticsRange range)
         {
-            SetPeriod(fromLocalDate, toLocalDate);
-            SetRowsVisible(false);
+            SetPeriodLabel(range);
+            ClearData();
+            ShowFeedback("통계를 불러오는 중…", false);
+        }
+
+        public void ShowError(StatisticsRange range, string message)
+        {
+            SetPeriodLabel(range);
+            ClearData();
             ShowFeedback(message, true);
         }
 
         public void Bind(
-            DateTime fromLocalDate,
-            DateTime toLocalDate,
-            IReadOnlyList<MemberDailyStat> dailyStats,
+            StatisticsRange range,
+            IReadOnlyList<MemberPeriodStat> stats,
             IReadOnlyList<TeamRankingEntry> ranking,
             string localMemberId)
         {
-            SetPeriod(fromLocalDate, toLocalDate);
-            BindDailyRows(dailyStats ?? Array.Empty<MemberDailyStat>());
-            BindRankingRows(ranking ?? Array.Empty<TeamRankingEntry>(), localMemberId);
+            SetPeriodLabel(range);
+            _bucket = range?.Bucket ?? StatisticsBucket.Day;
+            _localMemberId = localMemberId;
+            _ranking = ranking ?? Array.Empty<TeamRankingEntry>();
+            var buckets = stats ?? Array.Empty<MemberPeriodStat>();
+            BindStatRows(buckets);
+            BindSummary(buckets);
+            BindRankingRows();
             ShowFeedback(string.Empty, false);
             SelectTab(_showRanking);
         }
 
-        private void BindDailyRows(IReadOnlyList<MemberDailyStat> stats)
+        private void ClearData()
         {
-            var ordered = stats.OrderByDescending(entry => entry.LocalDate).ToArray();
+            _ranking = null;
+            SetRowsVisible(false);
+            if (_summaryText != null)
+            {
+                _summaryText.text = string.Empty;
+            }
+        }
+
+        private void BindStatRows(IReadOnlyList<MemberPeriodStat> stats)
+        {
+            // Newest first, and only as many buckets as there are rows: an all-time
+            // range keeps growing, while the summary below still covers every one.
+            var ordered = stats.OrderByDescending(entry => entry.BucketStart).ToArray();
             var maximumWork = ordered.Length == 0 ? 0 : ordered.Max(entry => entry.WorkSeconds);
             var maximumAttendance = ordered.Length == 0 ? 0 : ordered.Max(entry => entry.AttendanceSeconds);
-            for (var index = 0; index < _dailyRows.Length; index++)
+            for (var index = 0; index < _statRows.Length; index++)
             {
                 var hasEntry = index < ordered.Length;
-                _dailyRows[index].gameObject.SetActive(hasEntry);
+                _statRows[index].gameObject.SetActive(hasEntry);
                 if (hasEntry)
                 {
-                    _dailyRows[index].Bind(ordered[index], maximumWork, maximumAttendance);
+                    _statRows[index].Bind(ordered[index], _bucket, maximumWork, maximumAttendance);
                 }
             }
         }
 
-        private void BindRankingRows(IReadOnlyList<TeamRankingEntry> ranking, string localMemberId)
+        private void BindSummary(IReadOnlyList<MemberPeriodStat> stats)
         {
-            var maximumWork = ranking.Count == 0 ? 0 : ranking.Max(entry => entry.WorkSeconds);
+            if (_summaryText == null)
+            {
+                return;
+            }
+
+            var work = stats.Sum(entry => entry.WorkSeconds);
+            var attendance = stats.Sum(entry => entry.AttendanceSeconds);
+            // Averaging over every bucket would let untouched weekends drag the
+            // number down, so the divisor is the buckets that had any attendance.
+            var activeBuckets = stats.Count(entry => entry.HasActivity);
+            var average = activeBuckets == 0 ? 0 : work / activeBuckets;
+            _summaryText.text = "합계 작업 " + TeamPeriodStatRowView.FormatDuration(work)
+                + "  ·  총 " + TeamPeriodStatRowView.FormatDuration(attendance)
+                + "  ·  " + AverageLabel(_bucket) + " " + TeamPeriodStatRowView.FormatDuration(average)
+                + " (" + activeBuckets + UnitLabel(_bucket) + ")";
+        }
+
+        private void SelectMetric(RankingMetric metric)
+        {
+            _metric = metric;
+            for (var index = 0; index < _metricButtons.Length && index < Metrics.Length; index++)
+            {
+                Tint(
+                    _metricButtons[index],
+                    Metrics[index] == metric
+                        ? TeamRankingRowView.MetricColor(metric)
+                        : TeamOverlayPalette.Button);
+            }
+
+            BindRankingRows();
+        }
+
+        private void BindRankingRows()
+        {
+            var ranking = _ranking ?? Array.Empty<TeamRankingEntry>();
+            var ordered = ranking
+                .OrderByDescending(entry => entry.SecondsFor(_metric))
+                .ThenBy(entry => entry.SortOrder)
+                .ToArray();
+            var maximum = ordered.Length == 0 ? 0 : ordered.Max(entry => entry.SecondsFor(_metric));
             for (var index = 0; index < _rankingRows.Length; index++)
             {
-                var hasEntry = index < ranking.Count;
+                var hasEntry = index < ordered.Length;
                 _rankingRows[index].gameObject.SetActive(hasEntry);
                 if (hasEntry)
                 {
                     _rankingRows[index].Bind(
                         index + 1,
-                        ranking[index],
-                        maximumWork,
-                        string.Equals(ranking[index].MemberId, localMemberId, StringComparison.Ordinal));
+                        ordered[index],
+                        _metric,
+                        maximum,
+                        string.Equals(ordered[index].MemberId, _localMemberId, StringComparison.Ordinal));
                 }
             }
         }
@@ -107,15 +223,40 @@ namespace TeamOverlay.UI
 
         private void SetRowsVisible(bool visible)
         {
-            foreach (var row in _dailyRows) row.gameObject.SetActive(visible);
+            foreach (var row in _statRows) row.gameObject.SetActive(visible);
             foreach (var row in _rankingRows) row.gameObject.SetActive(visible);
         }
 
-        private void SetPeriod(DateTime fromLocalDate, DateTime toLocalDate)
+        private void SetPeriodLabel(StatisticsRange range)
         {
-            if (_periodLabel != null)
+            if (_periodLabel == null || range == null)
             {
-                _periodLabel.text = fromLocalDate.ToString("yyyy.MM.dd") + " - " + toLocalDate.ToString("yyyy.MM.dd");
+                return;
+            }
+
+            var from = range.FromLocalDate.HasValue
+                ? range.FromLocalDate.Value.ToString("yyyy.MM.dd")
+                : "처음";
+            _periodLabel.text = from + " - " + range.ToLocalDate.ToString("yyyy.MM.dd");
+        }
+
+        private static string AverageLabel(StatisticsBucket bucket)
+        {
+            switch (bucket)
+            {
+                case StatisticsBucket.Week: return "주평균";
+                case StatisticsBucket.Month: return "월평균";
+                default: return "일평균";
+            }
+        }
+
+        private static string UnitLabel(StatisticsBucket bucket)
+        {
+            switch (bucket)
+            {
+                case StatisticsBucket.Week: return "주";
+                case StatisticsBucket.Month: return "개월";
+                default: return "일";
             }
         }
 
@@ -137,5 +278,4 @@ namespace TeamOverlay.UI
             if (image != null) image.color = color;
         }
     }
-
 }

@@ -146,24 +146,39 @@ namespace TeamOverlay.Supabase
             }
         }
 
-        public async Task<IReadOnlyList<MemberDailyStat>> GetDailyStatsAsync(
+        public async Task<IReadOnlyList<MemberPeriodStat>> GetPeriodStatsAsync(
             string memberId,
-            DateTime fromLocalDate,
-            DateTime toLocalDate,
+            StatisticsRange range,
             CancellationToken cancellationToken)
         {
-            var body = JsonUtility.ToJson(new DailyStatsRequest
+            if (range == null)
             {
-                p_member_id = string.IsNullOrWhiteSpace(memberId) ? LocalMemberId : memberId,
-                p_from = FormatLocalDate(fromLocalDate),
-                p_to = FormatLocalDate(toLocalDate)
-            });
-            var response = await CallRpcAsync("member_daily_stats", body, cancellationToken);
+                throw new ArgumentNullException(nameof(range));
+            }
 
-            DailyStatArrayDocument document;
+            var member = string.IsNullOrWhiteSpace(memberId) ? LocalMemberId : memberId;
+            // An all-time range omits p_from rather than sending an empty string:
+            // the server's default resolves it to the member's first session.
+            var body = range.FromLocalDate.HasValue
+                ? JsonUtility.ToJson(new PeriodStatsRequest
+                {
+                    p_member_id = member,
+                    p_to = FormatLocalDate(range.ToLocalDate),
+                    p_bucket = ToServerBucket(range.Bucket),
+                    p_from = FormatLocalDate(range.FromLocalDate.Value)
+                })
+                : JsonUtility.ToJson(new PeriodStatsFromStartRequest
+                {
+                    p_member_id = member,
+                    p_to = FormatLocalDate(range.ToLocalDate),
+                    p_bucket = ToServerBucket(range.Bucket)
+                });
+            var response = await CallRpcAsync("member_period_stats", body, cancellationToken);
+
+            PeriodStatArrayDocument document;
             try
             {
-                document = JsonUtility.FromJson<DailyStatArrayDocument>(
+                document = JsonUtility.FromJson<PeriodStatArrayDocument>(
                     "{\"items\":" + response.Body + "}");
             }
             catch (ArgumentException exception)
@@ -171,31 +186,41 @@ namespace TeamOverlay.Supabase
                 throw new InvalidOperationException("Supabase 통계 응답을 읽지 못했습니다.", exception);
             }
 
-            var results = new List<MemberDailyStat>(document?.items?.Length ?? 0);
-            foreach (var item in document?.items ?? new DailyStatDocument[0])
+            var results = new List<MemberPeriodStat>(document?.items?.Length ?? 0);
+            foreach (var item in document?.items ?? new PeriodStatDocument[0])
             {
-                results.Add(new MemberDailyStat(
-                    ParseLocalDate(item.local_date),
+                results.Add(new MemberPeriodStat(
+                    ParseLocalDate(item.bucket_start),
+                    ParseLocalDate(item.bucket_end),
                     item.attendance_seconds,
                     item.work_seconds,
                     item.break_seconds,
                     item.meal_seconds));
             }
 
-            return new ReadOnlyCollection<MemberDailyStat>(results);
+            return new ReadOnlyCollection<MemberPeriodStat>(results);
         }
 
-        public async Task<IReadOnlyList<TeamRankingEntry>> GetWorkRankingAsync(
-            DateTime fromLocalDate,
-            DateTime toLocalDate,
+        public async Task<IReadOnlyList<TeamRankingEntry>> GetRankingAsync(
+            StatisticsRange range,
             CancellationToken cancellationToken)
         {
-            var body = JsonUtility.ToJson(new RankingRequest
+            if (range == null)
             {
-                p_from = FormatLocalDate(fromLocalDate),
-                p_to = FormatLocalDate(toLocalDate)
-            });
-            var response = await CallRpcAsync("team_work_ranking", body, cancellationToken);
+                throw new ArgumentNullException(nameof(range));
+            }
+
+            var body = range.FromLocalDate.HasValue
+                ? JsonUtility.ToJson(new RankingRequest
+                {
+                    p_to = FormatLocalDate(range.ToLocalDate),
+                    p_from = FormatLocalDate(range.FromLocalDate.Value)
+                })
+                : JsonUtility.ToJson(new RankingFromStartRequest
+                {
+                    p_to = FormatLocalDate(range.ToLocalDate)
+                });
+            var response = await CallRpcAsync("team_activity_ranking", body, cancellationToken);
 
             RankingArrayDocument document;
             try
@@ -216,7 +241,9 @@ namespace TeamOverlay.Supabase
                     item.display_name,
                     item.sort_order,
                     item.work_seconds,
-                    item.attendance_seconds));
+                    item.attendance_seconds,
+                    item.break_seconds,
+                    item.meal_seconds));
             }
 
             return new ReadOnlyCollection<TeamRankingEntry>(results);
@@ -530,6 +557,16 @@ namespace TeamOverlay.Supabase
         /// The server takes a local calendar date, so this must not go through UTC:
         /// converting would shift the day for anyone east of Greenwich.
         /// </summary>
+        private static string ToServerBucket(StatisticsBucket bucket)
+        {
+            switch (bucket)
+            {
+                case StatisticsBucket.Week: return "week";
+                case StatisticsBucket.Month: return "month";
+                default: return "day";
+            }
+        }
+
         private static string FormatLocalDate(DateTime localDate)
         {
             return localDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -629,30 +666,48 @@ namespace TeamOverlay.Supabase
         }
 
         [Serializable]
-        private sealed class DailyStatsRequest
+        private sealed class PeriodStatsRequest
         {
             public string p_member_id;
-            public string p_from;
             public string p_to;
+            public string p_bucket;
+            public string p_from;
+        }
+
+        // JsonUtility writes a null string as "", which Postgres cannot cast to a
+        // date, so "from the start" is a body that leaves p_from out entirely.
+        [Serializable]
+        private sealed class PeriodStatsFromStartRequest
+        {
+            public string p_member_id;
+            public string p_to;
+            public string p_bucket;
         }
 
         [Serializable]
         private sealed class RankingRequest
         {
+            public string p_to;
             public string p_from;
+        }
+
+        [Serializable]
+        private sealed class RankingFromStartRequest
+        {
             public string p_to;
         }
 
         [Serializable]
-        private sealed class DailyStatArrayDocument
+        private sealed class PeriodStatArrayDocument
         {
-            public DailyStatDocument[] items;
+            public PeriodStatDocument[] items;
         }
 
         [Serializable]
-        private sealed class DailyStatDocument
+        private sealed class PeriodStatDocument
         {
-            public string local_date;
+            public string bucket_start;
+            public string bucket_end;
             public int attendance_seconds;
             public int work_seconds;
             public int break_seconds;
@@ -673,6 +728,8 @@ namespace TeamOverlay.Supabase
             public int sort_order;
             public int work_seconds;
             public int attendance_seconds;
+            public int break_seconds;
+            public int meal_seconds;
         }
 
         [Serializable]

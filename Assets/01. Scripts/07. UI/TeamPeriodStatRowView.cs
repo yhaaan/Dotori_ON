@@ -5,8 +5,10 @@ using UnityEngine.UI;
 
 namespace TeamOverlay.UI
 {
-    public sealed class TeamDailyStatRowView : MonoBehaviour
+    public sealed class TeamPeriodStatRowView : MonoBehaviour
     {
+        private const string DayLabels = "일월화수목금토";
+
         [SerializeField] private Text _dateLabel;
         [SerializeField] private Text _workLabel;
         [SerializeField] private Text _attendanceLabel;
@@ -14,16 +16,39 @@ namespace TeamOverlay.UI
         [SerializeField] private Image _workBar;
         [SerializeField] private Image _attendanceBar;
 
-        public void Bind(MemberDailyStat stat, int maximumWorkSeconds, int maximumAttendanceSeconds)
+        public void Bind(
+            MemberPeriodStat stat,
+            StatisticsBucket bucket,
+            int maximumWorkSeconds,
+            int maximumAttendanceSeconds)
         {
-            var dayLabels = "\uC77C\uC6D4\uD654\uC218\uBAA9\uAE08\uD1A0";
-            _dateLabel.text = stat.LocalDate.ToString("MM.dd") + " (" + dayLabels[(int)stat.LocalDate.DayOfWeek] + ")";
-            _workLabel.text = "\uC791\uC5C5 " + FormatDuration(stat.WorkSeconds);
-            _attendanceLabel.text = "\uCD1D " + FormatDuration(stat.AttendanceSeconds);
-            _otherLabel.text = "\uD734\uC2DD " + FormatDuration(stat.BreakSeconds)
-                + "  \uC2DD\uC0AC " + FormatDuration(stat.MealSeconds);
+            _dateLabel.text = FormatBucket(stat, bucket);
+            _workLabel.text = "작업 " + FormatDuration(stat.WorkSeconds);
+            _attendanceLabel.text = "총 " + FormatDuration(stat.AttendanceSeconds);
+            _otherLabel.text = "휴식 " + FormatDuration(stat.BreakSeconds)
+                + "  식사 " + FormatDuration(stat.MealSeconds);
             SetBarRatio(_workBar, stat.WorkSeconds, maximumWorkSeconds);
             SetBarRatio(_attendanceBar, stat.AttendanceSeconds, maximumAttendanceSeconds);
+        }
+
+        /// <summary>
+        /// A row is one day, one week or one month, so the label has to say which:
+        /// "08.27 (목)" reads as a date, "08.24~08.30" as a span, "2026.08" as a
+        /// month. The span is clipped to the requested range on the server, so a
+        /// partial first or last week shows its real dates.
+        /// </summary>
+        public static string FormatBucket(MemberPeriodStat stat, StatisticsBucket bucket)
+        {
+            switch (bucket)
+            {
+                case StatisticsBucket.Week:
+                    return stat.BucketStart.ToString("MM.dd") + "~" + stat.BucketEnd.ToString("MM.dd");
+                case StatisticsBucket.Month:
+                    return stat.BucketStart.ToString("yyyy.MM");
+                default:
+                    return stat.BucketStart.ToString("MM.dd")
+                        + " (" + DayLabels[(int)stat.BucketStart.DayOfWeek] + ")";
+            }
         }
 
         public static string FormatDuration(int seconds)

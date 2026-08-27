@@ -40,8 +40,12 @@ namespace TeamOverlay.Platform.Windows
         public const int OverlayWindowWidth = 480;
         public const int CompactWindowHeight = 220;
 
-        /// <summary>Extra height the statistics panel needs under the compact layout.</summary>
-        public const int StatisticsPanelHeight = 400;
+        /// <summary>
+        /// Extra height the statistics panel needs under the compact layout. It
+        /// mirrors the panel's own height in the prefab, which PrefabAssetTests
+        /// pins so the two cannot drift apart.
+        /// </summary>
+        public const int StatisticsPanelHeight = 424;
 
         private static WindowsOverlayWindow _activeInstance;
 

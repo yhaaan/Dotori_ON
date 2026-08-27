@@ -263,12 +263,14 @@ namespace TeamOverlay.Editor
             panelRect.anchorMax = new Vector2(1f, 1f);
             panelRect.pivot = new Vector2(0.5f, 1f);
             panelRect.anchoredPosition = new Vector2(0f, -220f);
-            panelRect.sizeDelta = new Vector2(0f, 400f);
+            // Keep in sync with WindowsOverlayWindow.StatisticsPanelHeight: the
+            // window grows by exactly this much when the panel opens.
+            panelRect.sizeDelta = new Vector2(0f, 424f);
             var panelView = panel.gameObject.AddComponent<TeamStatisticsPanelView>();
 
             var heading = UiFactory.CreateText("Heading", panel.transform, font, 14,
                 TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
-            heading.text = "\uCD5C\uADFC 7\uC77C \uD1B5\uACC4";
+            heading.text = "\uD300 \uD1B5\uACC4";
             UiFactory.AnchorTop(heading.rectTransform, 14f, 8f, 150f, 24f);
             var period = UiFactory.CreateText("Period", panel.transform, font, 10,
                 TextAnchor.MiddleRight, TeamOverlayPalette.TextSecondary);
@@ -281,25 +283,56 @@ namespace TeamOverlay.Editor
             var rankingTab = UiFactory.CreateButton("RankingTab", panel.transform, font, "\uB7AD\uD0B9");
             UiFactory.AnchorTop(rankingTab.GetComponent<RectTransform>(), 108f, 39f, 88f, 28f);
 
-            var dailyContent = CreateStatisticsContent("DailyContent", panel.transform);
-            var dailyRows = new TeamDailyStatRowView[7];
-            for (var index = 0; index < dailyRows.Length; index++)
+            // Period sits next to the tabs because it applies to both of them.
+            var periodButtons = new Button[3];
+            var periodLabels = new[] { "7\uC77C", "\uC774\uBC88 \uB2EC", "\uB204\uC801" };
+            var periodNames = new[] { "PeriodSevenDays", "PeriodThisMonth", "PeriodAllTime" };
+            for (var index = 0; index < periodButtons.Length; index++)
             {
-                dailyRows[index] = BuildDailyStatRow(dailyContent.transform, font, index * 42f);
+                periodButtons[index] = UiFactory.CreateButton(
+                    periodNames[index], panel.transform, font, periodLabels[index], null,
+                    index == 0 ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button);
+                periodButtons[index].GetComponentInChildren<Text>().fontSize = 11;
+                UiFactory.AnchorTop(
+                    periodButtons[index].GetComponent<RectTransform>(), 206f + index * 88f, 39f, 84f, 28f);
+            }
+
+            var dailyContent = CreateStatisticsContent("DailyContent", panel.transform);
+            var summary = UiFactory.CreateText("Summary", dailyContent.transform, font, 10,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+            summary.text = "\uD569\uACC4 \uC791\uC5C5 00:00";
+            UiFactory.AnchorTop(summary.rectTransform, 10f, 0f, 460f, 20f);
+            var statRows = new TeamPeriodStatRowView[7];
+            for (var index = 0; index < statRows.Length; index++)
+            {
+                statRows[index] = BuildPeriodStatRow(dailyContent.transform, font, 24f + index * 42f);
             }
 
             var rankingContent = CreateStatisticsContent("RankingContent", panel.transform);
+            var metricButtons = new Button[4];
+            var metricLabels = new[] { "\uC791\uC5C5", "\uCD1D\uC2DC\uAC04", "\uD734\uC2DD", "\uC2DD\uC0AC" };
+            var metricNames = new[] { "MetricWork", "MetricAttendance", "MetricBreak", "MetricMeal" };
+            for (var index = 0; index < metricButtons.Length; index++)
+            {
+                metricButtons[index] = UiFactory.CreateButton(
+                    metricNames[index], rankingContent.transform, font, metricLabels[index], null,
+                    index == 0 ? TeamOverlayPalette.Working : TeamOverlayPalette.Button);
+                metricButtons[index].GetComponentInChildren<Text>().fontSize = 11;
+                UiFactory.AnchorTop(
+                    metricButtons[index].GetComponent<RectTransform>(), 10f + index * 115f, 0f, 111f, 24f);
+            }
+
             var rankingRows = new TeamRankingRowView[4];
             for (var index = 0; index < rankingRows.Length; index++)
             {
-                rankingRows[index] = BuildRankingRow(rankingContent.transform, font, index * 58f);
+                rankingRows[index] = BuildRankingRow(rankingContent.transform, font, 32f + index * 58f);
             }
             rankingContent.SetActive(false);
 
             var feedback = UiFactory.CreateText("StatisticsFeedback", panel.transform, font, 11,
                 TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary);
             feedback.horizontalOverflow = HorizontalWrapMode.Wrap;
-            feedback.text = "\uCD5C\uADFC 7\uC77C \uD1B5\uACC4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\u2026";
+            feedback.text = "\uD1B5\uACC4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\u2026";
             UiFactory.AnchorTop(feedback.rectTransform, 30f, 150f, 420f, 70f);
             feedback.gameObject.SetActive(false);
 
@@ -309,8 +342,11 @@ namespace TeamOverlay.Editor
             Set(serialized, "_dailyContent", dailyContent);
             Set(serialized, "_rankingContent", rankingContent);
             Set(serialized, "_periodLabel", period);
+            Set(serialized, "_summaryText", summary);
             Set(serialized, "_feedbackText", feedback);
-            SetArray(serialized, "_dailyRows", dailyRows);
+            SetArray(serialized, "_periodButtons", periodButtons);
+            SetArray(serialized, "_metricButtons", metricButtons);
+            SetArray(serialized, "_statRows", statRows);
             SetArray(serialized, "_rankingRows", rankingRows);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             panel.gameObject.SetActive(false);
@@ -325,28 +361,28 @@ namespace TeamOverlay.Editor
             rect.anchorMax = new Vector2(1f, 1f);
             rect.pivot = new Vector2(0.5f, 1f);
             rect.anchoredPosition = new Vector2(0f, -76f);
-            rect.sizeDelta = new Vector2(0f, 310f);
+            rect.sizeDelta = new Vector2(0f, 340f);
             return content;
         }
 
-        private static TeamDailyStatRowView BuildDailyStatRow(Transform parent, Font font, float top)
+        private static TeamPeriodStatRowView BuildPeriodStatRow(Transform parent, Font font, float top)
         {
-            var background = UiFactory.CreateImage("DailyRow", parent, TeamOverlayPalette.Card);
+            var background = UiFactory.CreateImage("StatRow", parent, TeamOverlayPalette.Card);
             UiFactory.AnchorTop(background.rectTransform, 10f, top, 460f, 38f);
-            var view = background.gameObject.AddComponent<TeamDailyStatRowView>();
-            var date = UiFactory.CreateText("Date", background.transform, font, 10,
+            var view = background.gameObject.AddComponent<TeamPeriodStatRowView>();
+            var date = UiFactory.CreateText("Date", background.transform, font, 9,
                 TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
-            UiFactory.AnchorTop(date.rectTransform, 8f, 0f, 54f, 38f);
+            UiFactory.AnchorTop(date.rectTransform, 6f, 0f, 70f, 38f);
             var work = UiFactory.CreateText("Work", background.transform, font, 9,
                 TextAnchor.MiddleLeft, TeamOverlayPalette.Working, FontStyle.Bold);
-            UiFactory.AnchorTop(work.rectTransform, 68f, 1f, 78f, 17f);
+            UiFactory.AnchorTop(work.rectTransform, 80f, 1f, 72f, 17f);
             var attendance = UiFactory.CreateText("Attendance", background.transform, font, 9,
                 TextAnchor.MiddleLeft, TeamOverlayPalette.Accent, FontStyle.Bold);
             UiFactory.AnchorTop(attendance.rectTransform, 274f, 1f, 91f, 17f);
             var other = UiFactory.CreateText("Other", background.transform, font, 9,
                 TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
-            UiFactory.AnchorTop(other.rectTransform, 68f, 19f, 260f, 16f);
-            var workBar = CreateFilledBar("WorkBar", background.transform, 148f, 7f, 118f,
+            UiFactory.AnchorTop(other.rectTransform, 80f, 19f, 248f, 16f);
+            var workBar = CreateFilledBar("WorkBar", background.transform, 154f, 7f, 110f,
                 TeamOverlayPalette.Working);
             var attendanceBar = CreateFilledBar("AttendanceBar", background.transform, 368f, 7f, 82f,
                 TeamOverlayPalette.Accent);
