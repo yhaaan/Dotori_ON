@@ -67,6 +67,7 @@ namespace TeamOverlay.UI
         private bool _identityActivationInProgress;
         private bool _signOutInProgress;
         private bool _mutationInProgress;
+        private bool _statisticsLoadInProgress;
         private bool _quitting;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -481,6 +482,7 @@ namespace TeamOverlay.UI
             _view.MinimizeRequested += HandleMinimizeRequested;
             _view.ExitRequested += HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
+            _view.StatsToggleRequested += HandleStatsToggleRequested;
             _view.StatusNoteSubmitted += HandleStatusNoteSubmitted;
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _firstRunNameView.Hide();
@@ -508,6 +510,8 @@ namespace TeamOverlay.UI
 
         private void TeardownSession()
         {
+            CloseStatisticsPanel();
+            _statisticsLoadInProgress = false;
             if (_view != null)
             {
                 DetachView();
@@ -544,6 +548,7 @@ namespace TeamOverlay.UI
             _view.MinimizeRequested -= HandleMinimizeRequested;
             _view.ExitRequested -= HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested -= HandleSwitchAccountRequested;
+            _view.StatsToggleRequested -= HandleStatsToggleRequested;
             _view.StatusNoteSubmitted -= HandleStatusNoteSubmitted;
         }
 
@@ -637,6 +642,93 @@ namespace TeamOverlay.UI
         private void HandleMinimizeRequested()
         {
             _window.Minimize();
+        }
+
+        private async void HandleStatsToggleRequested()
+        {
+            if (_view == null || _backend == null || _quitting || _signOutInProgress)
+            {
+                return;
+            }
+
+            if (_view.IsStatisticsVisible)
+            {
+                CloseStatisticsPanel();
+                return;
+            }
+
+            _view.SetStatisticsVisible(true);
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _window.SetWindowHeight(WindowsOverlayWindow.StatisticsWindowHeight);
+#endif
+
+            var toLocalDate = DateTime.Today;
+            var fromLocalDate = toLocalDate.AddDays(-6);
+            _view.ShowStatisticsLoading(fromLocalDate, toLocalDate);
+
+            var requestedBackend = _backend;
+            var statistics = requestedBackend as ITeamStatistics;
+            if (statistics == null)
+            {
+                _view.ShowStatisticsError(fromLocalDate, toLocalDate, "\uD604\uC7AC \uBC31\uC5D4\uB4DC\uB294 \uD1B5\uACC4\uB97C \uC9C0\uC6D0\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.");
+                return;
+            }
+
+            if (_statisticsLoadInProgress)
+            {
+                return;
+            }
+
+            _statisticsLoadInProgress = true;
+            try
+            {
+                var dailyTask = statistics.GetDailyStatsAsync(
+                    requestedBackend.LocalMemberId,
+                    fromLocalDate,
+                    toLocalDate,
+                    _lifetime.Token);
+                var rankingTask = statistics.GetWorkRankingAsync(
+                    fromLocalDate,
+                    toLocalDate,
+                    _lifetime.Token);
+                await Task.WhenAll(dailyTask, rankingTask);
+
+                if (_view != null && ReferenceEquals(_backend, requestedBackend))
+                {
+                    _view.BindStatistics(
+                        fromLocalDate,
+                        toLocalDate,
+                        dailyTask.Result,
+                        rankingTask.Result,
+                        requestedBackend.LocalMemberId);
+                }
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                if (_view != null && ReferenceEquals(_backend, requestedBackend))
+                {
+                    _view.ShowStatisticsError(
+                    fromLocalDate,
+                    toLocalDate,
+                    "\uD1B5\uACC4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4: " + exception.Message);
+                }
+            }
+            finally
+            {
+                _statisticsLoadInProgress = false;
+            }
+        }
+
+        private void CloseStatisticsPanel()
+        {
+            _view?.SetStatisticsVisible(false);
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _window?.SetWindowHeight(WindowsOverlayWindow.CompactWindowHeight);
+#endif
         }
 
         /// <summary>

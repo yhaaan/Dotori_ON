@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using TeamOverlay.UI;
 using UnityEditor;
@@ -32,6 +35,45 @@ namespace TeamOverlay.Tests.EditMode
             AssertReference(mainData, "_checkInButton");
             AssertReference(mainData, "_exitButton");
             AssertReference(mainData, "_switchAccountButton");
+            AssertReference(mainData, "_statsButton");
+            AssertReference(mainData, "_statisticsPanel");
+            var statisticsPanel = mainData.FindProperty("_statisticsPanel").objectReferenceValue;
+            var statisticsData = new SerializedObject(statisticsPanel);
+            AssertReference(statisticsData, "_dailyTabButton");
+            AssertReference(statisticsData, "_rankingTabButton");
+            Assert.That(statisticsData.FindProperty("_dailyRows").arraySize, Is.EqualTo(7));
+            Assert.That(statisticsData.FindProperty("_rankingRows").arraySize, Is.EqualTo(4));
+            foreach (var row in main.GetComponentsInChildren<TeamDailyStatRowView>(true))
+            {
+                var rowData = new SerializedObject(row);
+                AssertReference(rowData, "_dateLabel");
+                AssertReference(rowData, "_workLabel");
+                AssertReference(rowData, "_attendanceLabel");
+                AssertReference(rowData, "_otherLabel");
+                AssertReference(rowData, "_workBar");
+                AssertReference(rowData, "_attendanceBar");
+            }
+            Assert.That(main.GetComponentsInChildren<TeamDailyStatRowView>(true).Length, Is.EqualTo(7));
+            foreach (var row in main.GetComponentsInChildren<TeamRankingRowView>(true))
+            {
+                var rowData = new SerializedObject(row);
+                AssertReference(rowData, "_background");
+                AssertReference(rowData, "_rankLabel");
+                AssertReference(rowData, "_nameLabel");
+                AssertReference(rowData, "_workLabel");
+                AssertReference(rowData, "_attendanceLabel");
+                AssertReference(rowData, "_workBar");
+            }
+            Assert.That(main.GetComponentsInChildren<TeamRankingRowView>(true).Length, Is.EqualTo(4));
+            Assert.That(main.transform.Find("WindowBackground/StatisticsPanel"), Is.Not.Null);
+            Assert.That(main.transform.Find("WindowBackground/MemberCards").GetComponent<RectTransform>().anchorMin.y,
+                Is.EqualTo(1f));
+            Assert.That(main.transform.Find("WindowBackground/LocalControls").GetComponent<RectTransform>().anchorMin.y,
+                Is.EqualTo(1f));
+            Assert.That(main.transform.Find("WindowBackground/TopBar/FakeCheckIn"), Is.Null);
+            var panelRect = main.transform.Find("WindowBackground/StatisticsPanel").GetComponent<RectTransform>();
+            Assert.That(panelRect.anchoredPosition.y, Is.EqualTo(-220f));
+            Assert.That(panelRect.sizeDelta.y, Is.EqualTo(400f));
             AssertReference(mainData, "_statusNoteInput");
             AssertReference(mainData, "_windowDragHandle");
 
@@ -50,6 +92,46 @@ namespace TeamOverlay.Tests.EditMode
             var property = data.FindProperty(propertyName);
             Assert.That(property, Is.Not.Null, propertyName);
             Assert.That(property.objectReferenceValue, Is.Not.Null, propertyName);
+        }
+
+        [Test]
+        public void TeamOverlayCanvas_YamlHasNoDuplicateOrMissingLocalFileIds()
+        {
+            const string path = "Assets/02. Prefabs/TeamOverlayCanvas.prefab";
+            var yaml = File.ReadAllText(path);
+            Assert.That(yaml, Does.Not.Contain("m_Script: {fileID: 0}"));
+            var definitions = new HashSet<string>();
+            foreach (Match match in Regex.Matches(
+                         yaml,
+                         @"^--- !u!\d+ &(\d+)",
+                         RegexOptions.Multiline))
+            {
+                Assert.That(definitions.Add(match.Groups[1].Value), Is.True,
+                    "Duplicate fileID " + match.Groups[1].Value);
+            }
+
+            foreach (Match match in Regex.Matches(yaml, @"\{fileID: (\d+)([^}]*)\}"))
+            {
+                var fileId = match.Groups[1].Value;
+                var suffix = match.Groups[2].Value;
+                if (fileId == "0" || suffix.Contains("guid:"))
+                {
+                    continue;
+                }
+
+                Assert.That(definitions.Contains(fileId), Is.True,
+                    "Missing local fileID " + fileId);
+            }
+        }
+
+        [TestCase(0, "00:00")]
+        [TestCase(3660, "01:01")]
+        [TestCase(90061, "25:01")]
+        public void StatisticsDuration_UsesHoursAndMinutesWithoutMixingTotals(
+            int seconds,
+            string expected)
+        {
+            Assert.That(TeamDailyStatRowView.FormatDuration(seconds), Is.EqualTo(expected));
         }
     }
 }

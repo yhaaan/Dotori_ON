@@ -43,6 +43,15 @@ namespace TeamOverlay.Editor
 
         public static void RebuildPrefabsFromCommandLine() => BuildAll();
 
+        public static void RebuildMainViewFromCommandLine()
+        {
+            var cardPrefab = AssetDatabase.LoadAssetAtPath<TeamMemberCardView>(CardPath);
+            if (cardPrefab == null) throw new InvalidOperationException("Missing member card prefab.");
+            var mainPrefab = BuildMainView(cardPrefab);
+            AssetDatabase.SaveAssets();
+            Selection.activeObject = mainPrefab.gameObject;
+        }
+
         public static bool AllPrefabsExist()
         {
             return File.Exists(CardPath) && File.Exists(MainViewPath) &&
@@ -69,6 +78,12 @@ namespace TeamOverlay.Editor
         {
             var rootImage = UiFactory.CreateImage("TeamMemberCard", null, TeamOverlayPalette.CardOffline);
             var root = rootImage.gameObject;
+            var rootRect = root.GetComponent<RectTransform>();
+            rootRect.anchorMin = rootRect.anchorMax = new Vector2(0.5f, 1f);
+            rootRect.pivot = new Vector2(0.5f, 1f);
+            rootRect.anchoredPosition = Vector2.zero;
+            rootRect.sizeDelta = new Vector2(100f, 100f);
+
             try
             {
                 var layout = root.AddComponent<LayoutElement>();
@@ -138,22 +153,28 @@ namespace TeamOverlay.Editor
                 topBar.rectTransform.sizeDelta = new Vector2(0f, 32f);
 
                 var dragArea = UiFactory.CreateImage("WindowDragArea", topBar.transform, new Color(1f, 1f, 1f, 0.001f));
-                UiFactory.Stretch(dragArea.rectTransform, 0f, 0f, 235f, 0f);
+                UiFactory.Stretch(dragArea.rectTransform, 0f, 0f, 215f, 0f);
                 var dragHandle = dragArea.gameObject.AddComponent<WindowDragHandle>();
                 var title = UiFactory.CreateText("Title", dragArea.transform, font, 12,
                     TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
                 title.text = "TEAM OVERLAY";
                 UiFactory.Stretch(title.rectTransform, 10f, 0f, 0f, 0f);
 
-                var fake = TopButton(topBar.transform, font, "FakeCheckIn", "가짜 출근", 159f, 72f);
+                Button fake = null;
                 var switchAccount = TopButton(topBar.transform, font, "SwitchAccount", "이름변경", 105f, 54f);
+                var stats = TopButton(topBar.transform, font, "Statistics", "\uD1B5\uACC4", 163f, 48f);
                 switchAccount.GetComponentInChildren<Text>().fontSize = 9;
                 var topmost = TopButton(topBar.transform, font, "AlwaysOnTop", "TOP", 63f, 38f);
                 var minimize = TopButton(topBar.transform, font, "Minimize", "—", 32f, 28f);
                 var exit = TopButton(topBar.transform, font, "Exit", "×", 3f, 27f, TeamOverlayPalette.Danger);
 
                 var cardsRoot = UiFactory.CreateRect("MemberCards", background.transform);
-                UiFactory.Stretch(cardsRoot.GetComponent<RectTransform>(), 6f, 46f, 6f, 36f);
+                var cardsRect = cardsRoot.GetComponent<RectTransform>();
+                cardsRect.anchorMin = new Vector2(0f, 1f);
+                cardsRect.anchorMax = new Vector2(1f, 1f);
+                cardsRect.pivot = new Vector2(0.5f, 1f);
+                cardsRect.anchoredPosition = new Vector2(0f, -36f);
+                cardsRect.sizeDelta = new Vector2(-12f, 138f);
                 var horizontal = cardsRoot.AddComponent<HorizontalLayoutGroup>();
                 horizontal.spacing = 5f;
                 horizontal.childAlignment = TextAnchor.UpperCenter;
@@ -168,9 +189,10 @@ namespace TeamOverlay.Editor
                 }
 
                 var controls = UiFactory.CreateImage("LocalControls", background.transform, TeamOverlayPalette.ControlBar);
-                controls.rectTransform.anchorMin = Vector2.zero;
-                controls.rectTransform.anchorMax = new Vector2(1f, 0f);
-                controls.rectTransform.pivot = new Vector2(0.5f, 0f);
+                controls.rectTransform.anchorMin = new Vector2(0f, 1f);
+                controls.rectTransform.anchorMax = new Vector2(1f, 1f);
+                controls.rectTransform.pivot = new Vector2(0.5f, 1f);
+                controls.rectTransform.anchoredPosition = new Vector2(0f, -177f);
                 controls.rectTransform.sizeDelta = new Vector2(0f, 43f);
                 var checkIn = ControlButton(controls.transform, font, "CheckIn", "출근", -54f, 108f);
                 var checkOut = ControlButton(controls.transform, font, "CheckOut", "퇴근", -153f, 66f, TeamOverlayPalette.Danger);
@@ -206,6 +228,7 @@ namespace TeamOverlay.Editor
                 feedback.text = "Supabase Auth 연결 · 팀 상태 Mock";
                 UiFactory.Stretch(feedback.rectTransform, 4f, 0f, 4f, 31f);
 
+                var statisticsPanel = BuildStatisticsPanel(background.transform, font);
                 var view = root.GetComponent<TeamOverlayView>();
                 var serialized = new SerializedObject(view);
                 serialized.FindProperty("_cards").arraySize = cards.Length;
@@ -221,15 +244,172 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_exitButton", exit);
                 Set(serialized, "_switchAccountButton", switchAccount);
                 Set(serialized, "_statusNoteInput", noteInput);
+                Set(serialized, "_statsButton", stats);
                 Set(serialized, "_topmostLabel", topmost.GetComponentInChildren<Text>());
                 Set(serialized, "_feedbackText", feedback);
                 Set(serialized, "_windowDragHandle", dragHandle);
+                Set(serialized, "_statisticsPanel", statisticsPanel);
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 return PrefabUtility.SaveAsPrefabAsset(root, MainViewPath).GetComponent<TeamOverlayView>();
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
 
+        private static TeamStatisticsPanelView BuildStatisticsPanel(Transform parent, Font font)
+        {
+            var panel = UiFactory.CreateImage("StatisticsPanel", parent, TeamOverlayPalette.Window);
+            var panelRect = panel.rectTransform;
+            panelRect.anchorMin = new Vector2(0f, 1f);
+            panelRect.anchorMax = new Vector2(1f, 1f);
+            panelRect.pivot = new Vector2(0.5f, 1f);
+            panelRect.anchoredPosition = new Vector2(0f, -220f);
+            panelRect.sizeDelta = new Vector2(0f, 400f);
+            var panelView = panel.gameObject.AddComponent<TeamStatisticsPanelView>();
+
+            var heading = UiFactory.CreateText("Heading", panel.transform, font, 14,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+            heading.text = "\uCD5C\uADFC 7\uC77C \uD1B5\uACC4";
+            UiFactory.AnchorTop(heading.rectTransform, 14f, 8f, 150f, 24f);
+            var period = UiFactory.CreateText("Period", panel.transform, font, 10,
+                TextAnchor.MiddleRight, TeamOverlayPalette.TextSecondary);
+            period.text = "2026.08.21 - 2026.08.27";
+            UiFactory.AnchorTop(period.rectTransform, 236f, 8f, 230f, 24f);
+
+            var dailyTab = UiFactory.CreateButton("DailyTab", panel.transform, font, "\uB0B4 \uD1B5\uACC4", null,
+                TeamOverlayPalette.Accent);
+            UiFactory.AnchorTop(dailyTab.GetComponent<RectTransform>(), 14f, 39f, 88f, 28f);
+            var rankingTab = UiFactory.CreateButton("RankingTab", panel.transform, font, "\uB7AD\uD0B9");
+            UiFactory.AnchorTop(rankingTab.GetComponent<RectTransform>(), 108f, 39f, 88f, 28f);
+
+            var dailyContent = CreateStatisticsContent("DailyContent", panel.transform);
+            var dailyRows = new TeamDailyStatRowView[7];
+            for (var index = 0; index < dailyRows.Length; index++)
+            {
+                dailyRows[index] = BuildDailyStatRow(dailyContent.transform, font, index * 42f);
+            }
+
+            var rankingContent = CreateStatisticsContent("RankingContent", panel.transform);
+            var rankingRows = new TeamRankingRowView[4];
+            for (var index = 0; index < rankingRows.Length; index++)
+            {
+                rankingRows[index] = BuildRankingRow(rankingContent.transform, font, index * 58f);
+            }
+            rankingContent.SetActive(false);
+
+            var feedback = UiFactory.CreateText("StatisticsFeedback", panel.transform, font, 11,
+                TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary);
+            feedback.horizontalOverflow = HorizontalWrapMode.Wrap;
+            feedback.text = "\uCD5C\uADFC 7\uC77C \uD1B5\uACC4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\u2026";
+            UiFactory.AnchorTop(feedback.rectTransform, 30f, 150f, 420f, 70f);
+            feedback.gameObject.SetActive(false);
+
+            var serialized = new SerializedObject(panelView);
+            Set(serialized, "_dailyTabButton", dailyTab);
+            Set(serialized, "_rankingTabButton", rankingTab);
+            Set(serialized, "_dailyContent", dailyContent);
+            Set(serialized, "_rankingContent", rankingContent);
+            Set(serialized, "_periodLabel", period);
+            Set(serialized, "_feedbackText", feedback);
+            SetArray(serialized, "_dailyRows", dailyRows);
+            SetArray(serialized, "_rankingRows", rankingRows);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            panel.gameObject.SetActive(false);
+            return panelView;
+        }
+
+        private static GameObject CreateStatisticsContent(string name, Transform parent)
+        {
+            var content = UiFactory.CreateRect(name, parent);
+            var rect = content.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0f, 1f);
+            rect.anchorMax = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.anchoredPosition = new Vector2(0f, -76f);
+            rect.sizeDelta = new Vector2(0f, 310f);
+            return content;
+        }
+
+        private static TeamDailyStatRowView BuildDailyStatRow(Transform parent, Font font, float top)
+        {
+            var background = UiFactory.CreateImage("DailyRow", parent, TeamOverlayPalette.Card);
+            UiFactory.AnchorTop(background.rectTransform, 10f, top, 460f, 38f);
+            var view = background.gameObject.AddComponent<TeamDailyStatRowView>();
+            var date = UiFactory.CreateText("Date", background.transform, font, 10,
+                TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+            UiFactory.AnchorTop(date.rectTransform, 8f, 0f, 54f, 38f);
+            var work = UiFactory.CreateText("Work", background.transform, font, 9,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.Working, FontStyle.Bold);
+            UiFactory.AnchorTop(work.rectTransform, 68f, 1f, 78f, 17f);
+            var attendance = UiFactory.CreateText("Attendance", background.transform, font, 9,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.Accent, FontStyle.Bold);
+            UiFactory.AnchorTop(attendance.rectTransform, 274f, 1f, 91f, 17f);
+            var other = UiFactory.CreateText("Other", background.transform, font, 9,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+            UiFactory.AnchorTop(other.rectTransform, 68f, 19f, 260f, 16f);
+            var workBar = CreateFilledBar("WorkBar", background.transform, 148f, 7f, 118f,
+                TeamOverlayPalette.Working);
+            var attendanceBar = CreateFilledBar("AttendanceBar", background.transform, 368f, 7f, 82f,
+                TeamOverlayPalette.Accent);
+            Assign(view,
+                ("_dateLabel", date), ("_workLabel", work), ("_attendanceLabel", attendance),
+                ("_otherLabel", other), ("_workBar", workBar), ("_attendanceBar", attendanceBar));
+            return view;
+        }
+
+        private static TeamRankingRowView BuildRankingRow(Transform parent, Font font, float top)
+        {
+            var background = UiFactory.CreateImage("RankingRow", parent, TeamOverlayPalette.Card);
+            UiFactory.AnchorTop(background.rectTransform, 10f, top, 460f, 50f);
+            var view = background.gameObject.AddComponent<TeamRankingRowView>();
+            var rank = UiFactory.CreateText("Rank", background.transform, font, 18,
+                TextAnchor.MiddleCenter, TeamOverlayPalette.Accent, FontStyle.Bold);
+            UiFactory.AnchorTop(rank.rectTransform, 8f, 0f, 32f, 50f);
+            var name = UiFactory.CreateText("Name", background.transform, font, 12,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+            UiFactory.AnchorTop(name.rectTransform, 46f, 3f, 104f, 22f);
+            var work = UiFactory.CreateText("Work", background.transform, font, 10,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.Working, FontStyle.Bold);
+            UiFactory.AnchorTop(work.rectTransform, 158f, 3f, 96f, 20f);
+            var attendance = UiFactory.CreateText("Attendance", background.transform, font, 10,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.Accent);
+            UiFactory.AnchorTop(attendance.rectTransform, 265f, 3f, 110f, 20f);
+            var workBar = CreateFilledBar("WorkBar", background.transform, 158f, 31f, 284f,
+                TeamOverlayPalette.Working);
+            Assign(view,
+                ("_background", background), ("_rankLabel", rank), ("_nameLabel", name),
+                ("_workLabel", work), ("_attendanceLabel", attendance), ("_workBar", workBar));
+            return view;
+        }
+
+        private static Image CreateFilledBar(
+            string name,
+            Transform parent,
+            float left,
+            float top,
+            float width,
+            Color color)
+        {
+            var track = UiFactory.CreateImage(name + "Track", parent, TeamOverlayPalette.Button);
+            UiFactory.AnchorTop(track.rectTransform, left, top, width, 6f);
+            var fill = UiFactory.CreateImage(name, track.transform, color);
+            UiFactory.Stretch(fill.rectTransform);
+            fill.type = Image.Type.Filled;
+            fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = 0;
+            fill.fillAmount = 0.65f;
+            return fill;
+        }
+
+        private static void SetArray<T>(SerializedObject serialized, string name, T[] values)
+            where T : UnityEngine.Object
+        {
+            var property = serialized.FindProperty(name);
+            property.arraySize = values.Length;
+            for (var index = 0; index < values.Length; index++)
+            {
+                property.GetArrayElementAtIndex(index).objectReferenceValue = values[index];
+            }
+        }
         private static FirstRunNameView BuildNameView()
         {
             var root = new GameObject("FirstRunNameModal", typeof(RectTransform), typeof(Canvas),
@@ -310,7 +490,7 @@ namespace TeamOverlay.Editor
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(480f, 220f);
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0.5f;
+            scaler.matchWidthOrHeight = 0f;
         }
         private static void SetCardLine(Text text, float top, float height)
         {

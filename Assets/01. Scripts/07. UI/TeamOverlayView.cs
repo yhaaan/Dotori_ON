@@ -26,10 +26,12 @@ namespace TeamOverlay.UI
         [SerializeField] private Button _minimizeButton;
         [SerializeField] private Button _exitButton;
         [SerializeField] private Button _switchAccountButton;
+        [SerializeField] private Button _statsButton;
         [SerializeField] private InputField _statusNoteInput;
         [SerializeField] private Text _topmostLabel;
         [SerializeField] private Text _feedbackText;
         [SerializeField] private WindowDragHandle _windowDragHandle;
+        [SerializeField] private TeamStatisticsPanelView _statisticsPanel;
 
         private readonly List<Button> _interactiveButtons = new List<Button>();
         private bool _initialized;
@@ -43,6 +45,9 @@ namespace TeamOverlay.UI
         public event Action ExitRequested;
         public event Action SwitchAccountRequested;
         public event Action<string> StatusNoteSubmitted;
+        public event Action StatsToggleRequested;
+
+        public bool IsStatisticsVisible => _statisticsPanel != null && _statisticsPanel.gameObject.activeSelf;
 
         public void Initialize(Action beginWindowDrag)
         {
@@ -63,6 +68,7 @@ namespace TeamOverlay.UI
             AddListener(_minimizeButton, () => MinimizeRequested?.Invoke());
             AddListener(_exitButton, () => ExitRequested?.Invoke());
             AddListener(_switchAccountButton, () => SwitchAccountRequested?.Invoke());
+            AddListener(_statsButton, () => StatsToggleRequested?.Invoke());
 
             AddInteractive(_checkInButton);
             AddInteractive(_checkOutButton);
@@ -71,6 +77,13 @@ namespace TeamOverlay.UI
             AddInteractive(_mealButton);
             AddInteractive(_fakeEventButton);
             AddInteractive(_switchAccountButton);
+            AddInteractive(_statsButton);
+
+            if (_statisticsPanel != null)
+            {
+                _statisticsPanel.Initialize();
+                _statisticsPanel.gameObject.SetActive(false);
+            }
 
             if (_statusNoteInput != null)
             {
@@ -155,6 +168,41 @@ namespace TeamOverlay.UI
             var background = _topmostButton.GetComponent<Image>();
             if (background != null)
                 background.color = enabled ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button;
+        }
+
+        public void SetStatisticsVisible(bool visible)
+        {
+            if (_statisticsPanel != null)
+            {
+                _statisticsPanel.gameObject.SetActive(visible);
+            }
+
+            Tint(_statsButton, visible ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button);
+        }
+
+        public void ShowStatisticsLoading(DateTime fromLocalDate, DateTime toLocalDate)
+        {
+            _statisticsPanel?.ShowLoading(fromLocalDate, toLocalDate);
+        }
+
+        public void BindStatistics(
+            DateTime fromLocalDate,
+            DateTime toLocalDate,
+            IReadOnlyList<MemberDailyStat> dailyStats,
+            IReadOnlyList<TeamRankingEntry> ranking,
+            string localMemberId)
+        {
+            _statisticsPanel?.Bind(
+                fromLocalDate,
+                toLocalDate,
+                dailyStats,
+                ranking,
+                localMemberId);
+        }
+
+        public void ShowStatisticsError(DateTime fromLocalDate, DateTime toLocalDate, string message)
+        {
+            _statisticsPanel?.ShowError(fromLocalDate, toLocalDate, message);
         }
 
         private void AddListener(Button button, UnityEngine.Events.UnityAction action)
