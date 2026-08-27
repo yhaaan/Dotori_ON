@@ -38,6 +38,9 @@ namespace TeamOverlay.UI
         [Header("Prefab references")]
         [SerializeField] private TeamOverlayView _mainViewPrefab;
         [SerializeField] private FirstRunNameView _firstRunNamePrefab;
+
+        [Tooltip("효과음 설정 에셋. 비워 두면 코드로 만든 기본 알림음만 납니다.")]
+        [SerializeField] private TeamOverlaySounds _sounds;
         [Header("Development")]
         [Tooltip("Runs the overlay against the in-memory roster instead of Supabase. Identity still uses the real project.")]
         [SerializeField] private bool _useMockBackend;
@@ -117,6 +120,7 @@ namespace TeamOverlay.UI
             _window.Configure();
             _window.SetAlwaysOnTop(true);
             _tonePlayer = gameObject.AddComponent<NotificationTonePlayer>();
+            _tonePlayer.UseSounds(_sounds);
 
             if (_firstRunNamePrefab == null)
             {
@@ -199,10 +203,17 @@ namespace TeamOverlay.UI
 
             while (_pendingEvents.TryDequeue(out var teamEvent))
             {
-                if (teamEvent.Type == TeamEventType.MemberCheckedIn
-                    && !string.Equals(teamEvent.ActorMemberId, _backend.LocalMemberId, StringComparison.Ordinal))
+                var isLocalActor = string.Equals(
+                    teamEvent.ActorMemberId,
+                    _backend.LocalMemberId,
+                    StringComparison.Ordinal);
+                if (teamEvent.Type == TeamEventType.MemberCheckedIn && !isLocalActor)
                 {
-                    _tonePlayer.Play();
+                    _tonePlayer.Play(TeamSound.TeammateCheckedIn);
+                }
+                else if (teamEvent.Type == TeamEventType.MemberCheckedOut && !isLocalActor)
+                {
+                    _tonePlayer.Play(TeamSound.TeammateCheckedOut);
                 }
             }
 

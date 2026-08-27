@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using TeamOverlay.Audio;
 using TeamOverlay.UI;
 using UnityEditor;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace TeamOverlay.Editor
         // Assets root rather than taking a numbered folder.
         public const string ResourceFolder = "Assets/Resources/TeamOverlay";
         public const string AppPath = ResourceFolder + "/TeamOverlayApp.prefab";
+        public const string SoundsPath = ResourceFolder + "/TeamOverlaySounds.asset";
 
         [MenuItem("Team Overlay/Create Missing Editable UI Prefabs")]
         public static void CreateMissingPrefabs()
@@ -519,10 +521,39 @@ namespace TeamOverlay.Editor
             var root = new GameObject("TeamOverlayApp", typeof(TeamOverlayApp));
             try
             {
-                Assign(root.GetComponent<TeamOverlayApp>(), ("_mainViewPrefab", mainPrefab), ("_firstRunNamePrefab", namePrefab));
+                Assign(
+                    root.GetComponent<TeamOverlayApp>(),
+                    ("_mainViewPrefab", mainPrefab),
+                    ("_firstRunNamePrefab", namePrefab),
+                    ("_sounds", EnsureSoundsAsset()));
                 PrefabUtility.SaveAsPrefabAsset(root, AppPath);
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        /// <summary>
+        /// Creates the sound settings asset the first time and never touches it
+        /// again: it holds hand-picked clips, so a rebuild must not reset it the
+        /// way it resets the generated prefabs.
+        /// </summary>
+        [MenuItem("Team Overlay/Create Missing Sound Settings Asset")]
+        public static TeamOverlaySounds EnsureSoundsAsset()
+        {
+            EnsureFolder("Assets", "Resources");
+            EnsureFolder("Assets/Resources", "TeamOverlay");
+            var existing = AssetDatabase.LoadAssetAtPath<TeamOverlaySounds>(SoundsPath);
+            if (existing != null)
+            {
+                Selection.activeObject = existing;
+                return existing;
+            }
+
+            var created = ScriptableObject.CreateInstance<TeamOverlaySounds>();
+            AssetDatabase.CreateAsset(created, SoundsPath);
+            AssetDatabase.SaveAssets();
+            Selection.activeObject = created;
+            Debug.Log("Created " + SoundsPath + ". Drop the team's audio clips into it.");
+            return created;
         }
 
         private static Font PreviewFont() => Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");

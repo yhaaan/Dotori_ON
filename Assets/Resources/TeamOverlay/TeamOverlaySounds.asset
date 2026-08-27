@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ae19776ceb768e4987e87ee6d317c09, type: 3}
+  m_Name: TeamOverlaySounds
+  m_EditorClassIdentifier: TeamOverlay.Runtime::TeamOverlay.Audio.TeamOverlaySounds
+  _teammateCheckedIn: {fileID: 8300000, guid: a39b973fd1b7d3e4f9f9677721b66c2d, type: 3}
+  _teammateCheckedOut: {fileID: 8300000, guid: 9bbbeb258829ccc49af37422d153ae24, type: 3}
+  _nudgeReceived: {fileID: 8300000, guid: cd98ae5df5839304dbfd0fa4c0086be9, type: 3}
+  _volume: 0.35

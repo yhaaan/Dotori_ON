@@ -3,14 +3,27 @@ using UnityEngine;
 namespace TeamOverlay.Audio
 {
     /// <summary>
-    /// Creates a tiny notification chime at runtime so the mock vertical slice has
-    /// no binary audio-asset dependency. One event results in one PlayOneShot call.
+    /// Plays the clip a <see cref="TeamOverlaySounds"/> asset assigns to an event,
+    /// and falls back to a chime generated at runtime when no asset or no clip is
+    /// set. The fallback is what keeps the app audible on a fresh clone with no
+    /// binary audio committed. One event results in one PlayOneShot call.
     /// </summary>
     public sealed class NotificationTonePlayer : MonoBehaviour
     {
         private const int SampleRate = 44100;
         private AudioClip _notificationClip;
         private AudioSource _audioSource;
+        private TeamOverlaySounds _sounds;
+
+        /// <summary>Assigning null keeps the generated chime for every event.</summary>
+        public void UseSounds(TeamOverlaySounds sounds)
+        {
+            _sounds = sounds;
+            if (_audioSource != null && sounds != null)
+            {
+                _audioSource.volume = sounds.Volume;
+            }
+        }
 
         private void Awake()
         {
@@ -22,14 +35,28 @@ namespace TeamOverlay.Audio
             _notificationClip = CreateNotificationClip();
         }
 
-        public void Play()
+        public void Play(TeamSound sound)
         {
-            if (_notificationClip == null || _audioSource == null)
+            if (_audioSource == null)
             {
                 return;
             }
 
-            _audioSource.PlayOneShot(_notificationClip);
+            var clip = _sounds != null ? _sounds.Clip(sound) : null;
+            if (clip == null)
+            {
+                if (!TeamOverlaySounds.FallsBackToChime(sound))
+                {
+                    return;
+                }
+
+                clip = _notificationClip;
+            }
+
+            if (clip != null)
+            {
+                _audioSource.PlayOneShot(clip);
+            }
         }
 
         private void OnDestroy()
