@@ -246,6 +246,7 @@ MonoBehaviour:
   _statusText: {fileID: 4698884127424254874}
   _detailText: {fileID: 4136923742309522862}
   _nudgeButton: {fileID: 534459047929955214}
+  _nameDoubleClick: {fileID: 1961062046088422119}
 --- !u!1 &1408609108049136822
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,6 +412,7 @@ GameObject:
   - component: {fileID: 8358721760415272505}
   - component: {fileID: 112043441136592223}
   - component: {fileID: 8144691680713689457}
+  - component: {fileID: 1961062046088422119}
   m_Layer: 0
   m_Name: Name
   m_TagString: Untagged
@@ -459,7 +461,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
   m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -479,6 +481,18 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\uAE40\uD558\uB298"
+--- !u!114 &1961062046088422119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3969356049127392063}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b63a941a0726f32469f4941d0c39978f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TeamOverlay.Runtime::TeamOverlay.UI.DoubleClickHandle
 --- !u!1 &4018438312440899786
 GameObject:
   m_ObjectHideFlags: 0

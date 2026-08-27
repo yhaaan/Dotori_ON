@@ -21,6 +21,7 @@ namespace TeamOverlay.UI
         [SerializeField] private Text _statusText;
         [SerializeField] private Text _detailText;
         [SerializeField] private Button _nudgeButton;
+        [SerializeField] private DoubleClickHandle _nameDoubleClick;
 
         private string _memberId;
         private TeamAvatarCatalog _avatarCatalog;
@@ -30,6 +31,9 @@ namespace TeamOverlay.UI
 
         /// <summary>Raised when the person clicks their own profile icon to change it.</summary>
         public event Action AvatarEditRequested;
+
+        /// <summary>Raised when the person double clicks their own name to change it.</summary>
+        public event Action RenameRequested;
 
         public void Initialize()
         {
@@ -48,6 +52,8 @@ namespace TeamOverlay.UI
             {
                 _avatarButton.onClick.AddListener(() => AvatarEditRequested?.Invoke());
             }
+
+            _nameDoubleClick?.Initialize(() => RenameRequested?.Invoke());
         }
 
         /// <summary>Supplies the artwork the card draws stored avatar keys with.</summary>
@@ -69,6 +75,20 @@ namespace TeamOverlay.UI
         }
 
         /// <summary>
+        /// Only your own name, and only after you have gone home. Changing a name
+        /// is really a sign-out and sign-in, so on a clocked-in card a stray
+        /// double click would end the session that is being timed. Requiring the
+        /// session to be over already removes that outcome entirely.
+        /// </summary>
+        public void SetRenameAvailable(bool available)
+        {
+            if (_nameDoubleClick != null)
+            {
+                _nameDoubleClick.enabled = available;
+            }
+        }
+
+        /// <summary>
         /// Shows the poke button only when a poke would actually arrive: not on
         /// your own card, not for a teammate who has gone home, and not while you
         /// are clocked out yourself, which the server refuses anyway.
@@ -86,15 +106,15 @@ namespace TeamOverlay.UI
         public void Bind(MemberState member, bool isLocalMember, DateTimeOffset nowUtc)
         {
             _memberId = member.MemberId;
-            var isOnline = member.AttendanceStatus == AttendanceStatus.ClockedIn;
-            var accent = StatusColor(member, isOnline);
+            var isOnline = MemberStatusDisplay.IsOnline(member);
+            var accent = MemberStatusDisplay.Accent(member);
 
             _background.color = isOnline ? TeamOverlayPalette.Card : TeamOverlayPalette.CardOffline;
             _avatarBackground.color = accent;
             BindAvatar(member, isOnline);
             _nameText.text = member.DisplayName;
             _nameText.color = isLocalMember ? TeamOverlayPalette.Accent : TeamOverlayPalette.TextPrimary;
-            _statusText.text = StatusLabel(member, isOnline);
+            _statusText.text = MemberStatusDisplay.Label(member);
             _statusText.color = accent;
 
             if (isOnline && member.CheckedInAtUtc.HasValue)
@@ -146,38 +166,6 @@ namespace TeamOverlay.UI
             var showInitial = sprite == null;
             _avatarText.text = showInitial ? InitialFor(member.DisplayName) : string.Empty;
             _avatarText.enabled = showInitial;
-        }
-
-        private static string StatusLabel(MemberState member, bool isOnline)
-        {
-            if (!isOnline)
-            {
-                return "오프라인";
-            }
-
-            switch (member.ActivityStatus)
-            {
-                case ActivityStatus.Working: return "작업중";
-                case ActivityStatus.Break: return "쉬는중";
-                case ActivityStatus.Meal: return "식사중";
-                default: return "온라인";
-            }
-        }
-
-        private static Color StatusColor(MemberState member, bool isOnline)
-        {
-            if (!isOnline)
-            {
-                return TeamOverlayPalette.Offline;
-            }
-
-            switch (member.ActivityStatus)
-            {
-                case ActivityStatus.Working: return TeamOverlayPalette.Working;
-                case ActivityStatus.Break: return TeamOverlayPalette.Break;
-                case ActivityStatus.Meal: return TeamOverlayPalette.Meal;
-                default: return TeamOverlayPalette.Accent;
-            }
         }
 
         private static string InitialFor(string displayName)

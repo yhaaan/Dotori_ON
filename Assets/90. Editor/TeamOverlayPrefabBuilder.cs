@@ -36,6 +36,25 @@ namespace TeamOverlay.Editor
         public const float AvatarPickerPanelHeight = 160f;
 
         /// <summary>
+        /// The mini overlay's size in the prefab. The window is resized to exactly
+        /// this, so it has to match <c>WindowsOverlayWindow.MiniWindowWidth</c>
+        /// and <c>MiniWindowHeight</c>; PrefabAssetTests pins the pairs. It is
+        /// authored in real pixels rather than in the 480 wide reference space,
+        /// because the canvas scaler is switched off while the mini overlay shows.
+        /// Roughly one member card, which is all a name-and-status list needs.
+        /// </summary>
+        public const float MiniPanelWidth = 130f;
+
+        public const float MiniPanelHeight = 150f;
+
+        /// <summary>Mini overlay geometry, in pixels from the top of the panel.</summary>
+        internal const float MiniDragStripHeight = 18f;
+        internal const float MiniRowTop = 20f;
+        internal const float MiniRowHeight = 30f;
+        internal const float MiniRowSpacing = 2f;
+        internal const int MiniRowCount = 4;
+
+        /// <summary>
         /// How large a profile icon is drawn, on the card and in the picker
         /// alike. The icon fills its tile edge to edge, so this is also the tile
         /// size on the card. Pixel art divides into it cleanly at 24 (x2) and 16
@@ -81,6 +100,20 @@ namespace TeamOverlay.Editor
         }
 
         public static void RebuildPrefabsFromCommandLine() => BuildAll();
+
+        /// <summary>
+        /// Rebuilds the two prefabs a UI change normally touches, and only those.
+        /// The name modal and the app prefab are generated too, so a full rebuild
+        /// churns their YAML alongside a change that never involved them.
+        /// </summary>
+        [MenuItem("Team Overlay/Rebuild Card And Main View Prefabs")]
+        public static void RebuildCardAndMainView()
+        {
+            BuildMainView(BuildCard());
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(MainViewPath);
+        }
 
         public static void RebuildMainViewFromCommandLine()
         {
@@ -154,6 +187,13 @@ namespace TeamOverlay.Editor
                     TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
                 SetCardLine(name, CardNameTop, 18f);
                 name.text = "김하늘";
+                // Alone among the labels the name is clicked, so it is the only
+                // one that has to be a raycast target. The handle ships disabled:
+                // Bind turns it on for the local member's own card, once they
+                // have clocked out.
+                name.raycastTarget = true;
+                var nameDoubleClick = name.gameObject.AddComponent<DoubleClickHandle>();
+                nameDoubleClick.enabled = false;
                 var status = UiFactory.CreateText("Status", root.transform, font, 11,
                     TextAnchor.MiddleCenter, TeamOverlayPalette.Working, FontStyle.Bold);
                 SetCardLine(status, CardStatusTop, 18f);
@@ -176,7 +216,8 @@ namespace TeamOverlay.Editor
                     ("_background", rootImage), ("_avatarBackground", avatar),
                     ("_avatarIcon", avatarIcon), ("_avatarButton", avatarButton),
                     ("_avatarText", initial), ("_timerText", timer), ("_nameText", name),
-                    ("_statusText", status), ("_detailText", detail), ("_nudgeButton", nudge));
+                    ("_statusText", status), ("_detailText", detail), ("_nudgeButton", nudge),
+                    ("_nameDoubleClick", nameDoubleClick));
                 return PrefabUtility.SaveAsPrefabAsset(root, CardPath).GetComponent<TeamMemberCardView>();
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
@@ -216,9 +257,11 @@ namespace TeamOverlay.Editor
                 Button fake = null;
                 var teamNudge = TopButton(topBar.transform, font, "TeamNudge", "전체호출", 105f, 52f);
                 teamNudge.GetComponentInChildren<Text>().fontSize = 9;
-                var switchAccount = TopButton(topBar.transform, font, "SwitchAccount", "이름변경", 161f, 54f);
+                // Takes over the slot and the width the rename button had, so the
+                // rest of the bar keeps the offsets it was tuned with. Renaming
+                // moved onto the name it changes, where a double click does it.
+                var miniMode = TopButton(topBar.transform, font, "MiniMode", "소형", 161f, 54f);
                 var stats = TopButton(topBar.transform, font, "Statistics", "\uD1B5\uACC4", 219f, 48f);
-                switchAccount.GetComponentInChildren<Text>().fontSize = 9;
                 var topmost = TopButton(topBar.transform, font, "AlwaysOnTop", "TOP", 63f, 38f);
                 var minimize = TopButton(topBar.transform, font, "Minimize", "—", 32f, 28f);
                 var exit = TopButton(topBar.transform, font, "Exit", "×", 3f, 27f, TeamOverlayPalette.Danger);
@@ -289,6 +332,10 @@ namespace TeamOverlay.Editor
                 // is pushed down under it, which is what lets the window grow
                 // upwards without moving anything inside the compact layout.
                 var avatarPicker = BuildAvatarPickerPanel(root.transform, font);
+                // Also a sibling of the window background rather than a child of
+                // it, for a different reason: the mini overlay replaces the whole
+                // overlay instead of folding out of it.
+                var miniPanel = BuildMiniPanel(root.transform, font);
                 var view = root.GetComponent<TeamOverlayView>();
                 var serialized = new SerializedObject(view);
                 serialized.FindProperty("_cards").arraySize = cards.Length;
@@ -302,7 +349,7 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_topmostButton", topmost);
                 Set(serialized, "_minimizeButton", minimize);
                 Set(serialized, "_exitButton", exit);
-                Set(serialized, "_switchAccountButton", switchAccount);
+                Set(serialized, "_miniModeButton", miniMode);
                 Set(serialized, "_statusNoteInput", noteInput);
                 Set(serialized, "_statsButton", stats);
                 Set(serialized, "_topmostLabel", topmost.GetComponentInChildren<Text>());
@@ -313,6 +360,7 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_statisticsPanel", statisticsPanel);
                 Set(serialized, "_windowBackground", background.rectTransform);
                 Set(serialized, "_avatarPickerPanel", avatarPicker);
+                Set(serialized, "_miniPanel", miniPanel);
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 return PrefabUtility.SaveAsPrefabAsset(root, MainViewPath).GetComponent<TeamOverlayView>();
             }
@@ -432,6 +480,113 @@ namespace TeamOverlay.Editor
                 ("_grid", contentRect), ("_optionTemplate", template),
                 ("_confirmButton", confirm), ("_feedbackText", feedback));
             return panelView;
+        }
+
+        /// <summary>
+        /// The mini overlay: a drag strip and four name-and-status lines, sized
+        /// to about one member card. It ships switched off, and the app swaps it
+        /// for the window background rather than showing both.
+        /// </summary>
+        private static MiniOverlayPanelView BuildMiniPanel(Transform parent, Font font)
+        {
+            var panel = UiFactory.CreateImage("MiniOverlayPanel", parent, TeamOverlayPalette.Window);
+            var panelRect = panel.rectTransform;
+            panelRect.anchorMin = panelRect.anchorMax = new Vector2(0f, 1f);
+            panelRect.pivot = new Vector2(0f, 1f);
+            panelRect.anchoredPosition = Vector2.zero;
+            panelRect.sizeDelta = new Vector2(MiniPanelWidth, MiniPanelHeight);
+            var panelView = panel.gameObject.AddComponent<MiniOverlayPanelView>();
+
+            // The strip is the only part that drags, because a body that started
+            // a native window drag on pointer down would swallow the first half
+            // of the double click that brings the full overlay back.
+            var strip = UiFactory.CreateImage("MiniDragStrip", panel.transform, TeamOverlayPalette.TopBar);
+            strip.rectTransform.anchorMin = new Vector2(0f, 1f);
+            strip.rectTransform.anchorMax = new Vector2(1f, 1f);
+            strip.rectTransform.pivot = new Vector2(0.5f, 1f);
+            strip.rectTransform.anchoredPosition = Vector2.zero;
+            strip.rectTransform.sizeDelta = new Vector2(0f, MiniDragStripHeight);
+            var dragHandle = strip.gameObject.AddComponent<WindowDragHandle>();
+            var title = UiFactory.CreateText("Title", strip.transform, font, 9,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary, FontStyle.Bold);
+            title.text = "Dotori ON";
+            UiFactory.Stretch(title.rectTransform, 6f, 0f, 6f, 0f);
+
+            var rows = new MiniMemberRowView[MiniRowCount];
+            for (var index = 0; index < rows.Length; index++)
+            {
+                rows[index] = BuildMiniRow(panel.transform, font, index);
+            }
+
+            var panelData = new SerializedObject(panelView);
+            var rowsProperty = panelData.FindProperty("_rows");
+            rowsProperty.arraySize = rows.Length;
+            for (var index = 0; index < rows.Length; index++)
+                rowsProperty.GetArrayElementAtIndex(index).objectReferenceValue = rows[index];
+            Set(panelData, "_dragHandle", dragHandle);
+            panelData.ApplyModifiedPropertiesWithoutUndo();
+
+            panel.gameObject.SetActive(false);
+            return panelView;
+        }
+
+        /// <summary>
+        /// One mini line. Nothing in it is a raycast target: the whole body has
+        /// to reach the panel's double click handler, and a pill that ate the
+        /// click would leave dead spots you cannot restore the overlay from.
+        /// </summary>
+        private static MiniMemberRowView BuildMiniRow(Transform parent, Font font, int index)
+        {
+            var row = UiFactory.CreateRect("MiniRow_" + (index + 1), parent);
+            var rowRect = row.GetComponent<RectTransform>();
+            rowRect.anchorMin = new Vector2(0f, 1f);
+            rowRect.anchorMax = new Vector2(1f, 1f);
+            rowRect.pivot = new Vector2(0.5f, 1f);
+            rowRect.anchoredPosition =
+                new Vector2(0f, -(MiniRowTop + (index * (MiniRowHeight + MiniRowSpacing))));
+            rowRect.sizeDelta = new Vector2(0f, MiniRowHeight);
+            var rowView = row.AddComponent<MiniMemberRowView>();
+
+            var name = UiFactory.CreateText("Name", row.transform, font, 11,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+            UiFactory.AnchorTop(name.rectTransform, 8f, 0f, 50f, MiniRowHeight);
+            name.text = "김하늘";
+            // Best fit rather than overflow: there is no room to spill into
+            // before the pill, and a name shrunk a point or two still reads.
+            name.horizontalOverflow = HorizontalWrapMode.Wrap;
+            name.resizeTextForBestFit = true;
+            name.resizeTextMinSize = 7;
+            name.resizeTextMaxSize = 11;
+
+            var pill = UiFactory.CreateImage("Pill", row.transform, TeamOverlayPalette.Working);
+            UiFactory.AnchorRight(pill.rectTransform, 5f, 5f, 62f, 20f);
+            pill.sprite = BuiltinSprite("UI/Skin/UISprite.psd");
+            pill.type = Image.Type.Sliced;
+            pill.raycastTarget = false;
+
+            var dot = UiFactory.CreateImage("Dot", pill.transform, TeamOverlayPalette.TextPrimary);
+            UiFactory.AnchorTop(dot.rectTransform, 5f, 6f, 8f, 8f);
+            dot.sprite = BuiltinSprite("UI/Skin/Knob.psd");
+            dot.raycastTarget = false;
+
+            var status = UiFactory.CreateText("Status", pill.transform, font, 10,
+                TextAnchor.MiddleCenter, TeamOverlayPalette.Window, FontStyle.Bold);
+            status.text = "작업중";
+            UiFactory.Stretch(status.rectTransform, 16f, 0f, 5f, 0f);
+
+            Assign(rowView,
+                ("_nameText", name), ("_pill", pill), ("_dot", dot), ("_statusText", status));
+            return rowView;
+        }
+
+        /// <summary>
+        /// The rounded pill and its dot are the only shaped graphics in the UI,
+        /// which is otherwise flat rectangles. Unity ships both, so neither costs
+        /// the project an imported sprite.
+        /// </summary>
+        private static Sprite BuiltinSprite(string path)
+        {
+            return AssetDatabase.GetBuiltinExtraResource<Sprite>(path);
         }
 
         private static TeamStatisticsPanelView BuildStatisticsPanel(Transform parent, Font font)

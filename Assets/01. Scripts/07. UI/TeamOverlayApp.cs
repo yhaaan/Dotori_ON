@@ -35,6 +35,13 @@ namespace TeamOverlay.UI
 
         private const float MaximumPollBackoffSeconds = 30f;
 
+        /// <summary>
+        /// Whether the overlay was last left in mini mode. It is a view
+        /// preference and nothing else, so it lives in PlayerPrefs rather than in
+        /// the crash-safe identity store next to the things worth recovering.
+        /// </summary>
+        private const string MiniModePreferenceKey = "TeamOverlay.MiniMode";
+
         [Header("Prefab references")]
         [SerializeField] private TeamOverlayView _mainViewPrefab;
         [SerializeField] private FirstRunNameView _firstRunNamePrefab;
@@ -508,9 +515,15 @@ namespace TeamOverlay.UI
             _view.AvatarPickerRequested += HandleAvatarPickerRequested;
             _view.AvatarPickerCloseRequested += CloseAvatarPicker;
             _view.AvatarPicked += HandleAvatarPicked;
+            _view.MiniModeRequested += HandleMiniModeRequested;
+            _view.MiniModeExitRequested += HandleMiniModeExitRequested;
             _view.SetAvatarCatalog(_avatarCatalog);
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _firstRunNameView.Hide();
+            if (PlayerPrefs.GetInt(MiniModePreferenceKey, 0) == 1)
+            {
+                ApplyMiniMode(true);
+            }
         }
 
         /// <summary>
@@ -535,6 +548,9 @@ namespace TeamOverlay.UI
 
         private void TeardownSession()
         {
+            // The name screen is a full size window, and the stored preference is
+            // left alone so signing back in comes up the way it was left.
+            ApplyMiniMode(false);
             CloseStatisticsPanel();
             CloseAvatarPicker();
             // Nothing still in flight may bind into the next session's panel.
@@ -582,6 +598,8 @@ namespace TeamOverlay.UI
             _view.AvatarPickerRequested -= HandleAvatarPickerRequested;
             _view.AvatarPickerCloseRequested -= CloseAvatarPicker;
             _view.AvatarPicked -= HandleAvatarPicked;
+            _view.MiniModeRequested -= HandleMiniModeRequested;
+            _view.MiniModeExitRequested -= HandleMiniModeExitRequested;
         }
 
         private bool IsLocalMemberClockedIn()
@@ -674,6 +692,58 @@ namespace TeamOverlay.UI
         private void HandleMinimizeRequested()
         {
             _window.Minimize();
+        }
+
+        private void HandleMiniModeRequested()
+        {
+            if (_view == null || _quitting || _signOutInProgress)
+            {
+                return;
+            }
+
+            ApplyMiniMode(true);
+            PersistMiniMode(true);
+        }
+
+        private void HandleMiniModeExitRequested()
+        {
+            if (_view == null || _quitting)
+            {
+                return;
+            }
+
+            ApplyMiniMode(false);
+            PersistMiniMode(false);
+        }
+
+        /// <summary>
+        /// The statistics panel and the avatar picker each move the window
+        /// themselves, so neither may be left open while the mini overlay owns
+        /// the window rect.
+        /// </summary>
+        private void ApplyMiniMode(bool enabled)
+        {
+            if (enabled)
+            {
+                CloseStatisticsPanel();
+                CloseAvatarPicker();
+            }
+
+            _view?.SetMiniModeVisible(enabled);
+            if (enabled)
+            {
+                _window?.EnterMiniMode();
+            }
+            else
+            {
+                _window?.ExitMiniMode();
+            }
+        }
+
+        private static void PersistMiniMode(bool enabled)
+        {
+            PlayerPrefs.SetInt(MiniModePreferenceKey, enabled ? 1 : 0);
+            PlayerPrefs.Save();
         }
 
         private void HandleStatsToggleRequested()

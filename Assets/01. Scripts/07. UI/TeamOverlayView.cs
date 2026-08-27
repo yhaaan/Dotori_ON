@@ -25,7 +25,7 @@ namespace TeamOverlay.UI
         [SerializeField] private Button _topmostButton;
         [SerializeField] private Button _minimizeButton;
         [SerializeField] private Button _exitButton;
-        [SerializeField] private Button _switchAccountButton;
+        [SerializeField] private Button _miniModeButton;
         [SerializeField] private Button _statsButton;
         [SerializeField] private Button _teamNudgeButton;
         [SerializeField] private InputField _statusNoteInput;
@@ -36,8 +36,13 @@ namespace TeamOverlay.UI
         [SerializeField] private TeamStatisticsPanelView _statisticsPanel;
         [SerializeField] private RectTransform _windowBackground;
         [SerializeField] private AvatarPickerPanelView _avatarPickerPanel;
+        [SerializeField] private MiniOverlayPanelView _miniPanel;
 
         private readonly List<Button> _interactiveButtons = new List<Button>();
+        private CanvasScaler _canvasScaler;
+        private CanvasScaler.ScaleMode _fullScaleMode;
+        private Vector2 _fullReferenceResolution;
+        private float _fullScaleFactor;
         private bool _initialized;
 
         public event Action CheckInRequested;
@@ -47,7 +52,19 @@ namespace TeamOverlay.UI
         public event Action AlwaysOnTopToggleRequested;
         public event Action MinimizeRequested;
         public event Action ExitRequested;
+
+        /// <summary>
+        /// Raised by a double click on the local member's own name. It is the same
+        /// sign-out and sign-in the top bar used to offer as a button, moved onto
+        /// the name it actually changes.
+        /// </summary>
         public event Action SwitchAccountRequested;
+
+        public event Action MiniModeRequested;
+
+        /// <summary>Raised by a double click anywhere on the mini overlay.</summary>
+        public event Action MiniModeExitRequested;
+
         public event Action<string> StatusNoteSubmitted;
         public event Action StatsToggleRequested;
         public event Action<StatisticsPeriod> StatisticsPeriodChangeRequested;
@@ -67,6 +84,8 @@ namespace TeamOverlay.UI
 
         public bool IsAvatarPickerVisible => _avatarPickerPanel != null && _avatarPickerPanel.gameObject.activeSelf;
 
+        public bool IsMiniModeVisible => _miniPanel != null && _miniPanel.gameObject.activeSelf;
+
         /// <summary>
         /// How much taller the window has to be while the picker is open. Read
         /// from the prefab rather than repeated as a constant, so moving the panel
@@ -83,6 +102,16 @@ namespace TeamOverlay.UI
             _initialized = true;
 
             UiFactory.EnsureEventSystem();
+            // Captured rather than hardcoded so tuning the scaler in the prefab
+            // survives a trip through the mini overlay.
+            _canvasScaler = GetComponent<CanvasScaler>();
+            if (_canvasScaler != null)
+            {
+                _fullScaleMode = _canvasScaler.uiScaleMode;
+                _fullReferenceResolution = _canvasScaler.referenceResolution;
+                _fullScaleFactor = _canvasScaler.scaleFactor;
+            }
+
             UiFactory.ApplyApplicationFont(transform, _fontOverride);
             if (_windowDragHandle != null) _windowDragHandle.Initialize(beginWindowDrag);
             // Application.version is the bundleVersion the build was stamped with,
@@ -98,7 +127,7 @@ namespace TeamOverlay.UI
             AddListener(_topmostButton, () => AlwaysOnTopToggleRequested?.Invoke());
             AddListener(_minimizeButton, () => MinimizeRequested?.Invoke());
             AddListener(_exitButton, () => ExitRequested?.Invoke());
-            AddListener(_switchAccountButton, () => SwitchAccountRequested?.Invoke());
+            AddListener(_miniModeButton, () => MiniModeRequested?.Invoke());
             AddListener(_statsButton, () => StatsToggleRequested?.Invoke());
             AddListener(_teamNudgeButton, () => NudgeRequested?.Invoke(null));
             foreach (var card in _cards)
@@ -108,8 +137,10 @@ namespace TeamOverlay.UI
                 // Every tile stays inert until a Bind says whose card it is; the
                 // one belonging to the local member is the only clickable one.
                 card.SetAvatarEditable(false);
+                card.SetRenameAvailable(false);
                 card.NudgeRequested += memberId => NudgeRequested?.Invoke(memberId);
                 card.AvatarEditRequested += () => AvatarPickerRequested?.Invoke();
+                card.RenameRequested += () => SwitchAccountRequested?.Invoke();
             }
 
             AddInteractive(_checkInButton);
@@ -118,7 +149,7 @@ namespace TeamOverlay.UI
             AddInteractive(_breakButton);
             AddInteractive(_mealButton);
             AddInteractive(_fakeEventButton);
-            AddInteractive(_switchAccountButton);
+            AddInteractive(_miniModeButton);
             AddInteractive(_statsButton);
             AddInteractive(_teamNudgeButton);
 
@@ -138,10 +169,53 @@ namespace TeamOverlay.UI
                 SetAvatarPickerVisible(false);
             }
 
+            if (_miniPanel != null)
+            {
+                _miniPanel.Initialize(beginWindowDrag);
+                _miniPanel.RestoreRequested += () => MiniModeExitRequested?.Invoke();
+                SetMiniModeVisible(false);
+            }
+
             if (_statusNoteInput != null)
             {
                 _statusNoteInput.onEndEdit.AddListener(note => StatusNoteSubmitted?.Invoke(note));
             }
+        }
+
+        /// <summary>
+        /// Swaps the whole overlay for the mini one. The canvas scaler has to go
+        /// with it: it normally scales the layout to a 480 wide window, which at
+        /// mini width would shrink the text to a quarter size instead of showing
+        /// a smaller window. The mini overlay is authored in real pixels.
+        /// </summary>
+        public void SetMiniModeVisible(bool visible)
+        {
+            if (_miniPanel == null)
+            {
+                return;
+            }
+
+            _miniPanel.gameObject.SetActive(visible);
+            if (_windowBackground != null)
+            {
+                _windowBackground.gameObject.SetActive(!visible);
+            }
+
+            if (_canvasScaler == null)
+            {
+                return;
+            }
+
+            if (visible)
+            {
+                _canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+                _canvasScaler.scaleFactor = 1f;
+                return;
+            }
+
+            _canvasScaler.uiScaleMode = _fullScaleMode;
+            _canvasScaler.referenceResolution = _fullReferenceResolution;
+            _canvasScaler.scaleFactor = _fullScaleFactor;
         }
 
         /// <summary>Hands the icon artwork to the cards and the picker.</summary>
@@ -220,7 +294,10 @@ namespace TeamOverlay.UI
                     isClockedIn
                     && member.MemberId != localMemberId
                     && member.AttendanceStatus == AttendanceStatus.ClockedIn);
+                card.SetRenameAvailable(member.MemberId == localMemberId && !isClockedIn);
             }
+
+            _miniPanel?.Bind(orderedMembers);
 
             SetActive(_teamNudgeButton, isClockedIn);
             SetActive(_checkInButton, !isClockedIn);

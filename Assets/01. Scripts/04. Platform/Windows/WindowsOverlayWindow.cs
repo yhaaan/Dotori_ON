@@ -18,6 +18,13 @@ namespace TeamOverlay.Platform.Windows
     {
         public bool IsAlwaysOnTop { get; private set; } = true;
 
+        /// <summary>
+        /// The window is showing the name-and-status only mini overlay. Declared
+        /// outside the Windows-only block because the Unity side reads it on
+        /// every platform.
+        /// </summary>
+        public bool IsMiniMode { get; private set; }
+
         public bool IsInitialized { get; private set; }
 
         // Both events below are raised only from the Windows-only message loop, so
@@ -52,6 +59,23 @@ namespace TeamOverlay.Platform.Windows
         /// height in the prefab; PrefabAssetTests pins the pair.
         /// </summary>
         public const int AvatarPickerPanelHeight = 160;
+
+        /// <summary>
+        /// The mini overlay's client size. It mirrors the panel's own size in the
+        /// prefab, which PrefabAssetTests pins so the two cannot drift apart.
+        /// Roughly one member card, which is all a name-and-status list needs.
+        /// </summary>
+        public const int MiniWindowWidth = 130;
+
+        public const int MiniWindowHeight = 150;
+
+        /// <summary>
+        /// How opaque the mini overlay is, out of 255. It sits on top of whatever
+        /// the person is actually working on, so it reads better as a pane you can
+        /// see through than as a solid box; anything much below this and the
+        /// status text starts fighting the desktop behind it.
+        /// </summary>
+        public const byte MiniWindowAlpha = 225;
 
         /// <summary>Backstop for a window whose messages no longer reach us.</summary>
         private const float WindowAuditIntervalSeconds = 5f;
@@ -137,6 +161,34 @@ namespace TeamOverlay.Platform.Windows
 #endif
         }
 
+        /// <summary>
+        /// Shrinks the window down to the name-and-status list and makes it
+        /// translucent. The panel sizes come from the prefab, so nothing here
+        /// depends on which layout the overlay was showing beforehand.
+        /// </summary>
+        public void EnterMiniMode()
+        {
+            IsMiniMode = true;
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _statisticsExpanded = false;
+            _avatarPickerExpanded = false;
+            _growsUpward = false;
+            ApplyWindowOpacity();
+            ApplyContentSize();
+#endif
+        }
+
+        /// <summary>Brings the full overlay back, opaque and at its normal size.</summary>
+        public void ExitMiniMode()
+        {
+            IsMiniMode = false;
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _growsUpward = false;
+            ApplyWindowOpacity();
+            ApplyContentSize();
+#endif
+        }
+
         /// <summary>Shrinks the window back to the compact layout.</summary>
         public void RestoreCompactHeight()
         {
@@ -168,19 +220,23 @@ namespace TeamOverlay.Platform.Windows
                 return;
             }
 
-            var contentHeight = CompactWindowHeight +
-                (_statisticsExpanded ? StatisticsPanelHeight : 0) +
-                (_avatarPickerExpanded ? AvatarPickerPanelHeight : 0);
-            var widthDelta = OverlayWindowWidth - client.Width;
+            var contentWidth = IsMiniMode ? MiniWindowWidth : OverlayWindowWidth;
+            var contentHeight = IsMiniMode
+                ? MiniWindowHeight
+                : CompactWindowHeight +
+                  (_statisticsExpanded ? StatisticsPanelHeight : 0) +
+                  (_avatarPickerExpanded ? AvatarPickerPanelHeight : 0);
+            var widthDelta = contentWidth - client.Width;
             var heightDelta = contentHeight - client.Height;
             if (widthDelta == 0 && heightDelta == 0)
             {
                 return;
             }
 
+            var width = Math.Max(1, window.Width + widthDelta);
+            var height = Math.Max(1, window.Height + heightDelta);
             var left = window.Left;
             var top = window.Top;
-            var flags = WindowsNativeMethods.SwpNoZOrder | WindowsNativeMethods.SwpNoActivate;
             if (_growsUpward)
             {
                 // Holding the bottom edge still is what makes the picker look like
@@ -188,17 +244,17 @@ namespace TeamOverlay.Platform.Windows
                 // Correcting by the same delta the height moves by keeps this
                 // idempotent, so a second pass on the next tick is a no-op.
                 top -= heightDelta;
-                if (TryGetWorkArea(out var workArea) && top < workArea.Top)
-                {
-                    // Against the top of the screen there is nowhere to unfold
-                    // into, and a panel above the desktop cannot be clicked. Pin
-                    // the window there and let it grow down instead.
-                    top = workArea.Top;
-                }
             }
-            else
+
+            // A window that just changed size may no longer fit where it sat: a
+            // panel unfolding upwards can run past the top of the screen, and
+            // leaving the mini overlay nearly quadruples the width in place.
+            // Either way the part that spilled over cannot be clicked, so the
+            // window is pulled back inside the monitor it is on.
+            if (TryGetWorkArea(out var workArea))
             {
-                flags |= WindowsNativeMethods.SwpNoMove;
+                left = Math.Max(workArea.Left, Math.Min(left, workArea.Right - width));
+                top = Math.Max(workArea.Top, Math.Min(top, workArea.Bottom - height));
             }
 
             WindowsNativeMethods.SetWindowPos(
@@ -206,9 +262,70 @@ namespace TeamOverlay.Platform.Windows
                 IntPtr.Zero,
                 left,
                 top,
-                Math.Max(1, window.Width + widthDelta),
-                Math.Max(1, window.Height + heightDelta),
-                flags);
+                width,
+                height,
+                WindowsNativeMethods.SwpNoZOrder | WindowsNativeMethods.SwpNoActivate);
+        }
+
+        /// <summary>
+        /// Turns the whole window translucent in mini mode and solid again on the
+        /// way out. Unity re-asserts its own styles whenever it touches the
+        /// window, so like the frame stripping this is re-applied rather than set
+        /// once; it finds nothing to do on almost every pass.
+        /// </summary>
+        private void ApplyWindowOpacity()
+        {
+            if (!EnsureWindowHandle())
+            {
+                return;
+            }
+
+            var exStyle = WindowsNativeMethods.GetWindowLongPointer(
+                    _windowHandle,
+                    WindowsNativeMethods.GwlExStyle)
+                .ToInt64();
+            var isLayered = (exStyle & WindowsNativeMethods.WsExLayered) != 0;
+            if (IsMiniMode)
+            {
+                if (!isLayered)
+                {
+                    WindowsNativeMethods.SetWindowLongPointer(
+                        _windowHandle,
+                        WindowsNativeMethods.GwlExStyle,
+                        new IntPtr(exStyle | WindowsNativeMethods.WsExLayered));
+                }
+
+                // Re-sent even when the style was already there: Unity recreating
+                // the swap chain resets the alpha but not the style bit.
+                WindowsNativeMethods.SetLayeredWindowAttributes(
+                    _windowHandle,
+                    0,
+                    MiniWindowAlpha,
+                    WindowsNativeMethods.LwaAlpha);
+                return;
+            }
+
+            if (!isLayered)
+            {
+                return;
+            }
+
+            WindowsNativeMethods.SetWindowLongPointer(
+                _windowHandle,
+                WindowsNativeMethods.GwlExStyle,
+                new IntPtr(exStyle & ~WindowsNativeMethods.WsExLayered));
+            WindowsNativeMethods.SetWindowPos(
+                _windowHandle,
+                IntPtr.Zero,
+                0,
+                0,
+                0,
+                0,
+                WindowsNativeMethods.SwpNoMove |
+                WindowsNativeMethods.SwpNoSize |
+                WindowsNativeMethods.SwpNoZOrder |
+                WindowsNativeMethods.SwpNoActivate |
+                WindowsNativeMethods.SwpFrameChanged);
         }
 
         private bool TryGetWorkArea(out WindowsNativeMethods.Rect workArea)
@@ -257,6 +374,7 @@ namespace TeamOverlay.Platform.Windows
                 ApplyOverlayWindowStyle();
             }
 
+            ApplyWindowOpacity();
             ApplyContentSize();
         }
 #endif
@@ -416,6 +534,7 @@ namespace TeamOverlay.Platform.Windows
             }
 
             ApplyOverlayWindowStyle();
+            ApplyWindowOpacity();
             ApplyContentSize();
             HookWindowProcedure();
             SetAlwaysOnTop(IsAlwaysOnTop);
@@ -575,6 +694,25 @@ namespace TeamOverlay.Platform.Windows
 
                 return IntPtr.Zero;
             }
+            else if (message == WindowsNativeMethods.WmGetMinMaxInfo)
+            {
+                // Windows refuses to make a window narrower than the system
+                // minimum tracking width, which is wider than the mini overlay,
+                // so a resize to it would silently come back clamped. Windows
+                // fills the limits first and we only lower the floor.
+                var result = InvokePreviousWindowProcedure(
+                    windowHandle,
+                    message,
+                    wordParameter,
+                    longParameter);
+                var limits = (WindowsNativeMethods.MinMaxInfo)Marshal.PtrToStructure(
+                    longParameter,
+                    typeof(WindowsNativeMethods.MinMaxInfo));
+                limits.ptMinTrackSize.X = Math.Min(limits.ptMinTrackSize.X, MiniWindowWidth);
+                limits.ptMinTrackSize.Y = Math.Min(limits.ptMinTrackSize.Y, MiniWindowHeight);
+                Marshal.StructureToPtr(limits, longParameter, false);
+                return result;
+            }
             else if (message == WindowsNativeMethods.WmClose && !_allowNativeClose)
             {
                 // This used to hide the window to the tray. With no tray icon that
@@ -585,6 +723,15 @@ namespace TeamOverlay.Platform.Windows
                 return IntPtr.Zero;
             }
 
+            return InvokePreviousWindowProcedure(windowHandle, message, wordParameter, longParameter);
+        }
+
+        private IntPtr InvokePreviousWindowProcedure(
+            IntPtr windowHandle,
+            uint message,
+            IntPtr wordParameter,
+            IntPtr longParameter)
+        {
             return _previousWindowProcedure != IntPtr.Zero
                 ? WindowsNativeMethods.CallWindowProc(
                     _previousWindowProcedure,

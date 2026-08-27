@@ -7,6 +7,7 @@ namespace TeamOverlay.Platform.Windows
     internal static class WindowsNativeMethods
     {
         internal const int GwlStyle = -16;
+        internal const int GwlExStyle = -20;
         internal const int GwlWndProc = -4;
 
         internal const long WsCaption = 0x00C00000L;
@@ -15,6 +16,11 @@ namespace TeamOverlay.Platform.Windows
         internal const long WsMaximizeBox = 0x00010000L;
         internal const long WsPopup = unchecked((long)0x80000000);
         internal const long WsVisible = 0x10000000L;
+
+        internal const long WsExLayered = 0x00080000L;
+
+        /// <summary>Tells SetLayeredWindowAttributes to read the alpha argument.</summary>
+        internal const uint LwaAlpha = 0x00000002;
 
         internal const uint SwMinimize = 6;
 
@@ -31,6 +37,7 @@ namespace TeamOverlay.Platform.Windows
         internal const uint WmWindowPosChanged = 0x0047;
         internal const uint WmStyleChanged = 0x007D;
         internal const uint WmDpiChanged = 0x02E0;
+        internal const uint WmGetMinMaxInfo = 0x0024;
 
         internal const int HtCaption = 2;
         internal const uint GwOwner = 4;
@@ -60,6 +67,28 @@ namespace TeamOverlay.Platform.Windows
             internal uint dwFlags;
             internal uint uCount;
             internal uint dwTimeout;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct Point
+        {
+            internal int X;
+            internal int Y;
+        }
+
+        /// <summary>
+        /// The layout Windows hands to WM_GETMINMAXINFO. Only ptMinTrackSize is
+        /// interesting here: its default is the system minimum window width,
+        /// which is wider than the mini overlay.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct MinMaxInfo
+        {
+            internal Point ptReserved;
+            internal Point ptMaxSize;
+            internal Point ptMaxPosition;
+            internal Point ptMinTrackSize;
+            internal Point ptMaxTrackSize;
         }
 
         internal const uint MonitorDefaultToNearest = 0x00000002;
@@ -177,6 +206,17 @@ namespace TeamOverlay.Platform.Windows
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool ReleaseCapture();
+
+        // Uniform whole-window alpha. Per-pixel transparency would need the
+        // framebuffer alpha URP does not preserve here, and a status widget reads
+        // fine as a single translucent pane anyway.
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetLayeredWindowAttributes(
+            IntPtr windowHandle,
+            uint colorKey,
+            byte alpha,
+            uint flags);
 
         // Windows kills a process a few seconds after WM_ENDSESSION. Registering a
         // block reason during WM_QUERYENDSESSION asks the shell to keep waiting and
