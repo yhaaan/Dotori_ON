@@ -5,6 +5,7 @@ using NUnit.Framework;
 using TeamOverlay.UI;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TeamOverlay.Tests.EditMode
 {
@@ -132,6 +133,46 @@ namespace TeamOverlay.Tests.EditMode
             string expected)
         {
             Assert.That(TeamDailyStatRowView.FormatDuration(seconds), Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void StatisticsRows_ShowTotalAttendanceAndResizeBarsByRatio()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/02. Prefabs/TeamOverlayCanvas.prefab");
+            var instance = Object.Instantiate(prefab);
+            try
+            {
+                var daily = instance.GetComponentsInChildren<TeamDailyStatRowView>(true)[0];
+                daily.Bind(new TeamOverlay.Core.MemberDailyStat(
+                    new System.DateTime(2026, 8, 27), 1800, 900, 300, 600), 1800, 3600);
+                var dailyData = new SerializedObject(daily);
+                var totalLabel = (Text)dailyData.FindProperty("_attendanceLabel").objectReferenceValue;
+                var workBar = (Image)dailyData.FindProperty("_workBar").objectReferenceValue;
+                var attendanceBar = (Image)dailyData.FindProperty("_attendanceBar").objectReferenceValue;
+
+                Assert.That(totalLabel.text, Is.EqualTo("\uCD1D 00:30"));
+                Assert.That(workBar.rectTransform.anchorMax.x, Is.EqualTo(0.5f).Within(0.001f));
+                Assert.That(attendanceBar.rectTransform.anchorMax.x, Is.EqualTo(0.5f).Within(0.001f));
+
+                daily.Bind(new TeamOverlay.Core.MemberDailyStat(
+                    new System.DateTime(2026, 8, 27), 0, 0, 0, 0), 1800, 3600);
+                Assert.That(workBar.rectTransform.anchorMax.x, Is.Zero);
+                Assert.That(attendanceBar.rectTransform.anchorMax.x, Is.Zero);
+
+                var ranking = instance.GetComponentsInChildren<TeamRankingRowView>(true)[0];
+                ranking.Bind(1, new TeamOverlay.Core.TeamRankingEntry(
+                    "member", "name", 0, 900, 1800), 1800, false);
+                var rankingData = new SerializedObject(ranking);
+                var rankingTotal = (Text)rankingData.FindProperty("_attendanceLabel").objectReferenceValue;
+                var rankingBar = (Image)rankingData.FindProperty("_workBar").objectReferenceValue;
+                Assert.That(rankingTotal.text, Is.EqualTo("\uCD1D 00:30"));
+                Assert.That(rankingBar.rectTransform.anchorMax.x, Is.EqualTo(0.5f).Within(0.001f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
         }
     }
 }

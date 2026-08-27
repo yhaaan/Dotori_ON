@@ -18,13 +18,11 @@ namespace TeamOverlay.UI
             _rankLabel.text = rank.ToString();
             _nameLabel.text = entry.DisplayName;
             _workLabel.text = "\uC791\uC5C5 " + TeamDailyStatRowView.FormatDuration(entry.WorkSeconds);
-            _workBar.fillAmount = maximumWorkSeconds <= 0
-                ? 0f
-                : Mathf.Clamp01((float)entry.WorkSeconds / maximumWorkSeconds);
+            TeamDailyStatRowView.SetBarRatio(_workBar, entry.WorkSeconds, maximumWorkSeconds);
             _background.color = isLocalMember
                 ? new Color(0.14f, 0.25f, 0.37f, 1f)
                 : TeamOverlayPalette.Card;
-            _attendanceLabel.text = "\uCD9C\uADFC " + TeamDailyStatRowView.FormatDuration(entry.AttendanceSeconds);
+            _attendanceLabel.text = "\uCD1D " + TeamDailyStatRowView.FormatDuration(entry.AttendanceSeconds);
         }
     }
 }

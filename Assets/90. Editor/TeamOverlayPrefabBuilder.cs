@@ -393,10 +393,10 @@ namespace TeamOverlay.Editor
             UiFactory.AnchorTop(track.rectTransform, left, top, width, 6f);
             var fill = UiFactory.CreateImage(name, track.transform, color);
             UiFactory.Stretch(fill.rectTransform);
-            fill.type = Image.Type.Filled;
-            fill.fillMethod = Image.FillMethod.Horizontal;
-            fill.fillOrigin = 0;
-            fill.fillAmount = 0.65f;
+            fill.type = Image.Type.Simple;
+            fill.rectTransform.anchorMax = new Vector2(0.65f, 1f);
+            fill.rectTransform.anchoredPosition = Vector2.zero;
+            fill.rectTransform.sizeDelta = Vector2.zero;
             return fill;
         }
 
