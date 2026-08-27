@@ -658,9 +658,7 @@ namespace TeamOverlay.UI
             }
 
             _view.SetStatisticsVisible(true);
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            _window.SetWindowHeight(WindowsOverlayWindow.StatisticsWindowHeight);
-#endif
+            _window.ExpandForStatistics();
 
             var toLocalDate = DateTime.Today;
             var fromLocalDate = toLocalDate.AddDays(-6);
@@ -726,9 +724,7 @@ namespace TeamOverlay.UI
         private void CloseStatisticsPanel()
         {
             _view?.SetStatisticsVisible(false);
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            _window?.SetWindowHeight(WindowsOverlayWindow.CompactWindowHeight);
-#endif
+            _window?.RestoreCompactHeight();
         }
 
         /// <summary>

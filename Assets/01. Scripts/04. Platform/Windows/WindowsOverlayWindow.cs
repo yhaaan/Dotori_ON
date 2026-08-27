@@ -39,7 +39,9 @@ namespace TeamOverlay.Platform.Windows
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
         public const int OverlayWindowWidth = 480;
         public const int CompactWindowHeight = 220;
-        public const int StatisticsWindowHeight = 620;
+
+        /// <summary>Extra height the statistics panel needs under the compact layout.</summary>
+        public const int StatisticsPanelHeight = 400;
 
         private static WindowsOverlayWindow _activeInstance;
 
@@ -54,28 +56,84 @@ namespace TeamOverlay.Platform.Windows
         private int _exitPending;
         private int _sessionEndPending;
         private bool _sessionEndReported;
+        private int _compactWindowHeight;
 #endif
 
-        public void SetWindowHeight(int height)
+        /// <summary>
+        /// Grows the window by exactly the statistics panel's height, remembering
+        /// the height it grew from.
+        /// </summary>
+        public void ExpandForStatistics()
         {
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
-            if (!EnsureWindowHandle())
+            if (!TryGetWindowSize(out var width, out var height))
             {
                 return;
             }
 
+            if (_compactWindowHeight <= 0)
+            {
+                _compactWindowHeight = height;
+            }
+
+            // The canvas scales on width, so a window wider than the reference
+            // width renders the panel's design pixels proportionally taller.
+            var panelHeight = Mathf.RoundToInt(
+                StatisticsPanelHeight * (float)width / OverlayWindowWidth);
+            ResizeWindow(width, _compactWindowHeight + panelHeight);
+#endif
+        }
+
+        /// <summary>
+        /// Puts the window back to the exact height it had before the statistics
+        /// panel opened. Collapsing to the compact constant instead assumed the
+        /// window was still the size this class asked for at startup; Unity sizes
+        /// the client area rather than the window rect, so the window it hands us
+        /// can be taller than that constant and the compact layout came back
+        /// clipped.
+        /// </summary>
+        public void RestoreCompactHeight()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            if (!TryGetWindowSize(out var width, out _))
+            {
+                return;
+            }
+
+            ResizeWindow(width, _compactWindowHeight > 0 ? _compactWindowHeight : CompactWindowHeight);
+#endif
+        }
+
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        private bool TryGetWindowSize(out int width, out int height)
+        {
+            width = OverlayWindowWidth;
+            height = CompactWindowHeight;
+            if (!EnsureWindowHandle() ||
+                !WindowsNativeMethods.GetWindowRect(_windowHandle, out var bounds))
+            {
+                return false;
+            }
+
+            width = bounds.Width;
+            height = bounds.Height;
+            return true;
+        }
+
+        private void ResizeWindow(int width, int height)
+        {
             WindowsNativeMethods.SetWindowPos(
                 _windowHandle,
                 IntPtr.Zero,
                 0,
                 0,
-                OverlayWindowWidth,
+                Math.Max(1, width),
                 Math.Max(1, height),
                 WindowsNativeMethods.SwpNoMove |
                 WindowsNativeMethods.SwpNoZOrder |
                 WindowsNativeMethods.SwpNoActivate);
-#endif
         }
+#endif
 
         public bool Configure()
         {
