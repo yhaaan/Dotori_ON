@@ -69,6 +69,7 @@ namespace TeamOverlay.Tests.EditMode
                 AssertReference(rowData, "_background");
                 AssertReference(rowData, "_rankLabel");
                 AssertReference(rowData, "_nameLabel");
+                AssertReference(rowData, "_pointsLabel");
                 AssertReference(rowData, "_workLabel");
                 AssertReference(rowData, "_attendanceLabel");
                 AssertReference(rowData, "_workBar");
@@ -298,7 +299,7 @@ namespace TeamOverlay.Tests.EditMode
                 var ranking = instance.GetComponentsInChildren<TeamRankingRowView>(true)[0];
                 ranking.Bind(
                     1,
-                    new TeamOverlay.Core.TeamRankingEntry("member", "name", 0, 900, 1800, 300, 600),
+                    new TeamOverlay.Core.TeamRankingEntry("member", "name", 0, 900, 1800, 300, 600, 0, 0),
                     TeamOverlay.Core.RankingMetric.Work,
                     1800,
                     false);
@@ -336,8 +337,8 @@ namespace TeamOverlay.Tests.EditMode
                     },
                     new[]
                     {
-                        new TeamOverlay.Core.TeamRankingEntry("worker", "일벌레", 0, 3600, 7200, 60, 60),
-                        new TeamOverlay.Core.TeamRankingEntry("eater", "먹보", 1, 600, 7200, 60, 3000)
+                        new TeamOverlay.Core.TeamRankingEntry("worker", "일벌레", 0, 3600, 7200, 60, 60, 120, 12),
+                        new TeamOverlay.Core.TeamRankingEntry("eater", "먹보", 1, 600, 7200, 60, 3000, 30, 0)
                     },
                     "worker");
 

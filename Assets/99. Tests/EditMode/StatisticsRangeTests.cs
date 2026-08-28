@@ -61,7 +61,7 @@ namespace TeamOverlay.Tests.EditMode
         [Test]
         public void RankingEntry_ReportsTheSecondsOfEveryMetric()
         {
-            var entry = new TeamRankingEntry("member", "이름", 2, 900, 3600, 300, 600);
+            var entry = new TeamRankingEntry("member", "이름", 2, 900, 3600, 300, 600, 150, 7);
 
             Assert.That(entry.SecondsFor(RankingMetric.Work), Is.EqualTo(900));
             Assert.That(entry.SecondsFor(RankingMetric.Attendance), Is.EqualTo(3600));
