@@ -160,6 +160,8 @@ namespace TeamOverlay.Tests.EditMode
             }
             AssertReference(mainData, "_versionLabel");
             AssertReference(mainData, "_teamNudgeButton");
+            AssertReference(mainData, "_dailyCheckInButton");
+            AssertReference(mainData, "_dailyCheckInPointsLabel");
             AssertReference(mainData, "_statusNoteInput");
             AssertReference(mainData, "_windowDragHandle");
 

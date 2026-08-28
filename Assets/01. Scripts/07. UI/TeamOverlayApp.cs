@@ -536,10 +536,13 @@ namespace TeamOverlay.UI
             _view.AvatarPickerCloseRequested += CloseAvatarPicker;
             _view.AvatarPicked += HandleAvatarPicked;
             _view.MiniModeRequested += HandleMiniModeRequested;
+            _view.DailyCheckInRequested += HandleDailyCheckInRequested;
             _view.MiniModeExitRequested += HandleMiniModeExitRequested;
             _view.SetAvatarCatalog(_avatarCatalog);
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _firstRunNameView.Hide();
+            _view.SetDailyCheckIn(null, _backend is ITeamCheckIn);
+            LoadDailyCheckIn();
             if (PlayerPrefs.GetInt(MiniModePreferenceKey, 0) == 1)
             {
                 ApplyMiniMode(true);
@@ -620,6 +623,7 @@ namespace TeamOverlay.UI
             _view.AvatarPickerCloseRequested -= CloseAvatarPicker;
             _view.AvatarPicked -= HandleAvatarPicked;
             _view.MiniModeRequested -= HandleMiniModeRequested;
+            _view.DailyCheckInRequested -= HandleDailyCheckInRequested;
             _view.MiniModeExitRequested -= HandleMiniModeExitRequested;
         }
 
@@ -830,6 +834,71 @@ namespace TeamOverlay.UI
         private void HandleMinimizeRequested()
         {
             _window.Minimize();
+        }
+
+        /// <summary>
+        /// Reads where the check-in stands so the button opens in the right state
+        /// rather than the person finding out by pressing it.
+        /// </summary>
+        private async void LoadDailyCheckIn()
+        {
+            var requestedBackend = _backend;
+            if (!(requestedBackend is ITeamCheckIn checkIn))
+            {
+                return;
+            }
+
+            try
+            {
+                var state = await checkIn.GetDailyCheckInStateAsync(_lifetime.Token);
+                if (_view != null && ReferenceEquals(_backend, requestedBackend))
+                {
+                    _view.SetDailyCheckIn(state, true);
+                }
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                // The overlay is perfectly usable without knowing, so a failure
+                // here leaves the button alone instead of interrupting anyone.
+                Debug.LogWarning("Could not read the daily check-in: " + exception.Message);
+            }
+        }
+
+        private async void HandleDailyCheckInRequested()
+        {
+            var requestedBackend = _backend;
+            if (_view == null || _quitting || _signOutInProgress ||
+                !(requestedBackend is ITeamCheckIn checkIn))
+            {
+                return;
+            }
+
+            try
+            {
+                var state = await checkIn.ClaimDailyCheckInAsync(_lifetime.Token);
+                if (_view == null || !ReferenceEquals(_backend, requestedBackend))
+                {
+                    return;
+                }
+
+                _view.SetDailyCheckIn(state, true);
+                // Pressing twice is an ordinary thing to do, so the second press
+                // reports where things stand rather than reading as a failure.
+                _view.ShowFeedback(state.AwardedPoints > 0
+                    ? "출석했습니다. +" + state.AwardedPoints + "P (누적 " + state.TotalPoints + "P)"
+                    : "오늘은 이미 출석했습니다. 누적 " + state.TotalPoints + "P");
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                _view?.ShowFeedback(BackendError(exception), true);
+            }
         }
 
         private void HandleMiniModeRequested()

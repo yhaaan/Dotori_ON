@@ -18,7 +18,8 @@ namespace TeamOverlay.Supabase
     /// a missed poll degrades into a late event instead of a lost one. Swapping in
     /// a Realtime subscription later only has to replace <see cref="Poll"/>.
     /// </summary>
-    public sealed class SupabaseTeamBackend : ITeamBackend, ITeamStatistics, ITeamNudges, IDisposable
+    public sealed class SupabaseTeamBackend
+        : ITeamBackend, ITeamStatistics, ITeamNudges, ITeamCheckIn, IDisposable
     {
         private const string NudgeSelect = "id,actor_member_id,target_member_id,created_at";
 
@@ -388,6 +389,51 @@ namespace TeamOverlay.Supabase
                 p_avatar_key = string.IsNullOrWhiteSpace(avatarKey) ? string.Empty : avatarKey.Trim()
             });
             await CallRpcAsync("set_avatar_key", body, cancellationToken);
+        }
+
+        public async Task<DailyCheckInState> GetDailyCheckInStateAsync(
+            CancellationToken cancellationToken)
+        {
+            return await ReadCheckInAsync("daily_check_in_status", cancellationToken);
+        }
+
+        public async Task<DailyCheckInState> ClaimDailyCheckInAsync(
+            CancellationToken cancellationToken)
+        {
+            return await ReadCheckInAsync("claim_daily_check_in", cancellationToken);
+        }
+
+        /// <summary>
+        /// Both functions answer with the same row, so reading the state and
+        /// claiming it differ only in which one is called. Neither takes an
+        /// argument: the server reads the member from the session, and taking a
+        /// member id would invite a client to claim someone else's day.
+        /// </summary>
+        private async Task<DailyCheckInState> ReadCheckInAsync(
+            string function,
+            CancellationToken cancellationToken)
+        {
+            var response = await CallRpcAsync(function, "{}", cancellationToken);
+
+            CheckInArrayDocument document;
+            try
+            {
+                document = JsonUtility.FromJson<CheckInArrayDocument>(
+                    "{\"items\":" + response.Body + "}");
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException(
+                    "Could not read the check-in response: " + exception.Message);
+            }
+
+            if (document?.items == null || document.items.Length == 0)
+            {
+                throw new InvalidOperationException("The check-in response was empty.");
+            }
+
+            var row = document.items[0];
+            return new DailyCheckInState(row.claimed, row.total_points, row.awarded);
         }
 
         public async Task SendHeartbeatAsync(CancellationToken cancellationToken)
@@ -824,6 +870,23 @@ namespace TeamOverlay.Supabase
         private sealed class RankingFromStartRequest
         {
             public string p_to;
+        }
+
+        [Serializable]
+        private sealed class CheckInDocument
+        {
+            public bool claimed;
+
+            // Absent from the status function's row, which leaves it zero: the
+            // same meaning a claim that arrived second has.
+            public int awarded;
+            public int total_points;
+        }
+
+        [Serializable]
+        private sealed class CheckInArrayDocument
+        {
+            public CheckInDocument[] items;
         }
 
         [Serializable]

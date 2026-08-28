@@ -28,6 +28,8 @@ namespace TeamOverlay.UI
         [SerializeField] private Button _miniModeButton;
         [SerializeField] private Button _statsButton;
         [SerializeField] private Button _teamNudgeButton;
+        [SerializeField] private Button _dailyCheckInButton;
+        [SerializeField] private Text _dailyCheckInPointsLabel;
         [SerializeField] private InputField _statusNoteInput;
         [SerializeField] private Text _topmostLabel;
         [SerializeField] private Text _feedbackText;
@@ -62,6 +64,9 @@ namespace TeamOverlay.UI
         /// the name it actually changes.
         /// </summary>
         public event Action SwitchAccountRequested;
+
+        /// <summary>The gift button: showing up today, which is not clocking in.</summary>
+        public event Action DailyCheckInRequested;
 
         public event Action MiniModeRequested;
 
@@ -133,6 +138,7 @@ namespace TeamOverlay.UI
             AddListener(_minimizeButton, () => MinimizeRequested?.Invoke());
             AddListener(_exitButton, () => ExitRequested?.Invoke());
             AddListener(_miniModeButton, () => MiniModeRequested?.Invoke());
+            AddListener(_dailyCheckInButton, () => DailyCheckInRequested?.Invoke());
             AddListener(_statsButton, () => StatsToggleRequested?.Invoke());
             AddListener(_teamNudgeButton, () => NudgeRequested?.Invoke(null));
             foreach (var card in _cards)
@@ -155,6 +161,7 @@ namespace TeamOverlay.UI
             AddInteractive(_mealButton);
             AddInteractive(_fakeEventButton);
             AddInteractive(_miniModeButton);
+            AddInteractive(_dailyCheckInButton);
             AddInteractive(_statsButton);
             AddInteractive(_teamNudgeButton);
 
@@ -271,6 +278,39 @@ namespace TeamOverlay.UI
         private void RefreshTextRenderingSoon()
         {
             _pendingTextRefreshes = 3;
+        }
+
+        /// <summary>
+        /// Shows where the daily check-in stands. A backend with no history
+        /// cannot offer one at all, and a button that is only ever refused is
+        /// worse than no button, so an unsupported backend hides it outright.
+        /// </summary>
+        public void SetDailyCheckIn(DailyCheckInState state, bool supported)
+        {
+            SetActive(_dailyCheckInButton, supported && state != null);
+            if (_dailyCheckInPointsLabel != null)
+            {
+                _dailyCheckInPointsLabel.gameObject.SetActive(supported && state != null);
+            }
+
+            if (!supported || state == null)
+            {
+                return;
+            }
+
+            // Claimed days stay visible rather than hidden: the button is also
+            // where the point total lives, and a total that vanished for the rest
+            // of the day would read as having lost the points.
+            Tint(
+                _dailyCheckInButton,
+                state.ClaimedToday ? TeamOverlayPalette.Button : TeamOverlayPalette.Accent);
+            if (_dailyCheckInPointsLabel != null)
+            {
+                _dailyCheckInPointsLabel.text = state.TotalPoints + "P";
+                _dailyCheckInPointsLabel.color = state.ClaimedToday
+                    ? TeamOverlayPalette.TextSecondary
+                    : TeamOverlayPalette.Accent;
+            }
         }
 
         /// <summary>Hands the icon artwork to the cards and the picker.</summary>

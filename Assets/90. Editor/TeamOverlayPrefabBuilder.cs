@@ -269,6 +269,16 @@ namespace TeamOverlay.Editor
                 Button fake = null;
                 var teamNudge = TopButton(topBar.transform, font, "TeamNudge", "전체호출", 105f, 52f);
                 teamNudge.GetComponentInChildren<Text>().fontSize = 9;
+                // The strip between the drag area and the first button was empty,
+                // which is the only place left on the bar wide enough for a label
+                // that grows as the total does.
+                var dailyCheckIn = TopButton(topBar.transform, font, "DailyCheckIn", "출석", 160f, 36f,
+                    TeamOverlayPalette.Accent);
+                dailyCheckIn.GetComponentInChildren<Text>().fontSize = 9;
+                var checkInPoints = UiFactory.CreateText("DailyCheckInPoints", topBar.transform, font, 9,
+                    TextAnchor.MiddleRight, TeamOverlayPalette.Accent, FontStyle.Bold);
+                checkInPoints.text = "0P";
+                UiFactory.AnchorRight(checkInPoints.rectTransform, 200f, 5f, 40f, 22f);
                 // Takes over the slot and the width the rename button had, so the
                 // rest of the bar keeps the offsets it was tuned with. Renaming
                 // moved onto the name it changes, where a double click does it.
@@ -368,6 +378,8 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_feedbackText", feedback);
                 Set(serialized, "_versionLabel", version);
                 Set(serialized, "_teamNudgeButton", teamNudge);
+                Set(serialized, "_dailyCheckInButton", dailyCheckIn);
+                Set(serialized, "_dailyCheckInPointsLabel", checkInPoints);
                 Set(serialized, "_windowDragHandle", dragHandle);
                 Set(serialized, "_statisticsPanel", statisticsPanel);
                 Set(serialized, "_windowBackground", background.rectTransform);
