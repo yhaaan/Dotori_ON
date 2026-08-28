@@ -168,6 +168,11 @@ namespace TeamOverlay.Tests.EditMode
             var nameData = new SerializedObject(name);
             AssertReference(nameData, "_nameInput");
             AssertReference(nameData, "_confirmButton");
+            AssertReference(nameData, "_cancelButton");
+            // Only a rename can be backed out of, so the button ships hidden.
+            Assert.That(
+                name.transform.Find("ModalBackdrop/NamePanel/Cancel").gameObject.activeSelf,
+                Is.False);
             AssertReference(nameData, "_feedbackText");
 
             var appData = new SerializedObject(app);

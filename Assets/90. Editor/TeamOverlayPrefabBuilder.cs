@@ -945,6 +945,11 @@ namespace TeamOverlay.Editor
                 input.placeholder = placeholder;
                 var confirm = UiFactory.CreateButton("Confirm", panel.transform, font, "확인", null, TeamOverlayPalette.Accent);
                 UiFactory.AnchorTop(confirm.GetComponent<RectTransform>(), 274f, 76f, 80f, 36f);
+                // Only a rename shows this. The first run has nothing behind it
+                // to go back to, so it stays hidden there.
+                var cancel = UiFactory.CreateButton("Cancel", panel.transform, font, "×");
+                UiFactory.AnchorRight(cancel.GetComponent<RectTransform>(), 12f, 10f, 26f, 26f);
+                cancel.gameObject.SetActive(false);
                 var feedback = UiFactory.CreateText("Feedback", panel.transform, font, 10,
                     TextAnchor.UpperLeft, TeamOverlayPalette.TextSecondary);
                 feedback.text = "이름을 입력하면 팀 오버레이를 시작할 수 있어요.";
@@ -953,7 +958,7 @@ namespace TeamOverlay.Editor
                 UiFactory.AnchorTop(feedback.rectTransform, 18f, 119f, 336f, 35f);
                 Assign(root.GetComponent<FirstRunNameView>(), ("_nameInput", input),
                     ("_confirmButton", confirm), ("_confirmLabel", confirm.GetComponentInChildren<Text>()),
-                    ("_feedbackText", feedback));
+                    ("_cancelButton", cancel), ("_feedbackText", feedback));
                 return PrefabUtility.SaveAsPrefabAsset(root, NameViewPath).GetComponent<FirstRunNameView>();
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }

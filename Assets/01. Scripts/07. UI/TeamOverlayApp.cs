@@ -92,6 +92,8 @@ namespace TeamOverlay.UI
         private bool _heartbeatInProgress;
         private bool _identityActivationInProgress;
         private bool _signOutInProgress;
+        private bool _renamePending;
+        private bool _renameInProgress;
         private bool _mutationInProgress;
         private int _statisticsRequestId;
         private StatisticsPeriod _statisticsPeriod = StatisticsPeriod.LastSevenDays;
@@ -156,6 +158,7 @@ namespace TeamOverlay.UI
             _firstRunNameView.name = _firstRunNamePrefab.name;
             _firstRunNameView.Initialize();
             _firstRunNameView.Submitted += HandleFirstRunNameSubmitted;
+            _firstRunNameView.Cancelled += HandleRenameCancelled;
         }
 
         private async void Start()
@@ -277,7 +280,94 @@ namespace TeamOverlay.UI
             }
         }
 
-        private async void HandleFirstRunNameSubmitted(string submittedName)
+        private void HandleFirstRunNameSubmitted(string submittedName)
+        {
+            if (_renamePending)
+            {
+                HandleRenameSubmitted(submittedName);
+                return;
+            }
+
+            SignInWithName(submittedName);
+        }
+
+        private void HandleRenameCancelled()
+        {
+            if (!_renamePending || _renameInProgress)
+            {
+                return;
+            }
+
+            _renamePending = false;
+            _firstRunNameView.Hide();
+        }
+
+        /// <summary>
+        /// The rename is one request: the server moves the member row and the Auth
+        /// credentials together or moves neither, so there is no state where the
+        /// account and its name disagree. What can still come apart is the local
+        /// pointer, written after. If that write fails the next launch cannot sign
+        /// in, and typing the new name on the sign-in screen puts it right.
+        /// </summary>
+        private async void HandleRenameSubmitted(string submittedName)
+        {
+            if (_renameInProgress || _backend == null || _view == null || _quitting)
+            {
+                return;
+            }
+
+            var validation = DisplayNamePolicy.Validate(submittedName);
+            if (!validation.IsValid)
+            {
+                _firstRunNameView.ShowError(DisplayNameError(validation.Error));
+                return;
+            }
+
+            if (!(_backend is ITeamMemberRename rename))
+            {
+                _firstRunNameView.ShowError("현재 백엔드는 이름 변경을 지원하지 않습니다.");
+                return;
+            }
+
+            // Renaming to the name you already have is a way of closing the modal,
+            // not a request the server should be asked to refuse as taken.
+            if (string.Equals(
+                    validation.UniqueNameKey,
+                    _identityProfile?.UniqueNameKey,
+                    StringComparison.Ordinal))
+            {
+                HandleRenameCancelled();
+                return;
+            }
+
+            _renameInProgress = true;
+            _firstRunNameView.SetBusy(true);
+            try
+            {
+                await rename.RenameAsync(validation.DisplayName, _lifetime.Token);
+                _identityProfile = _identityStore.Rename(validation.DisplayName);
+                _renamePending = false;
+                _firstRunNameView.Hide();
+                await RefreshStateAsync();
+                _view?.ShowFeedback(
+                    "이름을 " + validation.DisplayName + "(으)로 바꿨습니다. 기록은 그대로입니다.");
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                _firstRunNameView.ShowError(BackendError(exception));
+            }
+            finally
+            {
+                _renameInProgress = false;
+                _firstRunNameView.SetBusy(false);
+            }
+        }
+
+        private async void SignInWithName(string submittedName)
         {
             if (_identityActivationInProgress || _signOutInProgress || _backend != null || _quitting)
             {
@@ -364,55 +454,29 @@ namespace TeamOverlay.UI
         /// back into the same member and keeps accumulating, a different name signs
         /// in as a different member.
         /// </summary>
-        private async void HandleSwitchAccountRequested()
+        /// <summary>
+        /// Double clicking your own name used to sign you out and back in as
+        /// somebody new, which left every session, interval and check-in behind
+        /// under the old name. It renames in place now. What it no longer offers
+        /// is signing in as a different member on this PC; nothing asked for that
+        /// except the rename it was standing in for.
+        /// </summary>
+        private void HandleSwitchAccountRequested()
         {
-            if (_quitting || _signOutInProgress || _identityActivationInProgress || _backend == null)
+            if (_quitting || _signOutInProgress || _identityActivationInProgress ||
+                _renamePending || _backend == null || _view == null)
             {
                 return;
             }
 
-            _signOutInProgress = true;
-            var previousName = _identityProfile?.DisplayName;
-            _view.SetBusy(true);
-            try
+            if (!(_backend is ITeamMemberRename))
             {
-                try
-                {
-                    if (IsLocalMemberClockedIn())
-                    {
-                        await _backend.CheckOutAsync(CheckoutReason.Manual, _lifetime.Token);
-                    }
-                }
-                catch (Exception exception) when (!(exception is OperationCanceledException))
-                {
-                    Debug.LogWarning("Best-effort checkout before sign-out failed: " + exception.Message);
-                }
+                _view.ShowFeedback("현재 백엔드는 이름 변경을 지원하지 않습니다.", true);
+                return;
+            }
 
-                TeardownSession();
-                _identityStore.Clear();
-                _firstRunNameView.Show(previousName);
-            }
-            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
-            {
-            }
-            catch (Exception exception)
-            {
-                Debug.LogException(exception);
-                if (_view != null)
-                {
-                    _view.SetBusy(false);
-                    _view.ShowFeedback("로그아웃하지 못했습니다: " + exception.Message, true);
-                }
-                else
-                {
-                    _firstRunNameView.Show(previousName);
-                    _firstRunNameView.ShowError("로그아웃하지 못했습니다: " + exception.Message);
-                }
-            }
-            finally
-            {
-                _signOutInProgress = false;
-            }
+            _renamePending = true;
+            _firstRunNameView.ShowForRename(_identityProfile?.DisplayName);
         }
 
         /// <summary>
@@ -1353,6 +1417,8 @@ namespace TeamOverlay.UI
                     return "출근 상태가 아닙니다.";
                 case "attendance_session_not_open":
                     return "출근 세션이 이미 종료되었습니다. 다시 출근해주세요.";
+                case "member_name_taken":
+                    return "이미 쓰고 있는 이름입니다.";
                 case "client_instance_mismatch":
                     return "다른 PC에서 출근한 세션입니다. 그 PC에서 퇴근해주세요.";
                 case "member_identity_mismatch":

@@ -121,6 +121,40 @@ namespace TeamOverlay.Identity
         }
 
         /// <summary>
+        /// Points this PC at the same identity under a new name. The client
+        /// instance id and creation time are kept deliberately: a rename is not
+        /// this PC becoming a new install, and the backend tells devices apart by
+        /// that id.
+        /// </summary>
+        public LocalIdentityProfile Rename(string rawDisplayName)
+        {
+            var validation = DisplayNamePolicy.Validate(rawDisplayName);
+            if (!validation.IsValid)
+            {
+                throw new ArgumentException(
+                    $"The display name is invalid: {validation.Error}.",
+                    nameof(rawDisplayName));
+            }
+
+            lock (_gate)
+            {
+                var current = LoadLocked(repairRecoveredProfile: false);
+                if (!current.HasProfile)
+                {
+                    throw new InvalidOperationException(
+                        "There is no local identity profile to rename.");
+                }
+
+                var renamed = new LocalIdentityProfile(
+                    current.Profile.ClientInstanceId,
+                    validation.DisplayName,
+                    current.Profile.CreatedAtUtc);
+                PersistLocked(renamed);
+                return renamed;
+            }
+        }
+
+        /// <summary>
         /// Forgets which profile this PC is signed in as. Only the local pointer is
         /// dropped: the backend member row and its stored Auth session are left
         /// alone, so signing back in with the same name resumes that member.

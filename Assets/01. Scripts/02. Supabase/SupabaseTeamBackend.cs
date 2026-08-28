@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using TeamOverlay.Core;
+using TeamOverlay.Identity;
 using UnityEngine;
 
 namespace TeamOverlay.Supabase
@@ -19,7 +20,7 @@ namespace TeamOverlay.Supabase
     /// a Realtime subscription later only has to replace <see cref="Poll"/>.
     /// </summary>
     public sealed class SupabaseTeamBackend
-        : ITeamBackend, ITeamStatistics, ITeamNudges, ITeamCheckIn, IDisposable
+        : ITeamBackend, ITeamStatistics, ITeamNudges, ITeamCheckIn, ITeamMemberRename, IDisposable
     {
         private const string NudgeSelect = "id,actor_member_id,target_member_id,created_at";
 
@@ -389,6 +390,29 @@ namespace TeamOverlay.Supabase
                 p_avatar_key = string.IsNullOrWhiteSpace(avatarKey) ? string.Empty : avatarKey.Trim()
             });
             await CallRpcAsync("set_avatar_key", body, cancellationToken);
+        }
+
+        /// <summary>
+        /// The credentials travel with the request because this client is the
+        /// thing that has to reproduce them on the next launch. A server that
+        /// derived them separately would only add a way for the two to disagree,
+        /// and a disagreement here is an account nobody can sign in to.
+        /// </summary>
+        public async Task RenameAsync(string newDisplayName, CancellationToken cancellationToken)
+        {
+            var validation = DisplayNamePolicy.Validate(newDisplayName);
+            if (!validation.IsValid)
+            {
+                throw new InvalidOperationException("The new display name is invalid.");
+            }
+
+            var body = JsonUtility.ToJson(new RenameRequest
+            {
+                p_display_name = validation.DisplayName,
+                p_email = DerivedTeamCredentials.EmailFor(validation),
+                p_password = DerivedTeamCredentials.PasswordFor(validation)
+            });
+            await CallRpcAsync("rename_member", body, cancellationToken);
         }
 
         public async Task<DailyCheckInState> GetDailyCheckInStateAsync(
@@ -870,6 +894,14 @@ namespace TeamOverlay.Supabase
         private sealed class RankingFromStartRequest
         {
             public string p_to;
+        }
+
+        [Serializable]
+        private sealed class RenameRequest
+        {
+            public string p_display_name;
+            public string p_email;
+            public string p_password;
         }
 
         [Serializable]
