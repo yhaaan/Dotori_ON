@@ -38,6 +38,10 @@ namespace TeamOverlay.Platform.Windows
         internal const uint WmStyleChanged = 0x007D;
         internal const uint WmDpiChanged = 0x02E0;
         internal const uint WmGetMinMaxInfo = 0x0024;
+        internal const uint WmPowerBroadcast = 0x0218;
+
+        /// <summary>The machine is suspending. There is no way to delay it.</summary>
+        internal const int PbtApmSuspend = 0x0004;
 
         internal const int HtCaption = 2;
         internal const uint GwOwner = 4;

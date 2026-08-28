@@ -140,6 +140,7 @@ namespace TeamOverlay.UI
             _window = gameObject.AddComponent<WindowsOverlayWindow>();
             _window.ClockOutAndExitRequested += HandleClockOutAndExitRequested;
             _window.SessionEndingRequested += HandleSessionEndingRequested;
+            _window.SuspendingRequested += HandleSuspendingRequested;
             _window.Configure();
             _window.SetAlwaysOnTop(true);
             _tonePlayer = gameObject.AddComponent<NotificationTonePlayer>();
@@ -945,6 +946,38 @@ namespace TeamOverlay.UI
         /// <see cref="CheckoutReason.OsShutdown"/> instead of being swept up three
         /// minutes later as a stale session.
         /// </summary>
+        /// <summary>
+        /// The machine is going to sleep with a session still open. The server
+        /// already closes those on its own, backdated to the last heartbeat, so
+        /// the record is right either way; what this buys is the roster being
+        /// right sooner, instead of showing someone as at their desk for up to
+        /// the three minutes it takes that sweep to notice.
+        ///
+        /// Nothing waits for a sleeping machine the way the shell waits for a
+        /// shutdown, so this is one attempt with about two seconds to land, and
+        /// the app stays running for the other side of the sleep.
+        /// </summary>
+        private async void HandleSuspendingRequested()
+        {
+            if (_quitting || _signOutInProgress || _backend == null || !IsLocalMemberClockedIn())
+            {
+                return;
+            }
+
+            try
+            {
+                // Reported as an OS shutdown because that is what it is from
+                // here: the machine is being taken away and this is the last
+                // request on the way out. AutoTimeout would claim the server
+                // stopped hearing from us, which is a different story.
+                await _backend.CheckOutAsync(CheckoutReason.OsShutdown, _lifetime.Token);
+            }
+            catch (Exception exception) when (!(exception is OperationCanceledException))
+            {
+                Debug.LogWarning("Best-effort checkout on suspend failed: " + exception.Message);
+            }
+        }
+
         private async void HandleSessionEndingRequested()
         {
             if (_quitting)
@@ -1187,6 +1220,7 @@ namespace TeamOverlay.UI
             {
                 _window.ClockOutAndExitRequested -= HandleClockOutAndExitRequested;
                 _window.SessionEndingRequested -= HandleSessionEndingRequested;
+                _window.SuspendingRequested -= HandleSuspendingRequested;
             }
 
             _lifetime?.Cancel();

@@ -70,6 +70,13 @@ namespace TeamOverlay.Platform.Windows
         /// a shutdown block reason keeps the shell waiting in the meantime.
         /// </summary>
         public event Action SessionEndingRequested;
+
+        /// <summary>
+        /// The machine is going to sleep. Unlike a shutdown there is nothing that
+        /// will wait for us, so a handler gets one best-effort attempt and no
+        /// promise it lands.
+        /// </summary>
+        public event Action SuspendingRequested;
 #pragma warning restore 67
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
@@ -121,6 +128,7 @@ namespace TeamOverlay.Platform.Windows
         private bool _allowNativeClose;
         private float _nextInitializationAttempt;
         private int _exitPending;
+        private int _suspendPending;
         private int _sessionEndPending;
         private bool _sessionEndReported;
         private bool _statisticsExpanded;
@@ -526,6 +534,11 @@ namespace TeamOverlay.Platform.Windows
                 ClockOutAndExitRequested?.Invoke();
             }
 
+            if (Interlocked.Exchange(ref _suspendPending, 0) != 0)
+            {
+                SuspendingRequested?.Invoke();
+            }
+
             var sessionEnding = Interlocked.CompareExchange(ref _sessionEndPending, 0, 0) == 1;
             if (sessionEnding && !_sessionEndReported)
             {
@@ -723,6 +736,15 @@ namespace TeamOverlay.Platform.Windows
                 }
 
                 return IntPtr.Zero;
+            }
+            else if (message == WindowsNativeMethods.WmPowerBroadcast &&
+                     wordParameter.ToInt64() == WindowsNativeMethods.PbtApmSuspend)
+            {
+                // Windows gives roughly two seconds here and cannot be asked for
+                // more, so the window procedure only raises a flag and Update does
+                // whatever it can with the time that is left.
+                Interlocked.Exchange(ref _suspendPending, 1);
+                return new IntPtr(1);
             }
             else if (message == WindowsNativeMethods.WmGetMinMaxInfo)
             {
