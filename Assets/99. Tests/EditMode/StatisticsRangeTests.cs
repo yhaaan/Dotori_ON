@@ -19,17 +19,18 @@ namespace TeamOverlay.Tests.EditMode
         }
 
         [Test]
-        public void ThisMonth_StartsOnTheFirstAndGroupsByWeek()
+        public void ThisMonth_StartsOnTheFirstAndKeepsDays()
         {
-            // A month of daily rows does not fit the panel, so the month view asks
-            // the server for weeks instead of trying to show 31 rows.
+            // The month is drawn as a calendar, so every day needs its own bucket.
+            // A grid has room for thirty-one squares where a list had room for
+            // seven rows.
             var range = StatisticsRange.Resolve(
                 StatisticsPeriod.ThisMonth,
                 new DateTime(2026, 8, 27, 23, 30, 0));
 
             Assert.That(range.FromLocalDate, Is.EqualTo(new DateTime(2026, 8, 1)));
             Assert.That(range.ToLocalDate, Is.EqualTo(new DateTime(2026, 8, 27)));
-            Assert.That(range.Bucket, Is.EqualTo(StatisticsBucket.Week));
+            Assert.That(range.Bucket, Is.EqualTo(StatisticsBucket.Day));
         }
 
         [Test]

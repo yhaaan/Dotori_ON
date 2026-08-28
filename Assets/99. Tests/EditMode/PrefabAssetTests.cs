@@ -105,6 +105,24 @@ namespace TeamOverlay.Tests.EditMode
             Assert.That(
                 main.transform.Find("AvatarPickerPanel/Viewport/Content/OptionTemplate").gameObject.activeSelf,
                 Is.False);
+            AssertReference(statisticsData, "_calendar");
+            var calendar = statisticsData.FindProperty("_calendar").objectReferenceValue;
+            Assert.That(
+                new SerializedObject(calendar).FindProperty("_cells").arraySize,
+                Is.EqualTo(42));
+            foreach (var cell in main.GetComponentsInChildren<TeamCalendarDayView>(true))
+            {
+                var cellData = new SerializedObject(cell);
+                AssertReference(cellData, "_background");
+                AssertReference(cellData, "_dayLabel");
+                AssertReference(cellData, "_durationLabel");
+            }
+            Assert.That(main.GetComponentsInChildren<TeamCalendarDayView>(true).Length, Is.EqualTo(42));
+            // Ships off: the month view is one of two readings of the daily
+            // buckets and the list is the one the panel opens on.
+            Assert.That(
+                main.transform.Find("WindowBackground/StatisticsPanel/DailyContent/Calendar").gameObject.activeSelf,
+                Is.False);
             AssertReference(mainData, "_miniPanel");
             var miniPanel = mainData.FindProperty("_miniPanel").objectReferenceValue;
             var miniData = new SerializedObject(miniPanel);
