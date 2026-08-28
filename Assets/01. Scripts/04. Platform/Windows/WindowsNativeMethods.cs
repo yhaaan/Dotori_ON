@@ -69,6 +69,18 @@ namespace TeamOverlay.Platform.Windows
             internal uint dwTimeout;
         }
 
+        /// <summary>
+        /// Carries the tick the desktop last saw keyboard or mouse input. The
+        /// value is for the whole interactive session, not this process, which is
+        /// what makes it a usable "away from the desk" signal.
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct LastInputInfo
+        {
+            internal uint cbSize;
+            internal uint dwTime;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         internal struct Point
         {
@@ -206,6 +218,15 @@ namespace TeamOverlay.Platform.Windows
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool ReleaseCapture();
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetLastInputInfo(ref LastInputInfo info);
+
+        // Read rather than Environment.TickCount so the comparison is against the
+        // same counter LastInputInfo is stamped from.
+        [DllImport("kernel32.dll")]
+        internal static extern uint GetTickCount();
 
         // Uniform whole-window alpha. Per-pixel transparency would need the
         // framebuffer alpha URP does not preserve here, and a status widget reads

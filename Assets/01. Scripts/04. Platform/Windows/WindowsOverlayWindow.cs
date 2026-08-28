@@ -27,6 +27,36 @@ namespace TeamOverlay.Platform.Windows
 
         public bool IsInitialized { get; private set; }
 
+        /// <summary>
+        /// Seconds since this desktop last saw keyboard or mouse input. Zero
+        /// wherever that cannot be asked - the Editor, and any non-Windows
+        /// build - because a machine that cannot report input must not read as
+        /// one nobody is sitting at.
+        /// </summary>
+        public double IdleSeconds
+        {
+            get
+            {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+                var info = new WindowsNativeMethods.LastInputInfo
+                {
+                    cbSize = (uint)Marshal.SizeOf(typeof(WindowsNativeMethods.LastInputInfo))
+                };
+                if (!WindowsNativeMethods.GetLastInputInfo(ref info))
+                {
+                    return 0d;
+                }
+
+                // Both sides come off the same 32 bit millisecond counter, which
+                // wraps about every 49 days. Unsigned subtraction stays correct
+                // across the wrap; a signed one would report weeks of idleness.
+                return unchecked(WindowsNativeMethods.GetTickCount() - info.dwTime) / 1000d;
+#else
+                return 0d;
+#endif
+            }
+        }
+
         // Both events below are raised only from the Windows-only message loop, so
         // an Editor or non-Windows compile sees a declaration with no raise site.
         // That is the intended shape here rather than an oversight.

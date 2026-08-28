@@ -36,6 +36,17 @@ namespace TeamOverlay.UI
         private const float MaximumPollBackoffSeconds = 30f;
 
         /// <summary>
+        /// How long the desk has to stay quiet before the overlay says so on the
+        /// person's behalf. Long enough that a phone call or a coffee run does not
+        /// flip anyone's status the moment they look away, short enough that the
+        /// work time the statistics rank people by is not simply the time the app
+        /// was open.
+        /// </summary>
+        private const double IdleBreakSeconds = 600d;
+
+        private const float IdleCheckSeconds = 5f;
+
+        /// <summary>
         /// Whether the overlay was last left in mini mode. It is a view
         /// preference and nothing else, so it lives in PlayerPrefs rather than in
         /// the crash-safe identity store next to the things worth recovering.
@@ -74,6 +85,8 @@ namespace TeamOverlay.UI
         private float _nextTimerRefresh;
         private float _nextTeamStatePoll;
         private float _nextHeartbeat;
+        private float _nextIdleCheck;
+        private readonly IdleActivityPolicy _idlePolicy = new IdleActivityPolicy(IdleBreakSeconds);
         private int _consecutivePollFailures;
         private bool _refreshInProgress;
         private bool _heartbeatInProgress;
@@ -248,6 +261,12 @@ namespace TeamOverlay.UI
             {
                 _nextHeartbeat = now + HeartbeatSeconds;
                 SendHeartbeatWithoutWaiting();
+            }
+
+            if (now >= _nextIdleCheck)
+            {
+                _nextIdleCheck = now + IdleCheckSeconds;
+                ApplyIdleActivity();
             }
 
             if (_members != null && now >= _nextTimerRefresh)
@@ -548,6 +567,7 @@ namespace TeamOverlay.UI
 
         private void TeardownSession()
         {
+            _idlePolicy.Reset();
             // The name screen is a full size window, and the stored preference is
             // left alone so signing back in comes up the way it was left.
             ApplyMiniMode(false);
@@ -602,22 +622,28 @@ namespace TeamOverlay.UI
             _view.MiniModeExitRequested -= HandleMiniModeExitRequested;
         }
 
-        private bool IsLocalMemberClockedIn()
+        private MemberState LocalMember()
         {
             if (_members == null || _backend == null)
             {
-                return false;
+                return null;
             }
 
             foreach (var member in _members)
             {
                 if (string.Equals(member.MemberId, _backend.LocalMemberId, StringComparison.Ordinal))
                 {
-                    return member.AttendanceStatus == AttendanceStatus.ClockedIn;
+                    return member;
                 }
             }
 
-            return false;
+            return null;
+        }
+
+        private bool IsLocalMemberClockedIn()
+        {
+            var localMember = LocalMember();
+            return localMember != null && localMember.AttendanceStatus == AttendanceStatus.ClockedIn;
         }
 
         private void HandleCheckInRequested()
@@ -628,6 +654,42 @@ namespace TeamOverlay.UI
         private void HandleCheckOutRequested()
         {
             RunMutation(token => _backend.CheckOutAsync(CheckoutReason.Manual, token), "퇴근했습니다.");
+        }
+
+        /// <summary>
+        /// Lets the desk going quiet, and waking up again, move the local status.
+        /// The rules live in <see cref="IdleActivityPolicy"/>; what is here is the
+        /// state it needs and the two requests it can ask for.
+        /// </summary>
+        private void ApplyIdleActivity()
+        {
+            var localMember = LocalMember();
+            if (localMember == null || localMember.AttendanceStatus != AttendanceStatus.ClockedIn)
+            {
+                // Nothing to move, and the next session must not be resumed out of
+                // a break this one entered.
+                _idlePolicy.Reset();
+                return;
+            }
+
+            if (_mutationInProgress || _quitting || _signOutInProgress)
+            {
+                return;
+            }
+
+            switch (_idlePolicy.Evaluate(_window.IdleSeconds, localMember.ActivityStatus.GetValueOrDefault()))
+            {
+                case IdleActivityAction.StartBreak:
+                    RunMutation(
+                        token => _backend.ChangeActivityAsync(ActivityStatus.Break, token),
+                        "자리를 비운 것 같아 쉬는중으로 바꿨습니다.");
+                    break;
+                case IdleActivityAction.ResumeWork:
+                    RunMutation(
+                        token => _backend.ChangeActivityAsync(ActivityStatus.Working, token),
+                        "돌아오신 것 같아 작업중으로 되돌렸습니다.");
+                    break;
+            }
         }
 
         private void HandleActivityChangeRequested(ActivityStatus status)
@@ -666,20 +728,7 @@ namespace TeamOverlay.UI
 
         private string LocalStatusNote()
         {
-            if (_members == null || _backend == null)
-            {
-                return null;
-            }
-
-            foreach (var member in _members)
-            {
-                if (string.Equals(member.MemberId, _backend.LocalMemberId, StringComparison.Ordinal))
-                {
-                    return member.StatusNote;
-                }
-            }
-
-            return null;
+            return LocalMember()?.StatusNote;
         }
 
         private void HandleAlwaysOnTopToggleRequested()
