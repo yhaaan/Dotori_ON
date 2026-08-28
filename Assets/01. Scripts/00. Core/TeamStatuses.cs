@@ -46,6 +46,12 @@ namespace DOTORION.Core
         MemberCheckedOut = 2,
 
         /// <summary>Someone poked a teammate, or the whole team.</summary>
-        MemberNudged = 3
+        MemberNudged = 3,
+
+        /// <summary>
+        /// Someone wrote or rewrote their status note. Derived from the polled
+        /// snapshot like the other transitions, so it costs no extra request.
+        /// </summary>
+        MemberStatusNoteChanged = 4
     }
 }

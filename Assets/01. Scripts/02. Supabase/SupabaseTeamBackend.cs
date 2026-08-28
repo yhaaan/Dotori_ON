@@ -703,6 +703,15 @@ namespace DOTORION.Supabase
                 {
                     Publish(TeamEventType.MemberActivityChanged, member);
                 }
+
+                // Only a note that says something is worth announcing. Clearing
+                // one, or having the server clear it at checkout, is not news
+                // anybody needs interrupting for.
+                if (!string.Equals(before.StatusNote, member.StatusNote, StringComparison.Ordinal)
+                    && !string.IsNullOrWhiteSpace(member.StatusNote))
+                {
+                    Publish(TeamEventType.MemberStatusNoteChanged, member);
+                }
             }
         }
 

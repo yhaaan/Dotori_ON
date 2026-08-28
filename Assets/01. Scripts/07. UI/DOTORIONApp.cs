@@ -88,6 +88,7 @@ namespace DOTORION.UI
         private float _nextHeartbeat;
         private float _nextIdleCheck;
         private readonly IdleActivityPolicy _idlePolicy = new IdleActivityPolicy(IdleBreakSeconds);
+        private readonly UnreadNoteTracker _unreadNotes = new UnreadNoteTracker();
         private int _consecutivePollFailures;
         private bool _refreshInProgress;
         private bool _heartbeatInProgress;
@@ -244,6 +245,18 @@ namespace DOTORION.UI
                 {
                     _tonePlayer.Play(TeamSound.TeammateCheckedOut);
                 }
+                else if (teamEvent.Type == TeamEventType.MemberStatusNoteChanged && !isLocalActor)
+                {
+                    // Only worth interrupting for once. A note rewritten while it
+                    // is still unread does not deserve a second flash.
+                    if (_unreadNotes.Add(teamEvent.State.MemberId) && !OverlayIsBeingRead())
+                    {
+                        _view.ShowFeedback(teamEvent.State.DisplayName + "님이 메모를 남겼습니다.");
+                        // The overlay is either behind something or shrunk to the
+                        // mini one, where a note has nowhere to appear.
+                        _window.FlashTaskbar();
+                    }
+                }
                 else if (teamEvent.Type == TeamEventType.MemberNudged)
                 {
                     _tonePlayer.Play(TeamSound.NudgeReceived);
@@ -280,10 +293,17 @@ namespace DOTORION.UI
                 ToggleDashboard();
             }
 
+            if (OverlayIsBeingRead())
+            {
+                // The notes are on the cards in front of them, so there is
+                // nothing left to announce.
+                _unreadNotes.ClearAll();
+            }
+
             if (_members != null && now >= _nextTimerRefresh)
             {
                 _nextTimerRefresh = now + 0.2f;
-                _view.Bind(_members, _backend.LocalMemberId, DateTimeOffset.UtcNow);
+                _view.Bind(_members, _backend.LocalMemberId, DateTimeOffset.UtcNow, _unreadNotes);
             }
         }
 
@@ -833,6 +853,30 @@ namespace DOTORION.UI
             }
 
             return summary;
+        }
+
+        private static IEnumerable<string> MembersWithNotes(IReadOnlyList<MemberState> members)
+        {
+            foreach (var member in members)
+            {
+                if (!string.IsNullOrWhiteSpace(member.StatusNote))
+                {
+                    yield return member.MemberId;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether someone is actually looking at the notes. The mini overlay has
+        /// no room for one, and a window behind something else is not being read
+        /// however focused the app thinks it is.
+        /// </summary>
+        private bool OverlayIsBeingRead()
+        {
+            return Application.isFocused
+                && _view != null
+                && !_view.IsMiniModeVisible
+                && !_view.IsDashboardVisible;
         }
 
         /// <summary>
@@ -1515,7 +1559,10 @@ namespace DOTORION.UI
             }
 
             _members = members;
-            _view.Bind(_members, _backend.LocalMemberId, DateTimeOffset.UtcNow);
+            // A note that was withdrawn before anyone looked has nothing left to
+            // announce, and neither does a member who went home or left the team.
+            _unreadNotes.RetainOnly(MembersWithNotes(members));
+            _view.Bind(_members, _backend.LocalMemberId, DateTimeOffset.UtcNow, _unreadNotes);
         }
 
         /// <summary>

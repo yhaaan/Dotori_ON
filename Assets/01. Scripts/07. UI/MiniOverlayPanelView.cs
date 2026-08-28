@@ -26,7 +26,7 @@ namespace DOTORION.UI
             _dragHandle?.Initialize(beginWindowDrag);
         }
 
-        public void Bind(IReadOnlyList<MemberState> orderedMembers)
+        public void Bind(IReadOnlyList<MemberState> orderedMembers, UnreadNoteTracker unreadNotes)
         {
             // The overlay is bound five times a second whether it is showing or
             // not, and it is off far more often than on.
@@ -41,7 +41,12 @@ namespace DOTORION.UI
                 if (row == null) continue;
                 var hasMember = index < orderedMembers.Count;
                 row.gameObject.SetActive(hasMember);
-                if (hasMember) row.Bind(orderedMembers[index]);
+                if (hasMember)
+                {
+                    row.Bind(
+                        orderedMembers[index],
+                        unreadNotes != null && unreadNotes.IsUnread(orderedMembers[index].MemberId));
+                }
             }
         }
 

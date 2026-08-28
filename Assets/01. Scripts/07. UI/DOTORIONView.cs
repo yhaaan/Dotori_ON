@@ -370,7 +370,11 @@ namespace DOTORION.UI
             _avatarPickerPanel?.SetSelected(avatarKey);
         }
 
-        public void Bind(IReadOnlyList<MemberState> members, string localMemberId, DateTimeOffset nowUtc)
+        public void Bind(
+            IReadOnlyList<MemberState> members,
+            string localMemberId,
+            DateTimeOffset nowUtc,
+            UnreadNoteTracker unreadNotes)
         {
             var orderedMembers = members
                 .OrderBy(member => member.SortOrder)
@@ -412,7 +416,7 @@ namespace DOTORION.UI
                 card.SetRenameAvailable(member.MemberId == localMemberId);
             }
 
-            _miniPanel?.Bind(orderedMembers);
+            _miniPanel?.Bind(orderedMembers, unreadNotes);
 
             SetActive(_teamNudgeButton, isClockedIn);
             SetActive(_checkInButton, !isClockedIn);
