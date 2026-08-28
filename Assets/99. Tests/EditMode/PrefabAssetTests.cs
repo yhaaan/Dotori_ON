@@ -123,6 +123,39 @@ namespace TeamOverlay.Tests.EditMode
             Assert.That(
                 main.transform.Find("WindowBackground/StatisticsPanel/DailyContent/Calendar").gameObject.activeSelf,
                 Is.False);
+            AssertReference(mainData, "_dashboardPanel");
+            var dashboard = mainData.FindProperty("_dashboardPanel").objectReferenceValue;
+            var dashboardData = new SerializedObject(dashboard);
+            AssertReference(dashboardData, "_feedbackText");
+            AssertReference(dashboardData, "_refreshButton");
+            AssertReference(dashboardData, "_signOutButton");
+            AssertReference(dashboardData, "_closeButton");
+            AssertReference(dashboardData, "_confirmPanel");
+            AssertReference(dashboardData, "_confirmText");
+            AssertReference(dashboardData, "_confirmDeleteButton");
+            AssertReference(dashboardData, "_cancelDeleteButton");
+            Assert.That(dashboardData.FindProperty("_rows").arraySize, Is.EqualTo(6));
+            foreach (var row in main.GetComponentsInChildren<DeveloperDashboardRowView>(true))
+            {
+                var rowData = new SerializedObject(row);
+                AssertReference(rowData, "_background");
+                AssertReference(rowData, "_nameLabel");
+                AssertReference(rowData, "_deleteButton");
+            }
+
+            var dashboardRect = main.transform
+                .Find("WindowBackground/DashboardPanel").GetComponent<RectTransform>();
+            // Keep in sync with WindowsOverlayWindow.DashboardPanelHeight: the
+            // window grows by exactly this much when the dashboard opens.
+            Assert.That(dashboardRect.sizeDelta.y, Is.EqualTo(300f));
+            Assert.That(dashboardRect.anchoredPosition.y, Is.EqualTo(-220f));
+            Assert.That(dashboardRect.gameObject.activeSelf, Is.False);
+            // Erasing is the one destructive thing on the screen, so the question
+            // ships closed and covers the list while it is open.
+            Assert.That(
+                main.transform.Find("WindowBackground/DashboardPanel/DeleteConfirm")
+                    .gameObject.activeSelf,
+                Is.False);
             AssertReference(mainData, "_miniPanel");
             var miniPanel = mainData.FindProperty("_miniPanel").objectReferenceValue;
             var miniData = new SerializedObject(miniPanel);
