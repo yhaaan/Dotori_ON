@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>
     /// Nudging is a separate capability from attendance: it carries no state, so

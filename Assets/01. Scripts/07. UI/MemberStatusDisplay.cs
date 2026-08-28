@@ -1,7 +1,7 @@
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>
     /// The one place a member's state turns into a label and a colour. The card
@@ -35,15 +35,15 @@ namespace TeamOverlay.UI
         {
             if (!IsOnline(member))
             {
-                return TeamOverlayPalette.Offline;
+                return DOTORIONPalette.Offline;
             }
 
             switch (member.ActivityStatus)
             {
-                case ActivityStatus.Working: return TeamOverlayPalette.Working;
-                case ActivityStatus.Break: return TeamOverlayPalette.Break;
-                case ActivityStatus.Meal: return TeamOverlayPalette.Meal;
-                default: return TeamOverlayPalette.Accent;
+                case ActivityStatus.Working: return DOTORIONPalette.Working;
+                case ActivityStatus.Break: return DOTORIONPalette.Break;
+                case ActivityStatus.Meal: return DOTORIONPalette.Meal;
+                default: return DOTORIONPalette.Accent;
             }
         }
     }

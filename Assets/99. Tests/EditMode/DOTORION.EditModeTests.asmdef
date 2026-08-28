@@ -1,8 +1,8 @@
 {
-  "name": "TeamOverlay.EditModeTests",
-  "rootNamespace": "TeamOverlay.Tests.EditMode",
+  "name": "DOTORION.EditModeTests",
+  "rootNamespace": "DOTORION.Tests.EditMode",
   "references": [
-    "TeamOverlay.Runtime"
+    "DOTORION.Runtime"
   ],
   "includePlatforms": [
     "Editor"

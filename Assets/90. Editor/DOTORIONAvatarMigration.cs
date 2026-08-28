@@ -1,9 +1,9 @@
-using TeamOverlay.UI;
+using DOTORION.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.Editor
+namespace DOTORION.Editor
 {
     /// <summary>
     /// Adds the avatar picker to prefabs that already exist, instead of asking
@@ -14,9 +14,9 @@ namespace TeamOverlay.Editor
     /// It is written to be safe to run twice: everything it adds is skipped when
     /// it is already there.
     /// </summary>
-    public static class TeamOverlayAvatarMigration
+    public static class DOTORIONAvatarMigration
     {
-        [MenuItem("Team Overlay/Add Avatar Picker To Existing Prefabs")]
+        [MenuItem("DOTORI ON/Add Avatar Picker To Existing Prefabs")]
         public static void AddAvatarPicker()
         {
             var changed = MigrateCard() | MigrateMainView() | MigrateApp();
@@ -27,13 +27,13 @@ namespace TeamOverlay.Editor
             }
 
             Debug.Log(changed
-                ? "Avatar picker added to the Team Overlay prefabs."
-                : "The Team Overlay prefabs already have the avatar picker. Nothing changed.");
+                ? "Avatar picker added to the DOTORI ON prefabs."
+                : "The DOTORI ON prefabs already have the avatar picker. Nothing changed.");
         }
 
         private static bool MigrateCard()
         {
-            var root = PrefabUtility.LoadPrefabContents(TeamOverlayPrefabBuilder.CardPath);
+            var root = PrefabUtility.LoadPrefabContents(DOTORIONPrefabBuilder.CardPath);
             try
             {
                 var view = root.GetComponent<TeamMemberCardView>();
@@ -51,11 +51,11 @@ namespace TeamOverlay.Editor
                     return false;
                 }
 
-                TeamOverlayPrefabBuilder.AttachAvatarPicking(avatar, out var button, out var icon);
+                DOTORIONPrefabBuilder.AttachAvatarPicking(avatar, out var button, out var icon);
                 serialized.FindProperty("_avatarButton").objectReferenceValue = button;
                 serialized.FindProperty("_avatarIcon").objectReferenceValue = icon;
                 serialized.ApplyModifiedPropertiesWithoutUndo();
-                PrefabUtility.SaveAsPrefabAsset(root, TeamOverlayPrefabBuilder.CardPath);
+                PrefabUtility.SaveAsPrefabAsset(root, DOTORIONPrefabBuilder.CardPath);
                 return true;
             }
             finally
@@ -66,10 +66,10 @@ namespace TeamOverlay.Editor
 
         private static bool MigrateMainView()
         {
-            var root = PrefabUtility.LoadPrefabContents(TeamOverlayPrefabBuilder.MainViewPath);
+            var root = PrefabUtility.LoadPrefabContents(DOTORIONPrefabBuilder.MainViewPath);
             try
             {
-                var view = root.GetComponent<TeamOverlayView>();
+                var view = root.GetComponent<DOTORIONView>();
                 var serialized = new SerializedObject(view);
                 var panelProperty = serialized.FindProperty("_avatarPickerPanel");
                 var backgroundProperty = serialized.FindProperty("_windowBackground");
@@ -80,9 +80,9 @@ namespace TeamOverlay.Editor
                     var existing = root.transform.Find("AvatarPickerPanel");
                     var panel = existing != null
                         ? existing.GetComponent<AvatarPickerPanelView>()
-                        : TeamOverlayPrefabBuilder.BuildAvatarPickerPanel(
+                        : DOTORIONPrefabBuilder.BuildAvatarPickerPanel(
                             root.transform,
-                            TeamOverlayPrefabBuilder.PreviewFont());
+                            DOTORIONPrefabBuilder.PreviewFont());
                     panelProperty.objectReferenceValue = panel;
                     // The picker starts closed; the view opens it, and a prefab
                     // that shipped it open would cover the cards on launch.
@@ -95,7 +95,7 @@ namespace TeamOverlay.Editor
                     var background = root.transform.Find("WindowBackground") as RectTransform;
                     if (background == null)
                     {
-                        Debug.LogError("TeamOverlayCanvas is missing its WindowBackground child.");
+                        Debug.LogError("DOTORIONCanvas is missing its WindowBackground child.");
                     }
                     else
                     {
@@ -110,7 +110,7 @@ namespace TeamOverlay.Editor
                 }
 
                 serialized.ApplyModifiedPropertiesWithoutUndo();
-                PrefabUtility.SaveAsPrefabAsset(root, TeamOverlayPrefabBuilder.MainViewPath);
+                PrefabUtility.SaveAsPrefabAsset(root, DOTORIONPrefabBuilder.MainViewPath);
                 return true;
             }
             finally
@@ -121,10 +121,10 @@ namespace TeamOverlay.Editor
 
         private static bool MigrateApp()
         {
-            var root = PrefabUtility.LoadPrefabContents(TeamOverlayPrefabBuilder.AppPath);
+            var root = PrefabUtility.LoadPrefabContents(DOTORIONPrefabBuilder.AppPath);
             try
             {
-                var app = root.GetComponent<TeamOverlayApp>();
+                var app = root.GetComponent<DOTORIONApp>();
                 var serialized = new SerializedObject(app);
                 var catalogProperty = serialized.FindProperty("_avatarCatalog");
                 if (catalogProperty.objectReferenceValue != null)
@@ -132,9 +132,9 @@ namespace TeamOverlay.Editor
                     return false;
                 }
 
-                catalogProperty.objectReferenceValue = TeamOverlayPrefabBuilder.EnsureAvatarCatalogAsset();
+                catalogProperty.objectReferenceValue = DOTORIONPrefabBuilder.EnsureAvatarCatalogAsset();
                 serialized.ApplyModifiedPropertiesWithoutUndo();
-                PrefabUtility.SaveAsPrefabAsset(root, TeamOverlayPrefabBuilder.AppPath);
+                PrefabUtility.SaveAsPrefabAsset(root, DOTORIONPrefabBuilder.AppPath);
                 return true;
             }
             finally
@@ -149,7 +149,7 @@ namespace TeamOverlay.Editor
         /// rects: it is for taking a revised icon size, not for a prefab that is
         /// merely missing the feature.
         /// </summary>
-        [MenuItem("Team Overlay/Apply Avatar Icon Layout")]
+        [MenuItem("DOTORI ON/Apply Avatar Icon Layout")]
         public static void ApplyIconLayout()
         {
             ApplyCardLayout();
@@ -157,12 +157,12 @@ namespace TeamOverlay.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("Profile icons now draw at " +
-                      TeamOverlayPrefabBuilder.AvatarIconSize + "px on the card and in the picker.");
+                      DOTORIONPrefabBuilder.AvatarIconSize + "px on the card and in the picker.");
         }
 
         private static void ApplyCardLayout()
         {
-            var root = PrefabUtility.LoadPrefabContents(TeamOverlayPrefabBuilder.CardPath);
+            var root = PrefabUtility.LoadPrefabContents(DOTORIONPrefabBuilder.CardPath);
             try
             {
                 var avatar = root.transform.Find("Avatar") as RectTransform;
@@ -172,8 +172,8 @@ namespace TeamOverlay.Editor
                     return;
                 }
 
-                var size = TeamOverlayPrefabBuilder.AvatarIconSize;
-                avatar.anchoredPosition = new Vector2(0f, -TeamOverlayPrefabBuilder.CardAvatarTop);
+                var size = DOTORIONPrefabBuilder.AvatarIconSize;
+                avatar.anchoredPosition = new Vector2(0f, -DOTORIONPrefabBuilder.CardAvatarTop);
                 avatar.sizeDelta = new Vector2(size, size);
 
                 var icon = avatar.Find("Icon") as RectTransform;
@@ -182,10 +182,10 @@ namespace TeamOverlay.Editor
                     UiFactory.Stretch(icon);
                 }
 
-                SetLine(root, "Name", TeamOverlayPrefabBuilder.CardNameTop, 18f);
-                SetLine(root, "Status", TeamOverlayPrefabBuilder.CardStatusTop, 18f);
-                SetLine(root, "Detail", TeamOverlayPrefabBuilder.CardDetailTop, 27f);
-                PrefabUtility.SaveAsPrefabAsset(root, TeamOverlayPrefabBuilder.CardPath);
+                SetLine(root, "Name", DOTORIONPrefabBuilder.CardNameTop, 18f);
+                SetLine(root, "Status", DOTORIONPrefabBuilder.CardStatusTop, 18f);
+                SetLine(root, "Detail", DOTORIONPrefabBuilder.CardDetailTop, 27f);
+                PrefabUtility.SaveAsPrefabAsset(root, DOTORIONPrefabBuilder.CardPath);
             }
             finally
             {
@@ -202,45 +202,45 @@ namespace TeamOverlay.Editor
                 return;
             }
 
-            TeamOverlayPrefabBuilder.SetCardLine(text, top, height);
+            DOTORIONPrefabBuilder.SetCardLine(text, top, height);
         }
 
         private static void ApplyPickerLayout()
         {
-            var root = PrefabUtility.LoadPrefabContents(TeamOverlayPrefabBuilder.MainViewPath);
+            var root = PrefabUtility.LoadPrefabContents(DOTORIONPrefabBuilder.MainViewPath);
             try
             {
                 var panel = root.transform.Find("AvatarPickerPanel") as RectTransform;
                 if (panel == null)
                 {
-                    Debug.LogError("TeamOverlayCanvas has no AvatarPickerPanel. " +
-                                   "Run Team Overlay/Add Avatar Picker To Existing Prefabs first.");
+                    Debug.LogError("DOTORIONCanvas has no AvatarPickerPanel. " +
+                                   "Run DOTORI ON/Add Avatar Picker To Existing Prefabs first.");
                     return;
                 }
 
                 panel.sizeDelta = new Vector2(
                     panel.sizeDelta.x,
-                    TeamOverlayPrefabBuilder.AvatarPickerPanelHeight);
+                    DOTORIONPrefabBuilder.AvatarPickerPanelHeight);
 
                 var grid = panel.Find("Viewport/Content")?.GetComponent<GridLayoutGroup>();
                 if (grid != null)
                 {
-                    var cell = TeamOverlayPrefabBuilder.AvatarCellSize;
+                    var cell = DOTORIONPrefabBuilder.AvatarCellSize;
                     grid.cellSize = new Vector2(cell, cell);
                     grid.spacing = new Vector2(
-                        TeamOverlayPrefabBuilder.AvatarCellSpacing,
-                        TeamOverlayPrefabBuilder.AvatarCellSpacing);
-                    grid.constraintCount = TeamOverlayPrefabBuilder.AvatarGridColumns;
+                        DOTORIONPrefabBuilder.AvatarCellSpacing,
+                        DOTORIONPrefabBuilder.AvatarCellSpacing);
+                    grid.constraintCount = DOTORIONPrefabBuilder.AvatarGridColumns;
                 }
 
                 var templateIcon = panel.Find("Viewport/Content/OptionTemplate/Icon") as RectTransform;
                 if (templateIcon != null)
                 {
-                    var padding = TeamOverlayPrefabBuilder.AvatarCellPadding;
+                    var padding = DOTORIONPrefabBuilder.AvatarCellPadding;
                     UiFactory.Stretch(templateIcon, padding, padding, padding, padding);
                 }
 
-                PrefabUtility.SaveAsPrefabAsset(root, TeamOverlayPrefabBuilder.MainViewPath);
+                PrefabUtility.SaveAsPrefabAsset(root, DOTORIONPrefabBuilder.MainViewPath);
             }
             finally
             {

@@ -4,11 +4,11 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using TeamOverlay.Core;
-using TeamOverlay.Identity;
+using DOTORION.Core;
+using DOTORION.Identity;
 using UnityEngine;
 
-namespace TeamOverlay.Supabase
+namespace DOTORION.Supabase
 {
     /// <summary>
     /// The live backend. Mutations go through the transaction-safe RPCs and the

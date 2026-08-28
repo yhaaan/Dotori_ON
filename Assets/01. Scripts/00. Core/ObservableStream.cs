@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>Minimal thread-safe hot observable shared by every backend.</summary>
     internal sealed class ObservableStream<T> : IObservable<T>, IDisposable

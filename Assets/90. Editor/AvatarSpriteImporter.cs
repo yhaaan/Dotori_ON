@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace TeamOverlay.Editor
+namespace DOTORION.Editor
 {
     /// <summary>
     /// Imports everything in the avatar folder as a UI sprite, so dropping a PNG
@@ -21,7 +21,7 @@ namespace TeamOverlay.Editor
 
         private void OnPreprocessTexture()
         {
-            if (!assetPath.StartsWith(TeamOverlayPrefabBuilder.AvatarSpriteFolder + "/", StringComparison.Ordinal))
+            if (!assetPath.StartsWith(DOTORIONPrefabBuilder.AvatarSpriteFolder + "/", StringComparison.Ordinal))
             {
                 return;
             }

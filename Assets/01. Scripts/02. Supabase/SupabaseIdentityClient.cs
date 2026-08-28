@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using TeamOverlay.Identity;
+using DOTORION.Identity;
 using UnityEngine;
 
-namespace TeamOverlay.Supabase
+namespace DOTORION.Supabase
 {
     public sealed class SupabaseIdentityClient : ISupabaseSessionProvider
     {

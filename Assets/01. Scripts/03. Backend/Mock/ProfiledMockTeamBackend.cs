@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
-using TeamOverlay.Core;
+using DOTORION.Core;
 
-namespace TeamOverlay.Backend.Mock
+namespace DOTORION.Backend.Mock
 {
     /// <summary>
     /// Keeps the first-run profile visible while the application is still using

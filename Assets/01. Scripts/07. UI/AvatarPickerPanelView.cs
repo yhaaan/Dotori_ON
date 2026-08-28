@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>
     /// The icon grid that opens above the overlay when someone clicks their own
@@ -143,7 +143,7 @@ namespace TeamOverlay.UI
                 var background = _options[index].GetComponent<Image>();
                 if (background != null)
                 {
-                    background.color = isSelected ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button;
+                    background.color = isSelected ? DOTORIONPalette.Accent : DOTORIONPalette.Button;
                 }
             }
         }
@@ -157,7 +157,7 @@ namespace TeamOverlay.UI
 
             _feedbackText.gameObject.SetActive(empty);
             _feedbackText.text = "고를 수 있는 아이콘이 없습니다. " +
-                                 "Resources/TeamOverlay/TeamAvatarCatalog에 이미지를 넣어 주세요.";
+                                 "Resources/DOTORION/TeamAvatarCatalog에 이미지를 넣어 주세요.";
         }
     }
 }

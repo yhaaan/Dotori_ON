@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
 
-namespace TeamOverlay.Supabase
+namespace DOTORION.Supabase
 {
     public interface ISupabaseAuthSessionStore
     {
@@ -67,7 +67,7 @@ namespace TeamOverlay.Supabase
                 CredFree(credentialPointer);
             }
 #else
-            throw new PlatformNotSupportedException("Team Overlay secure Auth storage currently requires Windows.");
+            throw new PlatformNotSupportedException("DOTORI ON secure Auth storage currently requires Windows.");
 #endif
         }
 
@@ -107,7 +107,7 @@ namespace TeamOverlay.Supabase
                 Marshal.FreeCoTaskMem(blob);
             }
 #else
-            throw new PlatformNotSupportedException("Team Overlay secure Auth storage currently requires Windows.");
+            throw new PlatformNotSupportedException("DOTORI ON secure Auth storage currently requires Windows.");
 #endif
         }
 
@@ -124,7 +124,7 @@ namespace TeamOverlay.Supabase
                 }
             }
 #else
-            throw new PlatformNotSupportedException("Team Overlay secure Auth storage currently requires Windows.");
+            throw new PlatformNotSupportedException("DOTORI ON secure Auth storage currently requires Windows.");
 #endif
         }
 

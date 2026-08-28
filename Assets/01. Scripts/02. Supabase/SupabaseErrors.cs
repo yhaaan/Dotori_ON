@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace TeamOverlay.Supabase
+namespace DOTORION.Supabase
 {
     /// <summary>
     /// Turns a PostgREST or GoTrue error body into a typed exception. The RPCs

@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TeamOverlay.Supabase
+namespace DOTORION.Supabase
 {
     public sealed class SupabaseAuthSession
     {

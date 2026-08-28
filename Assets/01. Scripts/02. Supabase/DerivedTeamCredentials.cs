@@ -1,9 +1,9 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using TeamOverlay.Identity;
+using DOTORION.Identity;
 
-namespace TeamOverlay.Supabase
+namespace DOTORION.Supabase
 {
     /// <summary>
     /// Turns a visible member name into the Auth credentials for that member.
@@ -19,13 +19,23 @@ namespace TeamOverlay.Supabase
     /// </summary>
     public static class DerivedTeamCredentials
     {
+        // CHANGING EITHER OF THESE INVALIDATES EVERY EXISTING ACCOUNT.
+        //
+        // A member's email and password are digests that include them, so a new
+        // value derives credentials that match nothing on the server: sign-in
+        // fails, and the sign-up that follows is refused by the team's four-slot
+        // limit. Both were last changed with a full reset of members and Auth
+        // users, which is the only way to move them safely. Rename anything else
+        // in this project freely; leave these alone unless the team is being
+        // wiped again, and bump the version suffix when it is.
+
         // Reserved TLD from RFC 2606: guaranteed never to resolve, so a stray
         // password-recovery mail can never reach a real inbox.
-        private const string EmailDomain = "teamoverlay.invalid";
+        private const string EmailDomain = "dotorion.invalid";
 
         // Only namespaces the digest so the password is not the same value as the
         // email local part. It is not secret; it ships inside the build.
-        private const string PasswordNamespace = "ProjectDDD.TeamOverlay.v1";
+        private const string PasswordNamespace = "DOTORION.v1";
 
         public static string EmailFor(string uniqueNameKey)
         {

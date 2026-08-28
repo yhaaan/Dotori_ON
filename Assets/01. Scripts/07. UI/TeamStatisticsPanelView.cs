@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     public sealed class TeamStatisticsPanelView : MonoBehaviour
     {
@@ -92,7 +92,7 @@ namespace TeamOverlay.UI
             {
                 Tint(
                     _periodButtons[index],
-                    Periods[index] == period ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button);
+                    Periods[index] == period ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
             }
         }
 
@@ -207,7 +207,7 @@ namespace TeamOverlay.UI
                     _metricButtons[index],
                     Metrics[index] == metric
                         ? TeamRankingRowView.MetricColor(metric)
-                        : TeamOverlayPalette.Button);
+                        : DOTORIONPalette.Button);
             }
 
             BindRankingRows();
@@ -242,8 +242,8 @@ namespace TeamOverlay.UI
             _showRanking = showRanking;
             if (_dailyContent != null) _dailyContent.SetActive(!showRanking);
             if (_rankingContent != null) _rankingContent.SetActive(showRanking);
-            Tint(_dailyTabButton, showRanking ? TeamOverlayPalette.Button : TeamOverlayPalette.Accent);
-            Tint(_rankingTabButton, showRanking ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button);
+            Tint(_dailyTabButton, showRanking ? DOTORIONPalette.Button : DOTORIONPalette.Accent);
+            Tint(_rankingTabButton, showRanking ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
         }
 
         private void SetRowsVisible(bool visible)
@@ -297,7 +297,7 @@ namespace TeamOverlay.UI
             }
 
             _feedbackText.text = message;
-            _feedbackText.color = isError ? TeamOverlayPalette.Danger : TeamOverlayPalette.TextSecondary;
+            _feedbackText.color = isError ? DOTORIONPalette.Danger : DOTORIONPalette.TextSecondary;
             _feedbackText.gameObject.SetActive(!string.IsNullOrEmpty(message));
         }
 

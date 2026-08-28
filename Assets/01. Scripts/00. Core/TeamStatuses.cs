@@ -1,4 +1,4 @@
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>
     /// Whether a member currently has an open attendance session.

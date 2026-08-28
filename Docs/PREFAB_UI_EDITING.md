@@ -1,24 +1,24 @@
-# Unity에서 Team Overlay UI 조정하기
+# Unity에서 DOTORI ON UI 조정하기
 
 이제 화면은 런타임 코드로 생성되지 않고 아래 네 개의 실제 프리팹을 사용합니다.
 
-- `Assets/02. Prefabs/TeamOverlayCanvas.prefab`: 메인 화면 전체
+- `Assets/02. Prefabs/DOTORIONCanvas.prefab`: 메인 화면 전체
 - `Assets/02. Prefabs/TeamMemberCard.prefab`: 메인 화면에 중첩된 멤버 카드 원본
 - `Assets/02. Prefabs/FirstRunNameModal.prefab`: 최초 실행 이름 설정 화면
-- `Assets/Resources/TeamOverlay/TeamOverlayApp.prefab`: 앱 시작점과 위 프리팹 참조
+- `Assets/Resources/DOTORION/DOTORIONApp.prefab`: 앱 시작점과 위 프리팹 참조
 
 ## 권장 편집 순서
 
-1. Unity Project 창에서 `TeamOverlayCanvas.prefab`을 더블 클릭합니다.
+1. Unity Project 창에서 `DOTORIONCanvas.prefab`을 더블 클릭합니다.
 2. Prefab Mode에서 위치, 크기, 색상, 글자 크기와 버튼 모양을 조정합니다.
 3. 네 카드에 공통으로 적용할 디자인은 `TeamMemberCard.prefab`에서 수정합니다.
 4. 최초 이름 입력 화면은 `FirstRunNameModal.prefab`에서 수정합니다.
 5. Play 버튼으로 480x220 화면과 버튼 동작을 확인합니다.
-6. `Team Overlay > Build Windows x86_64`로 빌드합니다.
+6. `DOTORI ON > Build Windows x86_64`로 빌드합니다.
 
-`Team Overlay > Create Missing Editable UI Prefabs`는 파일이 없을 때만 생성하며 기존 수정 내용을 덮어쓰지 않습니다.
+`DOTORI ON > Create Missing Editable UI Prefabs`는 파일이 없을 때만 생성하며 기존 수정 내용을 덮어쓰지 않습니다.
 
-`Team Overlay > Rebuild Editable UI Prefabs...`는 네 프리팹을 초기 레이아웃으로 다시 만들기 때문에 수동 수정 내용이 사라집니다. 초기화가 필요한 경우에만 사용하세요.
+`DOTORI ON > Rebuild Editable UI Prefabs...`는 네 프리팹을 초기 레이아웃으로 다시 만들기 때문에 수동 수정 내용이 사라집니다. 초기화가 필요한 경우에만 사용하세요.
 
 ## 주의할 참조
 
@@ -30,27 +30,27 @@
 
 ## 상태 메모 입력칸
 
-하단 컨트롤 바 오른쪽의 `StatusNoteInput`(`TeamOverlayView._statusNoteInput`)은 지금 뭘 하는지 24자까지 적는 칸입니다. 출근 중일 때만 보이고, Enter를 누르거나 포커스를 잃으면 저장됩니다. 서버가 퇴근 시 자동으로 비웁니다.
+하단 컨트롤 바 오른쪽의 `StatusNoteInput`(`DOTORIONView._statusNoteInput`)은 지금 뭘 하는지 24자까지 적는 칸입니다. 출근 중일 때만 보이고, Enter를 누르거나 포커스를 잃으면 저장됩니다. 서버가 퇴근 시 자동으로 비웁니다.
 
 글자 수 제한을 늘리려면 InputField의 `Character Limit`만이 아니라 `member_current_state.status_note`의 CHECK 제약도 같이 고쳐야 합니다. 카드 폭이 약 110px라 그 이상은 어차피 잘립니다.
 
 ## 소형 모드
 
-상단 바의 `소형`(`TopBar/MiniMode`, `TeamOverlayView._miniModeButton`)을 누르면 창이 130x150으로 줄고 반투명해집니다. 이름과 상태만 네 줄로 보이며, **창 아무 곳이나 더블클릭하면** 원래 크기로 돌아옵니다. 맨 위 18px 띠(`MiniOverlayPanel/MiniDragStrip`)만 창을 끄는 손잡이입니다. 본문이 드래그까지 맡으면 네이티브 창 이동 루프가 마우스를 눌리는 순간 가져가 버려서, 더블클릭의 첫 번째 클릭이 사라집니다.
+상단 바의 `소형`(`TopBar/MiniMode`, `DOTORIONView._miniModeButton`)을 누르면 창이 130x150으로 줄고 반투명해집니다. 이름과 상태만 네 줄로 보이며, **창 아무 곳이나 더블클릭하면** 원래 크기로 돌아옵니다. 맨 위 18px 띠(`MiniOverlayPanel/MiniDragStrip`)만 창을 끄는 손잡이입니다. 본문이 드래그까지 맡으면 네이티브 창 이동 루프가 마우스를 눌리는 순간 가져가 버려서, 더블클릭의 첫 번째 클릭이 사라집니다.
 
 `MiniOverlayPanel`은 `WindowBackground`의 자식이 아니라 형제이고, 아바타 선택창과 달리 펼쳐지는 게 아니라 **`WindowBackground`를 통째로 끄고 대신 켜집니다.**
 
 패널 크기(130x150)는 `WindowsOverlayWindow.MiniWindowWidth`·`MiniWindowHeight`와 같아야 하며 `PrefabAssetTests`가 함께 고정합니다. 행 안의 그래픽은 전부 `Raycast Target`이 꺼져 있어야 합니다. 켜져 있으면 그 자리가 더블클릭을 먹어서 창을 되돌릴 수 없는 죽은 영역이 됩니다. 이것도 테스트가 잡습니다.
 
-소형 모드에서는 캔버스 스케일러가 `Constant Pixel Size`로 바뀝니다. 평소 설정(`Scale With Screen Size`, 기준 480 폭)을 그대로 두면 창 폭이 130이 될 때 UI 전체가 0.27배로 줄어들어 글씨가 사라집니다. 그래서 소형 패널만 캔버스 기준 좌표가 아니라 **실제 픽셀 값으로** 만듭니다. 원래 설정은 `TeamOverlayView.Initialize`가 프리팹에서 읽어 두었다가 복귀할 때 되돌리므로, 스케일러를 손봐도 소형 모드를 다녀오면서 값이 굳지 않습니다.
+소형 모드에서는 캔버스 스케일러가 `Constant Pixel Size`로 바뀝니다. 평소 설정(`Scale With Screen Size`, 기준 480 폭)을 그대로 두면 창 폭이 130이 될 때 UI 전체가 0.27배로 줄어들어 글씨가 사라집니다. 그래서 소형 패널만 캔버스 기준 좌표가 아니라 **실제 픽셀 값으로** 만듭니다. 원래 설정은 `DOTORIONView.Initialize`가 프리팹에서 읽어 두었다가 복귀할 때 되돌리므로, 스케일러를 손봐도 소형 모드를 다녀오면서 값이 굳지 않습니다.
 
 반투명은 `WS_EX_LAYERED` + `SetLayeredWindowAttributes`로 창 전체에 균일하게 겁니다(`MiniWindowAlpha = 225`). 글자까지 같이 비치는 방식이며, 배경만 투명하게 하려면 프레임버퍼 알파가 필요해서 URP 쪽 작업이 따로 붙습니다. **레이어드 창은 DXGI 플립 모델과 같이 못 쓰기 때문에 Player Settings의 `Use DXGI Flip Model Swapchain`이 꺼져 있어야 합니다.** 다시 켜면 반투명이 조용히 사라집니다.
 
-소형 모드를 오갈 때는 `TeamOverlayView`가 몇 프레임에 걸쳐 모든 `Text`의 정점 캐시를 버립니다. 동적 폰트 아틀라스는 새 크기의 글리프를 요청받으면 다시 패킹되면서 이미 들어 있던 글리프 위치를 전부 바꾸는데, uGUI는 내용이 그대로면 예전 정점을 재사용하기 때문에 UV가 옛 자리를 가리켜 **텍스트만** 뭉개집니다. 실제로 그렇게 한 번 깨졌습니다. 이 무효화를 지우면 다시 재현됩니다.
+소형 모드를 오갈 때는 `DOTORIONView`가 몇 프레임에 걸쳐 모든 `Text`의 정점 캐시를 버립니다. 동적 폰트 아틀라스는 새 크기의 글리프를 요청받으면 다시 패킹되면서 이미 들어 있던 글리프 위치를 전부 바꾸는데, uGUI는 내용이 그대로면 예전 정점을 재사용하기 때문에 UV가 옛 자리를 가리켜 **텍스트만** 뭉개집니다. 실제로 그렇게 한 번 깨졌습니다. 이 무효화를 지우면 다시 재현됩니다.
 
 Windows는 시스템 최소 창 폭(보통 130~140px) 아래로는 창을 줄여 주지 않습니다. `WindowsOverlayWindow`가 `WM_GETMINMAXINFO`에서 그 하한을 낮추기 때문에 130이 통과합니다.
 
-마지막 상태는 `PlayerPrefs`의 `TeamOverlay.MiniMode`에 남아 다음 실행 때 그대로 켜집니다. 대시보드의 `다른 이름으로 로그인`으로 이름 화면에 돌아갈 때는 창만 원래 크기로 되돌리고 이 값은 건드리지 않으므로, 다시 로그인하면 남겨 둔 대로 뜹니다.
+마지막 상태는 `PlayerPrefs`의 `DOTORION.MiniMode`에 남아 다음 실행 때 그대로 켜집니다. 대시보드의 `다른 이름으로 로그인`으로 이름 화면에 돌아갈 때는 창만 원래 크기로 되돌리고 이 값은 건드리지 않으므로, 다시 로그인하면 남겨 둔 대로 뜹니다.
 
 에디터 Play 모드에서는 창 조작이 전부 no-op이라 패널만 좌상단에 130x150으로 그려집니다. 크기와 반투명은 빌드에서만 확인할 수 있습니다.
 
@@ -62,7 +62,7 @@ Windows는 시스템 최소 창 폭(보통 130~140px) 아래로는 창을 줄여
 
 상태 변경 요청이 실패하면 그 부재 동안은 다시 시도하지 않습니다. 몇 초마다 같은 오류를 반복하는 것보다, 이 기능이 없던 때와 같은 동작(작업중 유지)으로 남고 다음 부재에 다시 시도하는 편이 낫습니다.
 
-임계값을 바꾸려면 `TeamOverlayApp.IdleBreakSeconds`를 고칩니다. 짧게 잡을수록 통계는 정확해지지만 화장실 다녀오는 사이에 상태가 바뀌는 게 감시처럼 느껴질 수 있습니다.
+임계값을 바꾸려면 `DOTORIONApp.IdleBreakSeconds`를 고칩니다. 짧게 잡을수록 통계는 정확해지지만 화장실 다녀오는 사이에 상태가 바뀌는 게 감시처럼 느껴질 수 있습니다.
 
 에디터 Play 모드에서는 유휴 시간이 항상 0으로 보고됩니다. 입력을 물어볼 수 없는 곳이 "아무도 안 앉아 있다"로 읽히면 안 되기 때문입니다.
 
@@ -131,7 +131,7 @@ UTC 기준으로 두지 않은 이유는 따로 있습니다. 그랬다면 한�
 
 자격증명은 클라이언트가 만들어 보냅니다. 다음 실행에서 그 값을 재현해야 하는 쪽이 클라이언트라, 서버가 따로 유도하면 어긋날 길만 생깁니다. 파생식이 빌드에 들어 있어 값을 넘긴다고 새로 드러나는 비밀도 없습니다.
 
-Windows 자격 증명 관리자에 이름별로 저장되는 세션(`ProjectDDD.TeamOverlay.SupabaseAuth.<project-ref>.<이름 키>`)은 로그인 왕복을 한 번 아끼는 캐시일 뿐입니다. 이름을 바꾸면 새 키로 찾게 되어 캐시가 없으니 한 번 더 로그인할 뿐, 지워져도 이름만 다시 입력하면 복구됩니다.
+Windows 자격 증명 관리자에 이름별로 저장되는 세션(`ProjectDDD.DOTORION.SupabaseAuth.<project-ref>.<이름 키>`)은 로그인 왕복을 한 번 아끼는 캐시일 뿐입니다. 이름을 바꾸면 새 키로 찾게 되어 캐시가 없으니 한 번 더 로그인할 뿐, 지워져도 이름만 다시 입력하면 복구됩니다.
 
 **이는 보안 경계가 아닙니다.** 앱을 가진 사람은 누구든 팀원 이름으로 접속할 수 있으며, 4인 내부 도구라는 전제에서 내린 선택입니다.
 
@@ -169,7 +169,7 @@ update public.members set is_admin = true where display_name = '이름';
 
 패널 상단에는 탭 두 개(`내 통계`, `랭킹`)와 기간 버튼 세 개(`7일`, `이번 달`, `누적`)가 있습니다. 기간을 바꾸면 서버에 다시 요청하고, 기간에 따라 한 줄이 하루·한 주·한 달이 됩니다. `랭킹` 탭 위쪽의 지표 버튼 네 개(`작업`, `총시간`, `휴식`, `식사`)는 이미 받아 둔 값을 다시 정렬만 하므로 요청이 없습니다.
 
-행 개수는 프리팹에 고정돼 있습니다(내 통계 7행, 랭킹 4행). 행을 늘리려면 `TeamOverlayPrefabBuilder`의 배열 크기와 위치 계산, 패널 높이, 그리고 위 두 상수를 함께 고쳐야 합니다.
+행 개수는 프리팹에 고정돼 있습니다(내 통계 7행, 랭킹 4행). 행을 늘리려면 `DOTORIONPrefabBuilder`의 배열 크기와 위치 계산, 패널 높이, 그리고 위 두 상수를 함께 고쳐야 합니다.
 
 ## 프로필 아이콘
 
@@ -183,12 +183,12 @@ update public.members set is_admin = true where display_name = '이름';
 
 아이콘이 실제로 그려지는 크기는 **카드에서도 선택창에서도 48x48**입니다. 카드에서는 타일을 여백 없이 꽉 채우고, 선택창에서는 52px 칸 안에 2px씩 들어갑니다. 선택창의 2px은 여백이 아니라 선택된 칸의 색이 테두리로 남게 하는 자리입니다. 아이콘이 칸을 꽉 채우면 어느 것을 골랐는지 표시할 자리가 사라집니다.
 
-두 자리를 같은 크기로 맞춰 둔 이유는 픽셀아트 때문입니다. 한쪽만 다른 크기면 그쪽에서만 픽셀이 리샘플링됩니다. 크기는 `TeamOverlayPrefabBuilder.AvatarIconSize` 하나에서 나옵니다.
+두 자리를 같은 크기로 맞춰 둔 이유는 픽셀아트 때문입니다. 한쪽만 다른 크기면 그쪽에서만 픽셀이 리샘플링됩니다. 크기는 `DOTORIONPrefabBuilder.AvatarIconSize` 하나에서 나옵니다.
 
 1. `Assets/04. Avatars`에 PNG를 넣습니다.
    - 일반 그림: **128x128 정사각형, 투명 배경**.
    - 픽셀아트: `Assets/04. Avatars/Pixel/` 하위 폴더에 **24x24**(2배) 또는 **16x16**(3배), **48x48**(1:1)도 됩니다. 48의 약수가 아닌 크기는 픽셀 폭이 들쭉날쭉해집니다. 32는 1.5배라 여기에 해당합니다.
-2. `Team Overlay > Refresh Avatar Catalog From Folder`를 누릅니다. `Resources/TeamOverlay/TeamAvatarCatalog.asset` 목록이 폴더 내용(하위 폴더 포함)으로 갱신됩니다.
+2. `DOTORI ON > Refresh Avatar Catalog From Folder`를 누릅니다. `Resources/DOTORION/TeamAvatarCatalog.asset` 목록이 폴더 내용(하위 폴더 포함)으로 갱신됩니다.
 3. 목록에 직접 드래그해서 넣어도 됩니다. 카탈로그가 길어지면 선택창 격자가 그만큼 늘어나고, 두 줄을 넘으면 스크롤됩니다.
 
 임포트 설정은 `AvatarSpriteImporter`가 자동으로 걸어 줍니다. 손으로 만질 필요가 없고, 만져도 다음 재임포트에 되돌아갑니다.
@@ -209,6 +209,6 @@ update public.members set is_admin = true where display_name = '이름';
 
 ### 기존 프리팹에 붙이기
 
-프리팹을 다시 만들지 않고 `Team Overlay > Add Avatar Picker To Existing Prefabs`를 한 번 누르면 카드에 버튼과 아이콘 자리가, 메인 화면에 선택 패널이 추가됩니다. 이미 붙어 있으면 아무것도 하지 않으므로 여러 번 눌러도 안전합니다. 수동으로 고쳐 둔 레이아웃은 그대로 남습니다.
+프리팹을 다시 만들지 않고 `DOTORI ON > Add Avatar Picker To Existing Prefabs`를 한 번 누르면 카드에 버튼과 아이콘 자리가, 메인 화면에 선택 패널이 추가됩니다. 이미 붙어 있으면 아무것도 하지 않으므로 여러 번 눌러도 안전합니다. 수동으로 고쳐 둔 레이아웃은 그대로 남습니다.
 
-아이콘 크기를 바꿨을 때는 `Team Overlay > Apply Avatar Icon Layout`을 누릅니다. `AvatarIconSize`와 카드 줄 위치를 이미 있는 프리팹에 다시 써넣습니다. 위 명령과 나눠 둔 이유는 이쪽은 해당 rect를 덮어쓰기 때문입니다. 카드의 이름·상태·상세 줄 위치를 손으로 조정해 뒀다면 이 명령이 되돌립니다.
+아이콘 크기를 바꿨을 때는 `DOTORI ON > Apply Avatar Icon Layout`을 누릅니다. `AvatarIconSize`와 카드 줄 위치를 이미 있는 프리팹에 다시 써넣습니다. 위 명령과 나눠 둔 이유는 이쪽은 해당 rect를 덮어쓰기 때문입니다. 카드의 이름·상태·상세 줄 위치를 손으로 조정해 뒀다면 이 명령이 되돌립니다.

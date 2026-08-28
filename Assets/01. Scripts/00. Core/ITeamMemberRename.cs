@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>
     /// Changing your own name without losing what is recorded under it. Only a

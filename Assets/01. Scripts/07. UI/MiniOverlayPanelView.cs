@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>
     /// The name-and-status only overlay. It replaces the whole window rather than

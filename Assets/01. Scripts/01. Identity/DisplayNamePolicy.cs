@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Text;
 
-namespace TeamOverlay.Identity
+namespace DOTORION.Identity
 {
     public enum DisplayNameValidationError
     {

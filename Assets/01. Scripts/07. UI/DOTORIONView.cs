@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>The editable main overlay prefab.</summary>
-    public sealed class TeamOverlayView : MonoBehaviour
+    public sealed class DOTORIONView : MonoBehaviour
     {
         private const int MemberCount = 4;
 
@@ -315,13 +315,13 @@ namespace TeamOverlay.UI
             // of the day would read as having lost the points.
             Tint(
                 _dailyCheckInButton,
-                state.ClaimedToday ? TeamOverlayPalette.Button : TeamOverlayPalette.Accent);
+                state.ClaimedToday ? DOTORIONPalette.Button : DOTORIONPalette.Accent);
             if (_dailyCheckInPointsLabel != null)
             {
                 _dailyCheckInPointsLabel.text = state.TotalPoints + "P";
                 _dailyCheckInPointsLabel.color = state.ClaimedToday
-                    ? TeamOverlayPalette.TextSecondary
-                    : TeamOverlayPalette.Accent;
+                    ? DOTORIONPalette.TextSecondary
+                    : DOTORIONPalette.Accent;
             }
         }
 
@@ -461,7 +461,7 @@ namespace TeamOverlay.UI
         public void ShowFeedback(string message, bool isError = false)
         {
             _feedbackText.text = message;
-            _feedbackText.color = isError ? TeamOverlayPalette.Danger : TeamOverlayPalette.TextSecondary;
+            _feedbackText.color = isError ? DOTORIONPalette.Danger : DOTORIONPalette.TextSecondary;
         }
 
         public void SetAlwaysOnTop(bool enabled)
@@ -470,7 +470,7 @@ namespace TeamOverlay.UI
             if (_topmostButton == null) return;
             var background = _topmostButton.GetComponent<Image>();
             if (background != null)
-                background.color = enabled ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button;
+                background.color = enabled ? DOTORIONPalette.Accent : DOTORIONPalette.Button;
         }
 
         public void SetStatisticsVisible(bool visible)
@@ -480,7 +480,7 @@ namespace TeamOverlay.UI
                 _statisticsPanel.gameObject.SetActive(visible);
             }
 
-            Tint(_statsButton, visible ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button);
+            Tint(_statsButton, visible ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
         }
 
         public void SetStatisticsPeriod(StatisticsPeriod period)
@@ -524,9 +524,9 @@ namespace TeamOverlay.UI
 
         private void SetActivitySelection(ActivityStatus selected)
         {
-            Tint(_workingButton, selected == ActivityStatus.Working ? TeamOverlayPalette.Working : TeamOverlayPalette.Button);
-            Tint(_breakButton, selected == ActivityStatus.Break ? TeamOverlayPalette.Break : TeamOverlayPalette.Button);
-            Tint(_mealButton, selected == ActivityStatus.Meal ? TeamOverlayPalette.Meal : TeamOverlayPalette.Button);
+            Tint(_workingButton, selected == ActivityStatus.Working ? DOTORIONPalette.Working : DOTORIONPalette.Button);
+            Tint(_breakButton, selected == ActivityStatus.Break ? DOTORIONPalette.Break : DOTORIONPalette.Button);
+            Tint(_mealButton, selected == ActivityStatus.Meal ? DOTORIONPalette.Meal : DOTORIONPalette.Button);
         }
 
         private static void Tint(Button button, Color color)

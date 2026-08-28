@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using AOT;
 #endif
 
-namespace TeamOverlay.Platform.Windows
+namespace DOTORION.Platform.Windows
 {
     /// <summary>
     /// Keeps all Win32 details behind a small Unity-facing API. In the Editor and

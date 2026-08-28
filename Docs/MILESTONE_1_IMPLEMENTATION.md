@@ -28,9 +28,9 @@
 
 Unity에서 다음 메뉴를 실행한다.
 
-1. 필요하면 `Team Overlay > Configure Project`
-2. `Team Overlay > Build Windows x86_64`
-3. `Builds/Windows/TeamOverlay.exe` 실행
+1. 필요하면 `DOTORI ON > Configure Project`
+2. `DOTORI ON > Build Windows x86_64`
+3. `Builds/Windows/DOTORION.exe` 실행
 
 UI는 에디터 Play 모드에서도 확인할 수 있다. Always-on-top, 무테, 트레이 등 Win32 통합은 Windows Standalone 플레이어에서만 활성화된다.
 

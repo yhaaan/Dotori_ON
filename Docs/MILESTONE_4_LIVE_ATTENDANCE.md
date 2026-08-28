@@ -36,7 +36,7 @@ Team events are **derived by diffing consecutive snapshots** rather than read fr
   replay the whole roster as fresh check-ins and ring the notification tone.
 
 Replacing polling with Realtime later only has to replace the periodic
-`GetTeamStateAsync` call in `TeamOverlayApp.Update`; `ITeamBackend` and the view
+`GetTeamStateAsync` call in `DOTORIONApp.Update`; `ITeamBackend` and the view
 are unaffected. `team_events` becomes necessary once nudges or emotes are added,
 because those carry no state to diff.
 
@@ -74,7 +74,7 @@ invalidated session.
 
 ## Mock backend
 
-`TeamOverlayApp` keeps a `Use Mock Backend` inspector toggle. It is off by
+`DOTORIONApp` keeps a `Use Mock Backend` inspector toggle. It is off by
 default; turning it on runs the overlay against the in-memory roster so the UI can
 be exercised without a network. Identity still uses the real project either way.
 
@@ -89,12 +89,12 @@ be exercised without a network. Identity still uses the real project either way.
   reason guard.
 - `PrefabAssetTests` passing also confirms the recovered UI scripts kept their
   original GUIDs, that the hand-edited `_switchAccountButton` reference in
-  `TeamOverlayCanvas.prefab` resolves, and that the app prefab is reachable at its
-  new `Assets/Resources/TeamOverlay` path.
+  `DOTORIONCanvas.prefab` resolves, and that the app prefab is reachable at its
+  new `Assets/Resources/DOTORION` path.
 - No live request has been made against the hosted project yet. The first real
   check-in against Supabase is still unexercised.
 
-Evidence is stored under ignored `Logs/TeamOverlayValidation`:
+Evidence is stored under ignored `Logs/DOTORIONValidation`:
 
 - `editmode-m4.xml`
 - `editmode-m4.log`

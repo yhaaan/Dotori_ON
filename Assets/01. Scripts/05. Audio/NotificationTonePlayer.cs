@@ -1,9 +1,9 @@
 using UnityEngine;
 
-namespace TeamOverlay.Audio
+namespace DOTORION.Audio
 {
     /// <summary>
-    /// Plays the clip a <see cref="TeamOverlaySounds"/> asset assigns to an event,
+    /// Plays the clip a <see cref="DOTORIONSounds"/> asset assigns to an event,
     /// and falls back to a chime generated at runtime when no asset or no clip is
     /// set. The fallback is what keeps the app audible on a fresh clone with no
     /// binary audio committed. One event results in one PlayOneShot call.
@@ -13,10 +13,10 @@ namespace TeamOverlay.Audio
         private const int SampleRate = 44100;
         private AudioClip _notificationClip;
         private AudioSource _audioSource;
-        private TeamOverlaySounds _sounds;
+        private DOTORIONSounds _sounds;
 
         /// <summary>Assigning null keeps the generated chime for every event.</summary>
-        public void UseSounds(TeamOverlaySounds sounds)
+        public void UseSounds(DOTORIONSounds sounds)
         {
             _sounds = sounds;
             if (_audioSource != null && sounds != null)
@@ -45,7 +45,7 @@ namespace TeamOverlay.Audio
             var clip = _sounds != null ? _sounds.Clip(sound) : null;
             if (clip == null)
             {
-                if (!TeamOverlaySounds.FallsBackToChime(sound))
+                if (!DOTORIONSounds.FallsBackToChime(sound))
                 {
                     return;
                 }

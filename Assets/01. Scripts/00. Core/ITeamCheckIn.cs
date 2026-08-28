@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>
     /// Where the daily check-in stands for the local member. A claim and a plain

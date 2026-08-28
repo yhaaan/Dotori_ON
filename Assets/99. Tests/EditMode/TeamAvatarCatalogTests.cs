@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using TeamOverlay.UI;
+using DOTORION.UI;
 using UnityEditor;
 using UnityEngine;
 
-namespace TeamOverlay.Tests.EditMode
+namespace DOTORION.Tests.EditMode
 {
     public sealed class TeamAvatarCatalogTests
     {
@@ -75,7 +75,7 @@ namespace TeamOverlay.Tests.EditMode
         public void ShippedCatalogAsset_HasNothingItHadToSkip()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<TeamAvatarCatalog>(
-                "Assets/Resources/TeamOverlay/TeamAvatarCatalog.asset");
+                "Assets/Resources/DOTORION/TeamAvatarCatalog.asset");
             if (catalog == null)
             {
                 Assert.Ignore("The avatar catalog asset has not been created yet.");

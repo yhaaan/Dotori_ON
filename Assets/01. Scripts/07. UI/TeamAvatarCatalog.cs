@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>One pickable profile icon: the stored key and the artwork it draws.</summary>
     public readonly struct AvatarOption
@@ -31,7 +31,7 @@ namespace TeamOverlay.UI
     /// </summary>
     [CreateAssetMenu(
         fileName = "TeamAvatarCatalog",
-        menuName = "Team Overlay/Avatar Catalog",
+        menuName = "DOTORI ON/Avatar Catalog",
         order = 1)]
     public sealed class TeamAvatarCatalog : ScriptableObject
     {

@@ -1,9 +1,9 @@
 using System;
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>One member as a row of numbers, with the button that erases them.</summary>
     public sealed class DeveloperDashboardRowView : MonoBehaviour
@@ -47,15 +47,15 @@ namespace TeamOverlay.UI
 
             if (_background != null)
             {
-                _background.color = isLocalMember ? TeamOverlayPalette.Card : TeamOverlayPalette.CardOffline;
+                _background.color = isLocalMember ? DOTORIONPalette.Card : DOTORIONPalette.CardOffline;
             }
 
             if (_nameLabel != null)
             {
                 _nameLabel.text = member.DisplayName + (member.IsActive ? string.Empty : " (비활성)");
                 _nameLabel.color = isLocalMember
-                    ? TeamOverlayPalette.Accent
-                    : TeamOverlayPalette.TextPrimary;
+                    ? DOTORIONPalette.Accent
+                    : DOTORIONPalette.TextPrimary;
             }
 
             if (_sessionsLabel != null) _sessionsLabel.text = member.SessionCount + "회";

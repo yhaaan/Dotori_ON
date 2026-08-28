@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TeamOverlay.Audio
+namespace DOTORION.Audio
 {
     /// <summary>Every sound the overlay can play, in one place.</summary>
     public enum TeamSound
@@ -20,10 +20,10 @@ namespace TeamOverlay.Audio
     /// rebuild of anything but the player.
     /// </summary>
     [CreateAssetMenu(
-        fileName = "TeamOverlaySounds",
-        menuName = "Team Overlay/Sounds",
+        fileName = "DOTORIONSounds",
+        menuName = "DOTORI ON/Sounds",
         order = 0)]
-    public sealed class TeamOverlaySounds : ScriptableObject
+    public sealed class DOTORIONSounds : ScriptableObject
     {
         [Header("효과음 (비우면 기본 알림음)")]
         [Tooltip("팀원이 출근했을 때. 비우면 코드로 만든 기본 알림음이 납니다.")]

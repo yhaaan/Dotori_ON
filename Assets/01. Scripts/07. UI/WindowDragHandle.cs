@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     public sealed class WindowDragHandle : MonoBehaviour, IPointerDownHandler
     {

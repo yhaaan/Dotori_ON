@@ -5,25 +5,25 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using TeamOverlay.Audio;
-using TeamOverlay.Backend.Mock;
-using TeamOverlay.Core;
-using TeamOverlay.Identity;
-using TeamOverlay.Platform.Windows;
-using TeamOverlay.Supabase;
+using DOTORION.Audio;
+using DOTORION.Backend.Mock;
+using DOTORION.Core;
+using DOTORION.Identity;
+using DOTORION.Platform.Windows;
+using DOTORION.Supabase;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>
     /// Composition root. Owns identity, the backend and the two editable UI
     /// prefabs, and moves the application between the sign-in screen and the
     /// overlay.
     /// </summary>
-    public sealed class TeamOverlayApp : MonoBehaviour
+    public sealed class DOTORIONApp : MonoBehaviour
     {
-        private const string AppPrefabResourcePath = "TeamOverlay/TeamOverlayApp";
+        private const string AppPrefabResourcePath = "DOTORION/DOTORIONApp";
 
         // Polling stands in for a Realtime subscription. Four members at three
         // seconds is a handful of requests a minute, and a dropped poll self-heals
@@ -52,14 +52,14 @@ namespace TeamOverlay.UI
         /// preference and nothing else, so it lives in PlayerPrefs rather than in
         /// the crash-safe identity store next to the things worth recovering.
         /// </summary>
-        private const string MiniModePreferenceKey = "TeamOverlay.MiniMode";
+        private const string MiniModePreferenceKey = "DOTORION.MiniMode";
 
         [Header("Prefab references")]
-        [SerializeField] private TeamOverlayView _mainViewPrefab;
+        [SerializeField] private DOTORIONView _mainViewPrefab;
         [SerializeField] private FirstRunNameView _firstRunNamePrefab;
 
         [Tooltip("효과음 설정 에셋. 비워 두면 코드로 만든 기본 알림음만 납니다.")]
-        [SerializeField] private TeamOverlaySounds _sounds;
+        [SerializeField] private DOTORIONSounds _sounds;
 
         [Tooltip("프로필 아이콘 목록 에셋. 비워 두면 아이콘 대신 이름 첫 글자만 보입니다.")]
         [SerializeField] private TeamAvatarCatalog _avatarCatalog;
@@ -67,7 +67,7 @@ namespace TeamOverlay.UI
         [Tooltip("Runs the overlay against the in-memory roster instead of Supabase. Identity still uses the real project.")]
         [SerializeField] private bool _useMockBackend;
 
-        private static TeamOverlayApp _instance;
+        private static DOTORIONApp _instance;
 
         private readonly ConcurrentQueue<TeamEvent> _pendingEvents = new ConcurrentQueue<TeamEvent>();
         private CancellationTokenSource _lifetime;
@@ -79,7 +79,7 @@ namespace TeamOverlay.UI
         private IMockTeamBackendControls _mockControls;
         private IDisposable _eventSubscription;
         private IReadOnlyList<MemberState> _members;
-        private TeamOverlayView _view;
+        private DOTORIONView _view;
         private FirstRunNameView _firstRunNameView;
         private NotificationTonePlayer _tonePlayer;
         private WindowsOverlayWindow _window;
@@ -104,7 +104,7 @@ namespace TeamOverlay.UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            if (_instance != null || FindAnyObjectByType<TeamOverlayApp>() != null)
+            if (_instance != null || FindAnyObjectByType<DOTORIONApp>() != null)
             {
                 return;
             }
@@ -114,7 +114,7 @@ namespace TeamOverlay.UI
             {
                 Debug.LogError(
                     "Resources/" + AppPrefabResourcePath + ".prefab is missing. " +
-                    "Run Team Overlay/Create Missing Editable UI Prefabs to recreate it.");
+                    "Run DOTORI ON/Create Missing Editable UI Prefabs to recreate it.");
                 return;
             }
 
@@ -152,7 +152,7 @@ namespace TeamOverlay.UI
 
             if (_firstRunNamePrefab == null)
             {
-                Debug.LogError("TeamOverlayApp is missing its first-run name prefab reference.");
+                Debug.LogError("DOTORIONApp is missing its first-run name prefab reference.");
                 return;
             }
 
@@ -578,7 +578,7 @@ namespace TeamOverlay.UI
 
             if (_mainViewPrefab == null)
             {
-                throw new InvalidOperationException("TeamOverlayApp is missing its main view prefab reference.");
+                throw new InvalidOperationException("DOTORIONApp is missing its main view prefab reference.");
             }
 
             _identityProfile = profile;

@@ -1,4 +1,4 @@
-# Team Overlay Supabase backend
+# DOTORI ON Supabase backend
 
 This directory contains the reproducible database part of milestone 2. It is
 designed for Supabase Auth, Postgres, Realtime, RLS, and optional Supabase Cron.

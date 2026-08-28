@@ -1,6 +1,6 @@
 using System;
 
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>
     /// A day here starts at 06:00, not midnight, matching the server's

@@ -1,10 +1,10 @@
 using System;
-using TeamOverlay.Identity;
+using DOTORION.Identity;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>The editable first-launch name modal prefab.</summary>
     public sealed class FirstRunNameView : MonoBehaviour
@@ -108,7 +108,7 @@ namespace TeamOverlay.UI
             {
                 _feedbackShowsBusy = true;
                 _feedbackText.text = "이름을 저장하고 있어요…";
-                _feedbackText.color = TeamOverlayPalette.TextSecondary;
+                _feedbackText.color = DOTORIONPalette.TextSecondary;
             }
             else if (_feedbackShowsBusy) ShowHint();
         }
@@ -118,7 +118,7 @@ namespace TeamOverlay.UI
             _feedbackShowsBusy = false;
             _feedbackText.text = string.IsNullOrWhiteSpace(message)
                 ? "이름을 저장하지 못했습니다. 다시 시도해주세요." : message;
-            _feedbackText.color = TeamOverlayPalette.Danger;
+            _feedbackText.color = DOTORIONPalette.Danger;
             if (!_isBusy) FocusNameInput();
         }
 
@@ -158,7 +158,7 @@ namespace TeamOverlay.UI
         {
             _feedbackShowsBusy = false;
             _feedbackText.text = _isRename ? RenameHint : DefaultHint;
-            _feedbackText.color = TeamOverlayPalette.TextSecondary;
+            _feedbackText.color = DOTORIONPalette.TextSecondary;
         }
 
         private void FocusNameInput()

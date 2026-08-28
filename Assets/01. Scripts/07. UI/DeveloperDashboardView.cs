@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>
     /// The developer dashboard. It exists so the team's rows can be read without
@@ -103,8 +103,8 @@ namespace TeamOverlay.UI
 
             _feedbackText.text = message ?? string.Empty;
             _feedbackText.color = isError
-                ? TeamOverlayPalette.Danger
-                : TeamOverlayPalette.TextSecondary;
+                ? DOTORIONPalette.Danger
+                : DOTORIONPalette.TextSecondary;
         }
 
         public void SetBusy(bool busy)

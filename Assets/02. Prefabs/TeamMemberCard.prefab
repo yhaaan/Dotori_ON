@@ -235,7 +235,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eff9a2d97ea210e4b925082e7d77d09f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TeamOverlay.Runtime::TeamOverlay.UI.TeamMemberCardView
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.TeamMemberCardView
   _background: {fileID: 1046949441046839606}
   _avatarBackground: {fileID: 3423625583136907719}
   _avatarIcon: {fileID: 2153959801103405982}
@@ -480,7 +480,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uAE40\uD558\uB298"
+  m_Text: "\uAE40\uD584\uCD08"
 --- !u!114 &1961062046088422119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,7 +492,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b63a941a0726f32469f4941d0c39978f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TeamOverlay.Runtime::TeamOverlay.UI.DoubleClickHandle
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DoubleClickHandle
 --- !u!1 &4018438312440899786
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>What the desk going quiet, or waking up, should do to the status.</summary>
     public enum IdleActivityAction

@@ -18,7 +18,7 @@ team members a simple human-readable identifier.
 
 ## Unity identity flow
 
-- On a clean launch, `TeamOverlayApp` waits for a valid name before constructing
+- On a clean launch, `DOTORIONApp` waits for a valid name before constructing
   the normal overlay view/backend.
 - Names are Unicode NFKC-normalized, trimmed, whitespace-collapsed, limited to
   16 text elements, and restricted to letters/numbers, spaces, `_`, and `-`.
@@ -38,7 +38,7 @@ Key implementation files:
 - `Assets/01. Scripts/01. Identity/DisplayNamePolicy.cs`
 - `Assets/01. Scripts/01. Identity/LocalIdentityProfileStore.cs`
 - `Assets/01. Scripts/07. UI/FirstRunNameView.cs`
-- `Assets/01. Scripts/07. UI/TeamOverlayApp.cs`
+- `Assets/01. Scripts/07. UI/DOTORIONApp.cs`
 - `Assets/01. Scripts/03. Backend/Mock/ProfiledMockTeamBackend.cs`
 
 ## Supabase database contract
@@ -69,7 +69,7 @@ SQL verification, hosted deployment, and Cron setup.
 - The runtime test identity was moved out of LocalLow into the ignored validation
   logs after verification, so it does not become the developer's real identity.
 
-Evidence is kept in the ignored `Logs/TeamOverlayValidation` directory, including
+Evidence is kept in the ignored `Logs/DOTORIONValidation` directory, including
 `editmode-m2-source-results.xml`, `build-m2-release.log`, and the first/second
 launch screenshots.
 

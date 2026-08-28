@@ -1,11 +1,12 @@
 {
-  "name": "TeamOverlay.Runtime",
-  "rootNamespace": "TeamOverlay",
+  "name": "DOTORION.Editor",
+  "rootNamespace": "DOTORION.Editor",
   "references": [
-    "UnityEngine.UI",
-    "Unity.InputSystem"
+    "DOTORION.Runtime"
   ],
-  "includePlatforms": [],
+  "includePlatforms": [
+    "Editor"
+  ],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": false,

@@ -82,7 +82,7 @@ the server clock.
 - `TeamStatisticsPanelView` owns the metric and re-sorts the cached ranking
   locally. It raises `PeriodChangeRequested` for the period, because that is the
   only one of the two that needs the server.
-- `TeamOverlayApp.LoadStatistics` stamps every load with an incrementing request
+- `DOTORIONApp.LoadStatistics` stamps every load with an incrementing request
   id. A slow answer for a period the person already left is dropped instead of
   landing on top of a newer one.
 - The panel is 424px tall and the window grows by exactly that much;
@@ -92,7 +92,7 @@ the server clock.
 
 - Unity EditMode tests: **55 passed, 0 failed** (batch mode, Unity 6000.3.8f1),
   up from the 34 of milestone 4.
-- `TeamOverlayCanvas.prefab` was regenerated in batch mode
+- `DOTORIONCanvas.prefab` was regenerated in batch mode
   (`RebuildMainViewFromCommandLine`), which is also what applies the bar-ratio
   layout tweak that had only reached the builder.
 - New EditMode coverage: period resolution for all three periods, the metric
@@ -105,7 +105,7 @@ the server clock.
 - **Not yet verified**: the migration has not been applied to the hosted project,
   so no statistics request has run against the new functions yet.
 
-Evidence is stored under ignored `Logs/TeamOverlayValidation`:
+Evidence is stored under ignored `Logs/DOTORIONValidation`:
 
 - `editmode-m5.xml`
 - `editmode-m5.log`

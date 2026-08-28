@@ -1,6 +1,6 @@
 using System;
 
-namespace TeamOverlay.Identity
+namespace DOTORION.Identity
 {
     /// <summary>
     /// Immutable local identity. ClientInstanceId is the stable device/install

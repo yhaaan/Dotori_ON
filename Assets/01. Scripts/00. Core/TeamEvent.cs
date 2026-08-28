@@ -1,6 +1,6 @@
 using System;
 
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>
     /// A realtime domain event. State is the complete member snapshot immediately

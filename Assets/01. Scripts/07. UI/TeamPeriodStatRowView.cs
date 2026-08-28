@@ -1,9 +1,9 @@
 using System;
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     public sealed class TeamPeriodStatRowView : MonoBehaviour
     {

@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using TeamOverlay.UI;
+using DOTORION.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.Tests.EditMode
+namespace DOTORION.Tests.EditMode
 {
     public sealed class PrefabAssetTests
     {
@@ -16,12 +16,12 @@ namespace TeamOverlay.Tests.EditMode
         {
             var card = AssetDatabase.LoadAssetAtPath<TeamMemberCardView>(
                 "Assets/02. Prefabs/TeamMemberCard.prefab");
-            var main = AssetDatabase.LoadAssetAtPath<TeamOverlayView>(
-                "Assets/02. Prefabs/TeamOverlayCanvas.prefab");
+            var main = AssetDatabase.LoadAssetAtPath<DOTORIONView>(
+                "Assets/02. Prefabs/DOTORIONCanvas.prefab");
             var name = AssetDatabase.LoadAssetAtPath<FirstRunNameView>(
                 "Assets/02. Prefabs/FirstRunNameModal.prefab");
-            var app = AssetDatabase.LoadAssetAtPath<TeamOverlayApp>(
-                "Assets/Resources/TeamOverlay/TeamOverlayApp.prefab");
+            var app = AssetDatabase.LoadAssetAtPath<DOTORIONApp>(
+                "Assets/Resources/DOTORION/DOTORIONApp.prefab");
 
             Assert.That(card, Is.Not.Null);
             Assert.That(main, Is.Not.Null);
@@ -222,9 +222,9 @@ namespace TeamOverlay.Tests.EditMode
         }
 
         [Test]
-        public void TeamOverlayCanvas_YamlHasNoDuplicateOrMissingLocalFileIds()
+        public void DOTORIONCanvas_YamlHasNoDuplicateOrMissingLocalFileIds()
         {
-            const string path = "Assets/02. Prefabs/TeamOverlayCanvas.prefab";
+            const string path = "Assets/02. Prefabs/DOTORIONCanvas.prefab";
             var yaml = File.ReadAllText(path);
             Assert.That(yaml, Does.Not.Contain("m_Script: {fileID: 0}"));
             var definitions = new HashSet<string>();
@@ -265,16 +265,16 @@ namespace TeamOverlay.Tests.EditMode
         public void StatisticsRows_ShowTotalAttendanceAndResizeBarsByRatio()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
-                "Assets/02. Prefabs/TeamOverlayCanvas.prefab");
+                "Assets/02. Prefabs/DOTORIONCanvas.prefab");
             var instance = Object.Instantiate(prefab);
             try
             {
                 var daily = instance.GetComponentsInChildren<TeamPeriodStatRowView>(true)[0];
                 daily.Bind(
-                    new TeamOverlay.Core.MemberPeriodStat(
+                    new DOTORION.Core.MemberPeriodStat(
                         new System.DateTime(2026, 8, 27), new System.DateTime(2026, 8, 27),
                         1800, 900, 300, 600),
-                    TeamOverlay.Core.StatisticsBucket.Day,
+                    DOTORION.Core.StatisticsBucket.Day,
                     1800,
                     3600);
                 var dailyData = new SerializedObject(daily);
@@ -287,10 +287,10 @@ namespace TeamOverlay.Tests.EditMode
                 Assert.That(attendanceBar.rectTransform.anchorMax.x, Is.EqualTo(0.5f).Within(0.001f));
 
                 daily.Bind(
-                    new TeamOverlay.Core.MemberPeriodStat(
+                    new DOTORION.Core.MemberPeriodStat(
                         new System.DateTime(2026, 8, 27), new System.DateTime(2026, 8, 27),
                         0, 0, 0, 0),
-                    TeamOverlay.Core.StatisticsBucket.Day,
+                    DOTORION.Core.StatisticsBucket.Day,
                     1800,
                     3600);
                 Assert.That(workBar.rectTransform.anchorMax.x, Is.Zero);
@@ -299,8 +299,8 @@ namespace TeamOverlay.Tests.EditMode
                 var ranking = instance.GetComponentsInChildren<TeamRankingRowView>(true)[0];
                 ranking.Bind(
                     1,
-                    new TeamOverlay.Core.TeamRankingEntry("member", "name", 0, 900, 1800, 300, 600, 0, 0),
-                    TeamOverlay.Core.RankingMetric.Work,
+                    new DOTORION.Core.TeamRankingEntry("member", "name", 0, 900, 1800, 300, 600, 0, 0),
+                    DOTORION.Core.RankingMetric.Work,
                     1800,
                     false);
                 var rankingData = new SerializedObject(ranking);
@@ -319,26 +319,26 @@ namespace TeamOverlay.Tests.EditMode
         public void StatisticsPanel_ReordersTheRankingLocallyWhenTheMetricChanges()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
-                "Assets/02. Prefabs/TeamOverlayCanvas.prefab");
+                "Assets/02. Prefabs/DOTORIONCanvas.prefab");
             var instance = Object.Instantiate(prefab);
             try
             {
                 var panel = instance.GetComponentInChildren<TeamStatisticsPanelView>(true);
                 panel.Initialize();
                 panel.Bind(
-                    TeamOverlay.Core.StatisticsRange.Resolve(
-                        TeamOverlay.Core.StatisticsPeriod.LastSevenDays,
+                    DOTORION.Core.StatisticsRange.Resolve(
+                        DOTORION.Core.StatisticsPeriod.LastSevenDays,
                         new System.DateTime(2026, 8, 27)),
                     new[]
                     {
-                        new TeamOverlay.Core.MemberPeriodStat(
+                        new DOTORION.Core.MemberPeriodStat(
                             new System.DateTime(2026, 8, 27), new System.DateTime(2026, 8, 27),
                             3600, 1800, 600, 1200)
                     },
                     new[]
                     {
-                        new TeamOverlay.Core.TeamRankingEntry("worker", "일벌레", 0, 3600, 7200, 60, 60, 120, 12),
-                        new TeamOverlay.Core.TeamRankingEntry("eater", "먹보", 1, 600, 7200, 60, 3000, 30, 0)
+                        new DOTORION.Core.TeamRankingEntry("worker", "일벌레", 0, 3600, 7200, 60, 60, 120, 12),
+                        new DOTORION.Core.TeamRankingEntry("eater", "먹보", 1, 600, 7200, 60, 3000, 30, 0)
                     },
                     "worker");
 

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using TeamOverlay.Core;
-using TeamOverlay.Supabase;
+using DOTORION.Core;
+using DOTORION.Supabase;
 
-namespace TeamOverlay.Tests.EditMode
+namespace DOTORION.Tests.EditMode
 {
     public sealed class SupabaseTeamBackendTests
     {

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>
     /// The month laid out as a calendar. A month of daily rows never fit the

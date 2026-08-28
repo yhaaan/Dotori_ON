@@ -1,6 +1,6 @@
 using System;
 
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>
     /// Immutable snapshot used by the UI. Every timestamp exposed by this type is

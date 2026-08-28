@@ -48,7 +48,7 @@ an `ITeamBackend` implementation backed by the deployed RPCs and Realtime tables
 - No disposable test user or member was created in the hosted project. The first
   real app launch is intentionally reserved for the user's chosen name.
 
-Evidence is stored under ignored `Logs/TeamOverlayValidation`:
+Evidence is stored under ignored `Logs/DOTORIONValidation`:
 
 - `editmode-m3-secure-store-results.xml`
 - `editmode-m3-secure-store.log`

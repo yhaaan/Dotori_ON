@@ -1,13 +1,13 @@
 using System;
 using NUnit.Framework;
-using TeamOverlay.Core;
-using TeamOverlay.UI;
+using DOTORION.Core;
+using DOTORION.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace TeamOverlay.Tests.EditMode
+namespace DOTORION.Tests.EditMode
 {
     public sealed class TeamCalendarViewTests
     {
@@ -18,7 +18,7 @@ namespace TeamOverlay.Tests.EditMode
         private static GameObject Canvas()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
-                "Assets/02. Prefabs/TeamOverlayCanvas.prefab");
+                "Assets/02. Prefabs/DOTORIONCanvas.prefab");
             Assert.That(prefab, Is.Not.Null);
             return UnityEngine.Object.Instantiate(prefab);
         }

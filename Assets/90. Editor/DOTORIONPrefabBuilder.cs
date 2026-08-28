@@ -1,27 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using TeamOverlay.Audio;
-using TeamOverlay.UI;
+using DOTORION.Audio;
+using DOTORION.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.Editor
+namespace DOTORION.Editor
 {
-    public static class TeamOverlayPrefabBuilder
+    public static class DOTORIONPrefabBuilder
     {
         public const string PrefabFolder = "Assets/02. Prefabs";
         public const string CardPath = PrefabFolder + "/TeamMemberCard.prefab";
-        public const string MainViewPath = PrefabFolder + "/TeamOverlayCanvas.prefab";
+        public const string MainViewPath = PrefabFolder + "/DOTORIONCanvas.prefab";
         public const string NameViewPath = PrefabFolder + "/FirstRunNameModal.prefab";
 
         // Resources.Load resolves paths relative to a folder named exactly
         // "Resources", so this one keeps its engine-given name and sits at the
         // Assets root rather than taking a numbered folder.
-        public const string ResourceFolder = "Assets/Resources/TeamOverlay";
-        public const string AppPath = ResourceFolder + "/TeamOverlayApp.prefab";
-        public const string SoundsPath = ResourceFolder + "/TeamOverlaySounds.asset";
+        public const string ResourceFolder = "Assets/Resources/DOTORION";
+        public const string AppPath = ResourceFolder + "/DOTORIONApp.prefab";
+        public const string SoundsPath = ResourceFolder + "/DOTORIONSounds.asset";
         public const string AvatarCatalogPath = ResourceFolder + "/TeamAvatarCatalog.asset";
 
         /// <summary>Where the team drops profile icon images.</summary>
@@ -102,22 +102,22 @@ namespace TeamOverlay.Editor
         internal const float AvatarCellSpacing = 4f;
         internal const int AvatarGridColumns = 8;
 
-        [MenuItem("Team Overlay/Create Missing Editable UI Prefabs")]
+        [MenuItem("DOTORI ON/Create Missing Editable UI Prefabs")]
         public static void CreateMissingPrefabs()
         {
             if (AllPrefabsExist())
             {
-                Debug.Log("All Team Overlay editable UI prefabs already exist. Nothing was overwritten.");
+                Debug.Log("All DOTORI ON editable UI prefabs already exist. Nothing was overwritten.");
                 Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(MainViewPath);
                 return;
             }
             BuildAll();
         }
 
-        [MenuItem("Team Overlay/Rebuild Editable UI Prefabs...")]
+        [MenuItem("DOTORI ON/Rebuild Editable UI Prefabs...")]
         public static void RebuildPrefabsWithConfirmation()
         {
-            if (!EditorUtility.DisplayDialog("Rebuild Team Overlay UI prefabs?",
+            if (!EditorUtility.DisplayDialog("Rebuild DOTORI ON UI prefabs?",
                     "This replaces manual Inspector/layout changes in all four generated prefabs.",
                     "Rebuild", "Cancel")) return;
             BuildAll();
@@ -130,7 +130,7 @@ namespace TeamOverlay.Editor
         /// The name modal and the app prefab are generated too, so a full rebuild
         /// churns their YAML alongside a change that never involved them.
         /// </summary>
-        [MenuItem("Team Overlay/Rebuild Card And Main View Prefabs")]
+        [MenuItem("DOTORI ON/Rebuild Card And Main View Prefabs")]
         public static void RebuildCardAndMainView()
         {
             BuildMainView(BuildCard());
@@ -158,7 +158,7 @@ namespace TeamOverlay.Editor
         {
             EnsureFolder("Assets", "02. Prefabs");
             EnsureFolder("Assets", "Resources");
-            EnsureFolder("Assets/Resources", "TeamOverlay");
+            EnsureFolder("Assets/Resources", "DOTORION");
 
             var cardPrefab = BuildCard();
             var mainPrefab = BuildMainView(cardPrefab);
@@ -167,12 +167,12 @@ namespace TeamOverlay.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Selection.activeObject = mainPrefab.gameObject;
-            Debug.Log("Created editable Team Overlay prefabs. Builds will not regenerate or overwrite them.");
+            Debug.Log("Created editable DOTORI ON prefabs. Builds will not regenerate or overwrite them.");
         }
 
         private static TeamMemberCardView BuildCard()
         {
-            var rootImage = UiFactory.CreateImage("TeamMemberCard", null, TeamOverlayPalette.CardOffline);
+            var rootImage = UiFactory.CreateImage("TeamMemberCard", null, DOTORIONPalette.CardOffline);
             var root = rootImage.gameObject;
             var rootRect = root.GetComponent<RectTransform>();
             rootRect.anchorMin = rootRect.anchorMax = new Vector2(0.5f, 1f);
@@ -189,13 +189,13 @@ namespace TeamOverlay.Editor
                 var font = PreviewFont();
 
                 var timer = UiFactory.CreateText("ElapsedTimer", root.transform, font, 12,
-                    TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary, FontStyle.Bold);
+                    TextAnchor.MiddleCenter, DOTORIONPalette.TextSecondary, FontStyle.Bold);
                 UiFactory.AnchorTop(timer.rectTransform, 4f, 5f, 100f, 18f);
                 timer.rectTransform.anchorMax = new Vector2(1f, 1f);
                 timer.rectTransform.sizeDelta = new Vector2(-8f, 18f);
                 timer.text = "00:42:18";
 
-                var avatar = UiFactory.CreateImage("Avatar", root.transform, TeamOverlayPalette.Working);
+                var avatar = UiFactory.CreateImage("Avatar", root.transform, DOTORIONPalette.Working);
                 var avatarRect = avatar.rectTransform;
                 avatarRect.anchorMin = avatarRect.anchorMax = new Vector2(0.5f, 1f);
                 avatarRect.pivot = new Vector2(0.5f, 1f);
@@ -203,14 +203,14 @@ namespace TeamOverlay.Editor
                 avatarRect.sizeDelta = new Vector2(AvatarIconSize, AvatarIconSize);
                 AttachAvatarPicking(avatar, out var avatarButton, out var avatarIcon);
                 var initial = UiFactory.CreateText("Initial", avatar.transform, font, 17,
-                    TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                    TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
                 initial.text = "김";
                 UiFactory.Stretch(initial.rectTransform);
 
                 var name = UiFactory.CreateText("Name", root.transform, font, 13,
-                    TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                    TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
                 SetCardLine(name, CardNameTop, 18f);
-                name.text = "김하늘";
+                name.text = "김햄초";
                 // Alone among the labels the name is clicked, so it is the only
                 // one that has to be a raycast target. The handle ships disabled:
                 // Bind turns it on for the local member's own card, once they
@@ -219,7 +219,7 @@ namespace TeamOverlay.Editor
                 var nameDoubleClick = name.gameObject.AddComponent<DoubleClickHandle>();
                 nameDoubleClick.enabled = false;
                 var status = UiFactory.CreateText("Status", root.transform, font, 11,
-                    TextAnchor.MiddleCenter, TeamOverlayPalette.Working, FontStyle.Bold);
+                    TextAnchor.MiddleCenter, DOTORIONPalette.Working, FontStyle.Bold);
                 SetCardLine(status, CardStatusTop, 18f);
                 status.text = "작업중";
                 var nudge = UiFactory.CreateButton("Nudge", root.transform, font, "\uCF55");
@@ -231,7 +231,7 @@ namespace TeamOverlay.Editor
                 nudgeRect.sizeDelta = new Vector2(22f, 18f);
 
                 var detail = UiFactory.CreateText("Detail", root.transform, font, 9,
-                    TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary);
+                    TextAnchor.MiddleCenter, DOTORIONPalette.TextSecondary);
                 SetCardLine(detail, CardDetailTop, 27f);
                 detail.horizontalOverflow = HorizontalWrapMode.Wrap;
                 detail.text = "출근 09:00";
@@ -247,10 +247,10 @@ namespace TeamOverlay.Editor
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
 
-        private static TeamOverlayView BuildMainView(TeamMemberCardView cardPrefab)
+        private static DOTORIONView BuildMainView(TeamMemberCardView cardPrefab)
         {
-            var root = new GameObject("TeamOverlayCanvas", typeof(RectTransform), typeof(Canvas),
-                typeof(CanvasScaler), typeof(GraphicRaycaster), typeof(TeamOverlayView));
+            var root = new GameObject("DOTORIONCanvas", typeof(RectTransform), typeof(Canvas),
+                typeof(CanvasScaler), typeof(GraphicRaycaster), typeof(DOTORIONView));
             try
             {
                 var canvas = root.GetComponent<Canvas>();
@@ -258,9 +258,9 @@ namespace TeamOverlay.Editor
                 canvas.sortingOrder = 1000;
                 ConfigureScaler(root.GetComponent<CanvasScaler>());
                 var font = PreviewFont();
-                var background = UiFactory.CreateImage("WindowBackground", root.transform, TeamOverlayPalette.Window);
+                var background = UiFactory.CreateImage("WindowBackground", root.transform, DOTORIONPalette.Window);
                 UiFactory.Stretch(background.rectTransform);
-                var topBar = UiFactory.CreateImage("TopBar", background.transform, TeamOverlayPalette.TopBar);
+                var topBar = UiFactory.CreateImage("TopBar", background.transform, DOTORIONPalette.TopBar);
                 topBar.rectTransform.anchorMin = new Vector2(0f, 1f);
                 topBar.rectTransform.anchorMax = new Vector2(1f, 1f);
                 topBar.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -270,11 +270,11 @@ namespace TeamOverlay.Editor
                 UiFactory.Stretch(dragArea.rectTransform, 0f, 0f, 271f, 0f);
                 var dragHandle = dragArea.gameObject.AddComponent<WindowDragHandle>();
                 var title = UiFactory.CreateText("Title", dragArea.transform, font, 12,
-                    TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
-                title.text = "Dotori ON";
+                    TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
+                title.text = "DOTORI ON";
                 UiFactory.Stretch(title.rectTransform, 10f, 0f, 0f, 0f);
                 var version = UiFactory.CreateText("Version", dragArea.transform, font, 9,
-                    TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+                    TextAnchor.MiddleLeft, DOTORIONPalette.TextSecondary);
                 version.text = "v0.0";
                 UiFactory.AnchorTop(version.rectTransform, 82f, 0f, 40f, 32f);
 
@@ -287,10 +287,10 @@ namespace TeamOverlay.Editor
                 // Button consumes its own pointer-down, so the window still drags
                 // from everywhere around it.
                 var dailyCheckIn = TopButtonAt(dragArea.transform, font, "DailyCheckIn", "출석",
-                    126f, 36f, TeamOverlayPalette.Accent);
+                    126f, 36f, DOTORIONPalette.Accent);
                 dailyCheckIn.GetComponentInChildren<Text>().fontSize = 9;
                 var checkInPoints = UiFactory.CreateText("DailyCheckInPoints", dragArea.transform, font, 9,
-                    TextAnchor.MiddleLeft, TeamOverlayPalette.Accent, FontStyle.Bold);
+                    TextAnchor.MiddleLeft, DOTORIONPalette.Accent, FontStyle.Bold);
                 checkInPoints.text = "0P";
                 UiFactory.AnchorTop(checkInPoints.rectTransform, 166f, 5f, 40f, 22f);
                 // Takes over the slot and the width the rename button had, so the
@@ -300,7 +300,7 @@ namespace TeamOverlay.Editor
                 var stats = TopButton(topBar.transform, font, "Statistics", "\uD1B5\uACC4", 219f, 48f);
                 var topmost = TopButton(topBar.transform, font, "AlwaysOnTop", "TOP", 63f, 38f);
                 var minimize = TopButton(topBar.transform, font, "Minimize", "—", 32f, 28f);
-                var exit = TopButton(topBar.transform, font, "Exit", "×", 3f, 27f, TeamOverlayPalette.Danger);
+                var exit = TopButton(topBar.transform, font, "Exit", "×", 3f, 27f, DOTORIONPalette.Danger);
 
                 var cardsRoot = UiFactory.CreateRect("MemberCards", background.transform);
                 var cardsRect = cardsRoot.GetComponent<RectTransform>();
@@ -322,18 +322,18 @@ namespace TeamOverlay.Editor
                     cards[i] = instance.GetComponent<TeamMemberCardView>();
                 }
 
-                var controls = UiFactory.CreateImage("LocalControls", background.transform, TeamOverlayPalette.ControlBar);
+                var controls = UiFactory.CreateImage("LocalControls", background.transform, DOTORIONPalette.ControlBar);
                 controls.rectTransform.anchorMin = new Vector2(0f, 1f);
                 controls.rectTransform.anchorMax = new Vector2(1f, 1f);
                 controls.rectTransform.pivot = new Vector2(0.5f, 1f);
                 controls.rectTransform.anchoredPosition = new Vector2(0f, -177f);
                 controls.rectTransform.sizeDelta = new Vector2(0f, 43f);
                 var checkIn = ControlButton(controls.transform, font, "CheckIn", "출근", -54f, 108f);
-                var checkOut = ControlButton(controls.transform, font, "CheckOut", "퇴근", -153f, 66f, TeamOverlayPalette.Danger);
+                var checkOut = ControlButton(controls.transform, font, "CheckOut", "퇴근", -153f, 66f, DOTORIONPalette.Danger);
                 var working = ControlButton(controls.transform, font, "Working", "작업중", -81f, 70f);
                 var rest = ControlButton(controls.transform, font, "Break", "쉬는중", -5f, 70f);
                 var meal = ControlButton(controls.transform, font, "Meal", "식사중", 71f, 70f);
-                var noteBackground = UiFactory.CreateImage("StatusNoteInput", controls.transform, TeamOverlayPalette.Window);
+                var noteBackground = UiFactory.CreateImage("StatusNoteInput", controls.transform, DOTORIONPalette.Window);
                 var noteRect = noteBackground.rectTransform;
                 noteRect.anchorMin = noteRect.anchorMax = new Vector2(0.5f, 1f);
                 noteRect.pivot = new Vector2(0f, 1f);
@@ -344,13 +344,13 @@ namespace TeamOverlay.Editor
                 noteInput.lineType = InputField.LineType.SingleLine;
                 // Matches the 24-character check on member_current_state.status_note.
                 noteInput.characterLimit = 24;
-                noteInput.caretColor = TeamOverlayPalette.TextPrimary;
+                noteInput.caretColor = DOTORIONPalette.TextPrimary;
                 var noteText = UiFactory.CreateText("Text", noteBackground.transform, font, 10,
-                    TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary);
+                    TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary);
                 UiFactory.Stretch(noteText.rectTransform, 8f, 2f, 8f, 2f);
                 var notePlaceholder = UiFactory.CreateText("Placeholder", noteBackground.transform, font, 10,
-                    TextAnchor.MiddleLeft, new Color(TeamOverlayPalette.TextSecondary.r,
-                        TeamOverlayPalette.TextSecondary.g, TeamOverlayPalette.TextSecondary.b, 0.68f));
+                    TextAnchor.MiddleLeft, new Color(DOTORIONPalette.TextSecondary.r,
+                        DOTORIONPalette.TextSecondary.g, DOTORIONPalette.TextSecondary.b, 0.68f));
                 notePlaceholder.text = "메모";
                 notePlaceholder.fontStyle = FontStyle.Italic;
                 UiFactory.Stretch(notePlaceholder.rectTransform, 8f, 2f, 8f, 2f);
@@ -358,7 +358,7 @@ namespace TeamOverlay.Editor
                 noteInput.placeholder = notePlaceholder;
 
                 var feedback = UiFactory.CreateText("Feedback", controls.transform, font, 8,
-                    TextAnchor.LowerCenter, TeamOverlayPalette.TextSecondary);
+                    TextAnchor.LowerCenter, DOTORIONPalette.TextSecondary);
                 feedback.text = "Supabase Auth 연결 · 팀 상태 Mock";
                 UiFactory.Stretch(feedback.rectTransform, 4f, 0f, 4f, 31f);
 
@@ -375,7 +375,7 @@ namespace TeamOverlay.Editor
                 // A child of the window background, like the statistics panel: it
                 // unfolds downwards under the overlay rather than replacing it.
                 var dashboard = BuildDashboardPanel(background.transform, font);
-                var view = root.GetComponent<TeamOverlayView>();
+                var view = root.GetComponent<DOTORIONView>();
                 var serialized = new SerializedObject(view);
                 serialized.FindProperty("_cards").arraySize = cards.Length;
                 for (var i = 0; i < cards.Length; i++) serialized.FindProperty("_cards").GetArrayElementAtIndex(i).objectReferenceValue = cards[i];
@@ -404,7 +404,7 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_miniPanel", miniPanel);
                 Set(serialized, "_dashboardPanel", dashboard);
                 serialized.ApplyModifiedPropertiesWithoutUndo();
-                return PrefabUtility.SaveAsPrefabAsset(root, MainViewPath).GetComponent<TeamOverlayView>();
+                return PrefabUtility.SaveAsPrefabAsset(root, MainViewPath).GetComponent<DOTORIONView>();
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
@@ -451,7 +451,7 @@ namespace TeamOverlay.Editor
         /// </summary>
         internal static AvatarPickerPanelView BuildAvatarPickerPanel(Transform parent, Font font)
         {
-            var panel = UiFactory.CreateImage("AvatarPickerPanel", parent, TeamOverlayPalette.TopBar);
+            var panel = UiFactory.CreateImage("AvatarPickerPanel", parent, DOTORIONPalette.TopBar);
             var panelRect = panel.rectTransform;
             panelRect.anchorMin = new Vector2(0f, 1f);
             panelRect.anchorMax = new Vector2(1f, 1f);
@@ -461,12 +461,12 @@ namespace TeamOverlay.Editor
             var panelView = panel.gameObject.AddComponent<AvatarPickerPanelView>();
 
             var heading = UiFactory.CreateText("Heading", panel.transform, font, 12,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
             heading.text = "\uD504\uB85C\uD544 \uC544\uC774\uCF58";
             UiFactory.AnchorTop(heading.rectTransform, 12f, 8f, 200f, 20f);
 
             var confirm = UiFactory.CreateButton("Confirm", panel.transform, font, "\uD655\uC778",
-                null, TeamOverlayPalette.Accent);
+                null, DOTORIONPalette.Accent);
             UiFactory.AnchorRight(confirm.GetComponent<RectTransform>(), 10f, 6f, 56f, 24f);
 
             // RectMask2D clips without needing a mask sprite, and the scroll rect
@@ -512,7 +512,7 @@ namespace TeamOverlay.Editor
             template.gameObject.SetActive(false);
 
             var feedback = UiFactory.CreateText("Feedback", panel.transform, font, 10,
-                TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary);
+                TextAnchor.MiddleCenter, DOTORIONPalette.TextSecondary);
             feedback.horizontalOverflow = HorizontalWrapMode.Wrap;
             feedback.verticalOverflow = VerticalWrapMode.Overflow;
             UiFactory.Stretch(feedback.rectTransform, 16f, 8f, 16f, 34f);
@@ -531,7 +531,7 @@ namespace TeamOverlay.Editor
         /// </summary>
         private static MiniOverlayPanelView BuildMiniPanel(Transform parent, Font font)
         {
-            var panel = UiFactory.CreateImage("MiniOverlayPanel", parent, TeamOverlayPalette.Window);
+            var panel = UiFactory.CreateImage("MiniOverlayPanel", parent, DOTORIONPalette.Window);
             var panelRect = panel.rectTransform;
             panelRect.anchorMin = panelRect.anchorMax = new Vector2(0f, 1f);
             panelRect.pivot = new Vector2(0f, 1f);
@@ -542,7 +542,7 @@ namespace TeamOverlay.Editor
             // The strip is the only part that drags, because a body that started
             // a native window drag on pointer down would swallow the first half
             // of the double click that brings the full overlay back.
-            var strip = UiFactory.CreateImage("MiniDragStrip", panel.transform, TeamOverlayPalette.TopBar);
+            var strip = UiFactory.CreateImage("MiniDragStrip", panel.transform, DOTORIONPalette.TopBar);
             strip.rectTransform.anchorMin = new Vector2(0f, 1f);
             strip.rectTransform.anchorMax = new Vector2(1f, 1f);
             strip.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -550,8 +550,8 @@ namespace TeamOverlay.Editor
             strip.rectTransform.sizeDelta = new Vector2(0f, MiniDragStripHeight);
             var dragHandle = strip.gameObject.AddComponent<WindowDragHandle>();
             var title = UiFactory.CreateText("Title", strip.transform, font, 9,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary, FontStyle.Bold);
-            title.text = "Dotori ON";
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextSecondary, FontStyle.Bold);
+            title.text = "DOTORI ON";
             UiFactory.Stretch(title.rectTransform, 6f, 0f, 6f, 0f);
 
             var rows = new MiniMemberRowView[MiniRowCount];
@@ -590,9 +590,9 @@ namespace TeamOverlay.Editor
             var rowView = row.AddComponent<MiniMemberRowView>();
 
             var name = UiFactory.CreateText("Name", row.transform, font, 11,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
             UiFactory.AnchorTop(name.rectTransform, 8f, 0f, 50f, MiniRowHeight);
-            name.text = "김하늘";
+            name.text = "김햄초";
             // Best fit rather than overflow: there is no room to spill into
             // before the pill, and a name shrunk a point or two still reads.
             name.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -600,19 +600,19 @@ namespace TeamOverlay.Editor
             name.resizeTextMinSize = 7;
             name.resizeTextMaxSize = 11;
 
-            var pill = UiFactory.CreateImage("Pill", row.transform, TeamOverlayPalette.Working);
+            var pill = UiFactory.CreateImage("Pill", row.transform, DOTORIONPalette.Working);
             UiFactory.AnchorRight(pill.rectTransform, 5f, 5f, 62f, 20f);
             pill.sprite = BuiltinSprite("UI/Skin/UISprite.psd");
             pill.type = Image.Type.Sliced;
             pill.raycastTarget = false;
 
-            var dot = UiFactory.CreateImage("Dot", pill.transform, TeamOverlayPalette.TextPrimary);
+            var dot = UiFactory.CreateImage("Dot", pill.transform, DOTORIONPalette.TextPrimary);
             UiFactory.AnchorTop(dot.rectTransform, 5f, 6f, 8f, 8f);
             dot.sprite = BuiltinSprite("UI/Skin/Knob.psd");
             dot.raycastTarget = false;
 
             var status = UiFactory.CreateText("Status", pill.transform, font, 10,
-                TextAnchor.MiddleCenter, TeamOverlayPalette.Window, FontStyle.Bold);
+                TextAnchor.MiddleCenter, DOTORIONPalette.Window, FontStyle.Bold);
             status.text = "작업중";
             UiFactory.Stretch(status.rectTransform, 16f, 0f, 5f, 0f);
 
@@ -633,7 +633,7 @@ namespace TeamOverlay.Editor
 
         private static TeamStatisticsPanelView BuildStatisticsPanel(Transform parent, Font font)
         {
-            var panel = UiFactory.CreateImage("StatisticsPanel", parent, TeamOverlayPalette.Window);
+            var panel = UiFactory.CreateImage("StatisticsPanel", parent, DOTORIONPalette.Window);
             var panelRect = panel.rectTransform;
             panelRect.anchorMin = new Vector2(0f, 1f);
             panelRect.anchorMax = new Vector2(1f, 1f);
@@ -645,16 +645,16 @@ namespace TeamOverlay.Editor
             var panelView = panel.gameObject.AddComponent<TeamStatisticsPanelView>();
 
             var heading = UiFactory.CreateText("Heading", panel.transform, font, 14,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
             heading.text = "\uD300 \uD1B5\uACC4";
             UiFactory.AnchorTop(heading.rectTransform, 14f, 8f, 150f, 24f);
             var period = UiFactory.CreateText("Period", panel.transform, font, 10,
-                TextAnchor.MiddleRight, TeamOverlayPalette.TextSecondary);
+                TextAnchor.MiddleRight, DOTORIONPalette.TextSecondary);
             period.text = "2026.08.21 - 2026.08.27";
             UiFactory.AnchorTop(period.rectTransform, 236f, 8f, 230f, 24f);
 
             var dailyTab = UiFactory.CreateButton("DailyTab", panel.transform, font, "\uB0B4 \uD1B5\uACC4", null,
-                TeamOverlayPalette.Accent);
+                DOTORIONPalette.Accent);
             UiFactory.AnchorTop(dailyTab.GetComponent<RectTransform>(), 14f, 39f, 88f, 28f);
             var rankingTab = UiFactory.CreateButton("RankingTab", panel.transform, font, "\uB7AD\uD0B9");
             UiFactory.AnchorTop(rankingTab.GetComponent<RectTransform>(), 108f, 39f, 88f, 28f);
@@ -667,7 +667,7 @@ namespace TeamOverlay.Editor
             {
                 periodButtons[index] = UiFactory.CreateButton(
                     periodNames[index], panel.transform, font, periodLabels[index], null,
-                    index == 0 ? TeamOverlayPalette.Accent : TeamOverlayPalette.Button);
+                    index == 0 ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
                 periodButtons[index].GetComponentInChildren<Text>().fontSize = 11;
                 UiFactory.AnchorTop(
                     periodButtons[index].GetComponent<RectTransform>(), 206f + index * 88f, 39f, 84f, 28f);
@@ -675,7 +675,7 @@ namespace TeamOverlay.Editor
 
             var dailyContent = CreateStatisticsContent("DailyContent", panel.transform);
             var summary = UiFactory.CreateText("Summary", dailyContent.transform, font, 10,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextSecondary);
             summary.text = "\uD569\uACC4 \uC791\uC5C5 00:00";
             UiFactory.AnchorTop(summary.rectTransform, 10f, 0f, 460f, 20f);
             var statRows = new TeamPeriodStatRowView[7];
@@ -697,7 +697,7 @@ namespace TeamOverlay.Editor
             {
                 metricButtons[index] = UiFactory.CreateButton(
                     metricNames[index], rankingContent.transform, font, metricLabels[index], null,
-                    index == 0 ? TeamOverlayPalette.Working : TeamOverlayPalette.Button);
+                    index == 0 ? DOTORIONPalette.Working : DOTORIONPalette.Button);
                 metricButtons[index].GetComponentInChildren<Text>().fontSize = 11;
                 UiFactory.AnchorTop(
                     metricButtons[index].GetComponent<RectTransform>(), 10f + index * 115f, 0f, 111f, 24f);
@@ -711,7 +711,7 @@ namespace TeamOverlay.Editor
             rankingContent.SetActive(false);
 
             var feedback = UiFactory.CreateText("StatisticsFeedback", panel.transform, font, 11,
-                TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary);
+                TextAnchor.MiddleCenter, DOTORIONPalette.TextSecondary);
             feedback.horizontalOverflow = HorizontalWrapMode.Wrap;
             feedback.text = "\uD1B5\uACC4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\u2026";
             UiFactory.AnchorTop(feedback.rectTransform, 30f, 150f, 420f, 70f);
@@ -755,7 +755,7 @@ namespace TeamOverlay.Editor
             for (var column = 0; column < weekdays.Length; column++)
             {
                 var label = UiFactory.CreateText("Weekday_" + weekdays[column], calendar.transform, font, 9,
-                    TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary, FontStyle.Bold);
+                    TextAnchor.MiddleCenter, DOTORIONPalette.TextSecondary, FontStyle.Bold);
                 label.text = weekdays[column];
                 UiFactory.AnchorTop(
                     label.rectTransform,
@@ -793,7 +793,7 @@ namespace TeamOverlay.Editor
             float top)
         {
             var background = UiFactory.CreateImage(
-                "CalendarDay_" + (index + 1), parent, TeamOverlayPalette.Card);
+                "CalendarDay_" + (index + 1), parent, DOTORIONPalette.Card);
             UiFactory.AnchorTop(
                 background.rectTransform, left, top, CalendarCellWidth, CalendarCellHeight);
             // The squares are the grid's only control: clicking any of them swaps
@@ -802,12 +802,12 @@ namespace TeamOverlay.Editor
             var cell = background.gameObject.AddComponent<TeamCalendarDayView>();
 
             var day = UiFactory.CreateText("Day", background.transform, font, 9,
-                TextAnchor.UpperLeft, TeamOverlayPalette.TextSecondary);
+                TextAnchor.UpperLeft, DOTORIONPalette.TextSecondary);
             day.text = "1";
             UiFactory.AnchorTop(day.rectTransform, 4f, 3f, 24f, 12f);
 
             var duration = UiFactory.CreateText("Duration", background.transform, font, 11,
-                TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
             duration.text = "00:00";
             // Tall enough for the three stacked lines of the breakdown, and
             // allowed to overflow so a tight fit clips nothing.
@@ -828,7 +828,7 @@ namespace TeamOverlay.Editor
         /// </summary>
         private static DeveloperDashboardView BuildDashboardPanel(Transform parent, Font font)
         {
-            var panel = UiFactory.CreateImage("DashboardPanel", parent, TeamOverlayPalette.Window);
+            var panel = UiFactory.CreateImage("DashboardPanel", parent, DOTORIONPalette.Window);
             var panelRect = panel.rectTransform;
             panelRect.anchorMin = new Vector2(0f, 1f);
             panelRect.anchorMax = new Vector2(1f, 1f);
@@ -838,7 +838,7 @@ namespace TeamOverlay.Editor
             var panelView = panel.gameObject.AddComponent<DeveloperDashboardView>();
 
             var heading = UiFactory.CreateText("Heading", panel.transform, font, 14,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
             heading.text = "\uAC1C\uBC1C\uC790 \uB300\uC2DC\uBCF4\uB4DC";
             UiFactory.AnchorTop(heading.rectTransform, 14f, 8f, 200f, 24f);
 
@@ -863,7 +863,7 @@ namespace TeamOverlay.Editor
             }
 
             var feedback = UiFactory.CreateText("DashboardFeedback", panel.transform, font, 10,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextSecondary);
             feedback.text = "\uBD88\uB7EC\uC624\uB294 \uC911\u2026";
             UiFactory.AnchorTop(feedback.rectTransform, 14f, 268f, 452f, 20f);
 
@@ -892,21 +892,21 @@ namespace TeamOverlay.Editor
             float top)
         {
             var background = UiFactory.CreateImage(
-                "DashboardRow_" + (index + 1), parent, TeamOverlayPalette.CardOffline);
+                "DashboardRow_" + (index + 1), parent, DOTORIONPalette.CardOffline);
             UiFactory.AnchorTop(background.rectTransform, 14f, top, 452f, DashboardRowHeight);
             var row = background.gameObject.AddComponent<DeveloperDashboardRowView>();
 
             var name = UiFactory.CreateText("Name", background.transform, font, 11,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
             UiFactory.AnchorTop(name.rectTransform, 10f, 0f, 120f, DashboardRowHeight);
-            name.text = "\uAE40\uD558\uB298";
+            name.text = "김햄초";
             var sessions = DashboardCell(background.transform, font, "Sessions", 134f, 60f, "12");
             var attendance = DashboardCell(background.transform, font, "Attendance", 198f, 80f, "48:20");
             var points = DashboardCell(background.transform, font, "Points", 282f, 60f, "120P");
             var lastSeen = DashboardCell(background.transform, font, "LastSeen", 346f, 90f, "08/27 19:02");
 
             var delete = UiFactory.CreateButton("Delete", background.transform, font,
-                "\uC0AD\uC81C", null, TeamOverlayPalette.Danger);
+                "\uC0AD\uC81C", null, DOTORIONPalette.Danger);
             delete.GetComponentInChildren<Text>().fontSize = 9;
             UiFactory.AnchorRight(delete.GetComponent<RectTransform>(), 6f, 5f, 42f, 22f);
 
@@ -926,7 +926,7 @@ namespace TeamOverlay.Editor
             string sample)
         {
             var text = UiFactory.CreateText(name, parent, font, 10,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextSecondary);
             UiFactory.AnchorTop(text.rectTransform, left, 0f, width, DashboardRowHeight);
             text.text = sample;
             return text;
@@ -948,13 +948,13 @@ namespace TeamOverlay.Editor
             UiFactory.Stretch(backdrop.rectTransform);
 
             message = UiFactory.CreateText("Message", backdrop.transform, font, 12,
-                TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
             message.text = "\uACC4\uC815\uACFC \uBAA8\uB4E0 \uAE30\uB85D\uC744 \uC9C0\uC6C1\uB2C8\uB2E4.";
             message.horizontalOverflow = HorizontalWrapMode.Wrap;
             UiFactory.AnchorTop(message.rectTransform, 40f, 110f, 400f, 44f);
 
             confirm = UiFactory.CreateButton("ConfirmDelete", backdrop.transform, font,
-                "\uC9C0\uC6C1\uB2C8\uB2E4", null, TeamOverlayPalette.Danger);
+                "\uC9C0\uC6C1\uB2C8\uB2E4", null, DOTORIONPalette.Danger);
             UiFactory.AnchorTop(confirm.GetComponent<RectTransform>(), 130f, 164f, 100f, 32f);
             cancel = UiFactory.CreateButton("CancelDelete", backdrop.transform, font, "\uCDE8\uC18C");
             UiFactory.AnchorTop(cancel.GetComponent<RectTransform>(), 250f, 164f, 100f, 32f);
@@ -977,25 +977,25 @@ namespace TeamOverlay.Editor
 
         private static TeamPeriodStatRowView BuildPeriodStatRow(Transform parent, Font font, float top)
         {
-            var background = UiFactory.CreateImage("StatRow", parent, TeamOverlayPalette.Card);
+            var background = UiFactory.CreateImage("StatRow", parent, DOTORIONPalette.Card);
             UiFactory.AnchorTop(background.rectTransform, 10f, top, 460f, 38f);
             var view = background.gameObject.AddComponent<TeamPeriodStatRowView>();
             var date = UiFactory.CreateText("Date", background.transform, font, 9,
-                TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
             UiFactory.AnchorTop(date.rectTransform, 6f, 0f, 70f, 38f);
             var work = UiFactory.CreateText("Work", background.transform, font, 9,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.Working, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.Working, FontStyle.Bold);
             UiFactory.AnchorTop(work.rectTransform, 80f, 1f, 72f, 17f);
             var attendance = UiFactory.CreateText("Attendance", background.transform, font, 9,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.Accent, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.Accent, FontStyle.Bold);
             UiFactory.AnchorTop(attendance.rectTransform, 274f, 1f, 91f, 17f);
             var other = UiFactory.CreateText("Other", background.transform, font, 9,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextSecondary);
             UiFactory.AnchorTop(other.rectTransform, 80f, 19f, 248f, 16f);
             var workBar = CreateFilledBar("WorkBar", background.transform, 154f, 7f, 110f,
-                TeamOverlayPalette.Working);
+                DOTORIONPalette.Working);
             var attendanceBar = CreateFilledBar("AttendanceBar", background.transform, 368f, 7f, 82f,
-                TeamOverlayPalette.Accent);
+                DOTORIONPalette.Accent);
             Assign(view,
                 ("_dateLabel", date), ("_workLabel", work), ("_attendanceLabel", attendance),
                 ("_otherLabel", other), ("_workBar", workBar), ("_attendanceBar", attendanceBar));
@@ -1004,29 +1004,29 @@ namespace TeamOverlay.Editor
 
         private static TeamRankingRowView BuildRankingRow(Transform parent, Font font, float top)
         {
-            var background = UiFactory.CreateImage("RankingRow", parent, TeamOverlayPalette.Card);
+            var background = UiFactory.CreateImage("RankingRow", parent, DOTORIONPalette.Card);
             UiFactory.AnchorTop(background.rectTransform, 10f, top, 460f, 50f);
             var view = background.gameObject.AddComponent<TeamRankingRowView>();
             var rank = UiFactory.CreateText("Rank", background.transform, font, 18,
-                TextAnchor.MiddleCenter, TeamOverlayPalette.Accent, FontStyle.Bold);
+                TextAnchor.MiddleCenter, DOTORIONPalette.Accent, FontStyle.Bold);
             UiFactory.AnchorTop(rank.rectTransform, 8f, 0f, 32f, 50f);
             var name = UiFactory.CreateText("Name", background.transform, font, 12,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
             UiFactory.AnchorTop(name.rectTransform, 46f, 3f, 104f, 22f);
             // Under the name, where a second line about the person fits without
             // crowding the numbers the ranking is actually sorted by.
             var points = UiFactory.CreateText("Points", background.transform, font, 9,
-                TextAnchor.UpperLeft, TeamOverlayPalette.Accent);
+                TextAnchor.UpperLeft, DOTORIONPalette.Accent);
             UiFactory.AnchorTop(points.rectTransform, 46f, 24f, 104f, 18f);
             points.text = "0P";
             var work = UiFactory.CreateText("Work", background.transform, font, 10,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.Working, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.Working, FontStyle.Bold);
             UiFactory.AnchorTop(work.rectTransform, 158f, 3f, 96f, 20f);
             var attendance = UiFactory.CreateText("Attendance", background.transform, font, 10,
-                TextAnchor.MiddleLeft, TeamOverlayPalette.Accent);
+                TextAnchor.MiddleLeft, DOTORIONPalette.Accent);
             UiFactory.AnchorTop(attendance.rectTransform, 265f, 3f, 110f, 20f);
             var workBar = CreateFilledBar("WorkBar", background.transform, 158f, 31f, 284f,
-                TeamOverlayPalette.Working);
+                DOTORIONPalette.Working);
             Assign(view,
                 ("_background", background), ("_rankLabel", rank), ("_nameLabel", name),
                 ("_pointsLabel", points), ("_workLabel", work),
@@ -1042,7 +1042,7 @@ namespace TeamOverlay.Editor
             float width,
             Color color)
         {
-            var track = UiFactory.CreateImage(name + "Track", parent, TeamOverlayPalette.Button);
+            var track = UiFactory.CreateImage(name + "Track", parent, DOTORIONPalette.Button);
             UiFactory.AnchorTop(track.rectTransform, left, top, width, 6f);
             var fill = UiFactory.CreateImage(name, track.transform, color);
             UiFactory.Stretch(fill.rectTransform);
@@ -1089,40 +1089,40 @@ namespace TeamOverlay.Editor
                 var font = PreviewFont();
                 var backdrop = UiFactory.CreateImage("ModalBackdrop", root.transform, new Color(0.025f, 0.035f, 0.055f, 0.88f));
                 UiFactory.Stretch(backdrop.rectTransform);
-                var panel = UiFactory.CreateImage("NamePanel", backdrop.transform, TeamOverlayPalette.Card);
+                var panel = UiFactory.CreateImage("NamePanel", backdrop.transform, DOTORIONPalette.Card);
                 var panelRect = panel.rectTransform;
                 panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(0.5f, 0.5f);
                 panelRect.sizeDelta = new Vector2(372f, 174f);
-                var accent = UiFactory.CreateImage("Accent", panel.transform, TeamOverlayPalette.Accent);
+                var accent = UiFactory.CreateImage("Accent", panel.transform, DOTORIONPalette.Accent);
                 UiFactory.AnchorTop(accent.rectTransform, 0f, 0f, 372f, 3f);
                 var title = UiFactory.CreateText("Title", panel.transform, font, 16, TextAnchor.MiddleLeft,
-                    TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                    DOTORIONPalette.TextPrimary, FontStyle.Bold);
                 title.text = "팀에서 사용할 이름을 알려주세요";
                 UiFactory.AnchorTop(title.rectTransform, 18f, 13f, 336f, 25f);
                 var description = UiFactory.CreateText("Description", panel.transform, font, 10,
-                    TextAnchor.UpperLeft, TeamOverlayPalette.TextSecondary);
+                    TextAnchor.UpperLeft, DOTORIONPalette.TextSecondary);
                 description.text = "다른 팀원에게 표시되는 이름입니다. 한글 이름도 사용할 수 있어요.";
                 description.horizontalOverflow = HorizontalWrapMode.Wrap;
                 UiFactory.AnchorTop(description.rectTransform, 18f, 42f, 336f, 28f);
 
-                var inputBackground = UiFactory.CreateImage("NameInput", panel.transform, TeamOverlayPalette.ControlBar);
+                var inputBackground = UiFactory.CreateImage("NameInput", panel.transform, DOTORIONPalette.ControlBar);
                 UiFactory.AnchorTop(inputBackground.rectTransform, 18f, 76f, 248f, 36f);
                 var input = inputBackground.gameObject.AddComponent<InputField>();
                 input.targetGraphic = inputBackground;
                 input.lineType = InputField.LineType.SingleLine;
                 input.characterLimit = 32;
-                input.caretColor = TeamOverlayPalette.TextPrimary;
+                input.caretColor = DOTORIONPalette.TextPrimary;
                 var inputText = UiFactory.CreateText("Text", inputBackground.transform, font, 13,
-                    TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary);
+                    TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary);
                 UiFactory.Stretch(inputText.rectTransform, 11f, 2f, 9f, 2f);
                 var placeholder = UiFactory.CreateText("Placeholder", inputBackground.transform, font, 12,
-                    TextAnchor.MiddleLeft, new Color(TeamOverlayPalette.TextSecondary.r, TeamOverlayPalette.TextSecondary.g, TeamOverlayPalette.TextSecondary.b, 0.68f));
-                placeholder.text = "예: 김하늘";
+                    TextAnchor.MiddleLeft, new Color(DOTORIONPalette.TextSecondary.r, DOTORIONPalette.TextSecondary.g, DOTORIONPalette.TextSecondary.b, 0.68f));
+                placeholder.text = "예: 김햄초";
                 placeholder.fontStyle = FontStyle.Italic;
                 UiFactory.Stretch(placeholder.rectTransform, 11f, 2f, 9f, 2f);
                 input.textComponent = inputText;
                 input.placeholder = placeholder;
-                var confirm = UiFactory.CreateButton("Confirm", panel.transform, font, "확인", null, TeamOverlayPalette.Accent);
+                var confirm = UiFactory.CreateButton("Confirm", panel.transform, font, "확인", null, DOTORIONPalette.Accent);
                 UiFactory.AnchorTop(confirm.GetComponent<RectTransform>(), 274f, 76f, 80f, 36f);
                 // Only a rename shows this. The first run has nothing behind it
                 // to go back to, so it stays hidden there.
@@ -1130,7 +1130,7 @@ namespace TeamOverlay.Editor
                 UiFactory.AnchorRight(cancel.GetComponent<RectTransform>(), 12f, 10f, 26f, 26f);
                 cancel.gameObject.SetActive(false);
                 var feedback = UiFactory.CreateText("Feedback", panel.transform, font, 10,
-                    TextAnchor.UpperLeft, TeamOverlayPalette.TextSecondary);
+                    TextAnchor.UpperLeft, DOTORIONPalette.TextSecondary);
                 feedback.text = "이름을 입력하면 팀 오버레이를 시작할 수 있어요.";
                 feedback.horizontalOverflow = HorizontalWrapMode.Wrap;
                 feedback.verticalOverflow = VerticalWrapMode.Overflow;
@@ -1143,13 +1143,13 @@ namespace TeamOverlay.Editor
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
 
-        private static void BuildApp(TeamOverlayView mainPrefab, FirstRunNameView namePrefab)
+        private static void BuildApp(DOTORIONView mainPrefab, FirstRunNameView namePrefab)
         {
-            var root = new GameObject("TeamOverlayApp", typeof(TeamOverlayApp));
+            var root = new GameObject("DOTORIONApp", typeof(DOTORIONApp));
             try
             {
                 Assign(
-                    root.GetComponent<TeamOverlayApp>(),
+                    root.GetComponent<DOTORIONApp>(),
                     ("_mainViewPrefab", mainPrefab),
                     ("_firstRunNamePrefab", namePrefab),
                     ("_sounds", EnsureSoundsAsset()),
@@ -1164,19 +1164,19 @@ namespace TeamOverlay.Editor
         /// again: it holds hand-picked clips, so a rebuild must not reset it the
         /// way it resets the generated prefabs.
         /// </summary>
-        [MenuItem("Team Overlay/Create Missing Sound Settings Asset")]
-        public static TeamOverlaySounds EnsureSoundsAsset()
+        [MenuItem("DOTORI ON/Create Missing Sound Settings Asset")]
+        public static DOTORIONSounds EnsureSoundsAsset()
         {
             EnsureFolder("Assets", "Resources");
-            EnsureFolder("Assets/Resources", "TeamOverlay");
-            var existing = AssetDatabase.LoadAssetAtPath<TeamOverlaySounds>(SoundsPath);
+            EnsureFolder("Assets/Resources", "DOTORION");
+            var existing = AssetDatabase.LoadAssetAtPath<DOTORIONSounds>(SoundsPath);
             if (existing != null)
             {
                 Selection.activeObject = existing;
                 return existing;
             }
 
-            var created = ScriptableObject.CreateInstance<TeamOverlaySounds>();
+            var created = ScriptableObject.CreateInstance<DOTORIONSounds>();
             AssetDatabase.CreateAsset(created, SoundsPath);
             AssetDatabase.SaveAssets();
             Selection.activeObject = created;
@@ -1189,11 +1189,11 @@ namespace TeamOverlay.Editor
         /// the same reason as the sound asset: it holds hand-picked artwork, so a
         /// prefab rebuild must not empty it.
         /// </summary>
-        [MenuItem("Team Overlay/Create Missing Avatar Catalog Asset")]
+        [MenuItem("DOTORI ON/Create Missing Avatar Catalog Asset")]
         public static TeamAvatarCatalog EnsureAvatarCatalogAsset()
         {
             EnsureFolder("Assets", "Resources");
-            EnsureFolder("Assets/Resources", "TeamOverlay");
+            EnsureFolder("Assets/Resources", "DOTORION");
             var existing = AssetDatabase.LoadAssetAtPath<TeamAvatarCatalog>(AvatarCatalogPath);
             if (existing != null)
             {
@@ -1212,7 +1212,7 @@ namespace TeamOverlay.Editor
         /// so adding an icon is dropping a file in a folder rather than also
         /// remembering to drag it into a list.
         /// </summary>
-        [MenuItem("Team Overlay/Refresh Avatar Catalog From Folder")]
+        [MenuItem("DOTORI ON/Refresh Avatar Catalog From Folder")]
         public static void RefreshAvatarCatalogFromFolder()
         {
             var catalog = EnsureAvatarCatalogAsset();

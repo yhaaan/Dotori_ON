@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TeamOverlay.Backend.Mock
+namespace DOTORION.Backend.Mock
 {
     /// <summary>
     /// Development-only controls kept out of ITeamBackend so production backends

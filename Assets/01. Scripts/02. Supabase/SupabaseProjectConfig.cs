@@ -1,4 +1,4 @@
-namespace TeamOverlay.Supabase
+namespace DOTORION.Supabase
 {
     /// <summary>
     /// Public client configuration. A publishable key is intentionally safe to
@@ -11,6 +11,6 @@ namespace TeamOverlay.Supabase
         public const string ProjectUrl = "https://pperuinfufndfathcosf.supabase.co";
         public const string PublishableKey = "sb_publishable_XXTLgr_HJhoIAUt2_X_FgA_DOVeuLa9";
         public const string CredentialTarget =
-            "ProjectDDD.TeamOverlay.SupabaseAuth." + ProjectRef;
+            "DOTORION.SupabaseAuth." + ProjectRef;
     }
 }

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using TeamOverlay.Backend.Mock;
-using TeamOverlay.Core;
+using DOTORION.Backend.Mock;
+using DOTORION.Core;
 
-namespace TeamOverlay.Tests.EditMode
+namespace DOTORION.Tests.EditMode
 {
     public sealed class MockTeamBackendTests
     {

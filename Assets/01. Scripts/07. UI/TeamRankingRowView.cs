@@ -1,8 +1,8 @@
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     public sealed class TeamRankingRowView : MonoBehaviour
     {
@@ -42,7 +42,7 @@ namespace TeamOverlay.UI
 
             _background.color = isLocalMember
                 ? new Color(0.14f, 0.25f, 0.37f, 1f)
-                : TeamOverlayPalette.Card;
+                : DOTORIONPalette.Card;
 
             // The second line is the number the ranked one is most often compared
             // against: work against the whole session, anything else against work.
@@ -69,10 +69,10 @@ namespace TeamOverlay.UI
         {
             switch (metric)
             {
-                case RankingMetric.Attendance: return TeamOverlayPalette.Accent;
-                case RankingMetric.Break: return TeamOverlayPalette.Break;
-                case RankingMetric.Meal: return TeamOverlayPalette.Meal;
-                default: return TeamOverlayPalette.Working;
+                case RankingMetric.Attendance: return DOTORIONPalette.Accent;
+                case RankingMetric.Break: return DOTORIONPalette.Break;
+                case RankingMetric.Meal: return DOTORIONPalette.Meal;
+                default: return DOTORIONPalette.Working;
             }
         }
     }

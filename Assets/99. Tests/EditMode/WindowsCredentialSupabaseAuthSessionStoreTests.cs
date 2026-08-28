@@ -1,15 +1,15 @@
 using System;
 using NUnit.Framework;
-using TeamOverlay.Supabase;
+using DOTORION.Supabase;
 
-namespace TeamOverlay.Tests.EditMode
+namespace DOTORION.Tests.EditMode
 {
     public sealed class WindowsCredentialSupabaseAuthSessionStoreTests
     {
         [Test]
         public void SaveLoadDelete_RoundTripsSessionInWindowsCredentialManager()
         {
-            var target = "ProjectDDD.TeamOverlay.Tests." + Guid.NewGuid().ToString("N");
+            var target = "ProjectDDD.DOTORION.Tests." + Guid.NewGuid().ToString("N");
             var store = new WindowsCredentialSupabaseAuthSessionStore(target);
             var expected = new SupabaseAuthSession(
                 new Guid("aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"),

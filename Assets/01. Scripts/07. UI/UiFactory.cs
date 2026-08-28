@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>Editor-prefab construction helpers and small runtime UI services.</summary>
     public static class UiFactory
@@ -44,11 +44,11 @@ namespace TeamOverlay.UI
         public static Button CreateButton(string name, Transform parent, Font font, string label,
             Action onClick = null, Color? background = null)
         {
-            var image = CreateImage(name, parent, background ?? TeamOverlayPalette.Button);
+            var image = CreateImage(name, parent, background ?? DOTORIONPalette.Button);
             var button = image.gameObject.AddComponent<Button>();
             var colors = button.colors;
             colors.normalColor = Color.white;
-            colors.highlightedColor = TeamOverlayPalette.ButtonHover;
+            colors.highlightedColor = DOTORIONPalette.ButtonHover;
             colors.pressedColor = new Color(0.72f, 0.78f, 0.88f, 1f);
             colors.selectedColor = Color.white;
             colors.disabledColor = new Color(0.48f, 0.52f, 0.58f, 0.55f);
@@ -58,7 +58,7 @@ namespace TeamOverlay.UI
             if (onClick != null) button.onClick.AddListener(() => onClick());
 
             var text = CreateText("Label", button.transform, font, 12, TextAnchor.MiddleCenter,
-                TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+                DOTORIONPalette.TextPrimary, FontStyle.Bold);
             text.text = label;
             Stretch(text.rectTransform);
             return button;
@@ -79,7 +79,7 @@ namespace TeamOverlay.UI
             var font = Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "Segoe UI", "Arial" }, 16);
             if (font != null)
             {
-                font.name = "Team Overlay UI Font";
+                font.name = "DOTORI ON UI Font";
                 return font;
             }
 #endif

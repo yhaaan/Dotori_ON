@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using UnityEngine;
 
-namespace TeamOverlay.Identity
+namespace DOTORION.Identity
 {
     public interface IIdentityProfileSerializer
     {

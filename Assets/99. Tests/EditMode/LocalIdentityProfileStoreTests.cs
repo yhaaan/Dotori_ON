@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
-using TeamOverlay.Identity;
+using DOTORION.Identity;
 
-namespace TeamOverlay.Tests.EditMode
+namespace DOTORION.Tests.EditMode
 {
     public sealed class LocalIdentityProfileStoreTests
     {

@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace TeamOverlay.Platform.Windows
+namespace DOTORION.Platform.Windows
 {
     internal static class WindowsNativeMethods
     {

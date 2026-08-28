@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85aa7cef31a39534e9203b0e08e9b85d, type: 3}
   m_Name: TeamAvatarCatalog
-  m_EditorClassIdentifier: TeamOverlay.Runtime::TeamOverlay.UI.TeamAvatarCatalog
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.TeamAvatarCatalog
   _icons:
   - {fileID: 21300000, guid: 76d424cbb54e18a4e9952b5d23afb89f, type: 3}
   - {fileID: 21300000, guid: ed48040a3e3c45b42a7127db01e825cf, type: 3}

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3103733795609774185}
   - component: {fileID: 8417173397024005556}
   m_Layer: 0
-  m_Name: TeamOverlayApp
+  m_Name: DOTORIONApp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,7 +43,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0633ed1f73ba1954a9b320d464552532, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TeamOverlay.Runtime::TeamOverlay.UI.TeamOverlayApp
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONApp
   _mainViewPrefab: {fileID: 2135190404135899458, guid: 1a6543019b12bf3498581c376625934d, type: 3}
   _firstRunNamePrefab: {fileID: 910186508334100652, guid: 14f346e48942508478593b678c89d7e6, type: 3}
   _sounds: {fileID: 11400000, guid: e9596c0c2135c784ab260791839c3cc8, type: 2}

@@ -1,8 +1,8 @@
 using System;
 using NUnit.Framework;
-using TeamOverlay.Core;
+using DOTORION.Core;
 
-namespace TeamOverlay.Tests.EditMode
+namespace DOTORION.Tests.EditMode
 {
     public sealed class StatisticsRangeTests
     {

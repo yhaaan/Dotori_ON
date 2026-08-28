@@ -1,10 +1,10 @@
 using System;
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>One square of the month calendar: a date and what was worked on it.</summary>
     public sealed class TeamCalendarDayView : MonoBehaviour, IPointerClickHandler
@@ -51,7 +51,7 @@ namespace TeamOverlay.UI
 
             if (_background != null)
             {
-                _background.color = Color.Lerp(TeamOverlayPalette.Card, TeamOverlayPalette.Working, fill);
+                _background.color = Color.Lerp(DOTORIONPalette.Card, DOTORIONPalette.Working, fill);
             }
 
             if (_dayLabel != null)
@@ -60,8 +60,8 @@ namespace TeamOverlay.UI
                 // Today keeps the accent whatever the fill is: it is the square
                 // the reader is looking for, and it is the one still running.
                 _dayLabel.color = isToday
-                    ? TeamOverlayPalette.Accent
-                    : (onBrightFill ? TeamOverlayPalette.Window : TeamOverlayPalette.TextSecondary);
+                    ? DOTORIONPalette.Accent
+                    : (onBrightFill ? DOTORIONPalette.Window : DOTORIONPalette.TextSecondary);
                 _dayLabel.fontStyle = isToday ? FontStyle.Bold : FontStyle.Normal;
             }
 
@@ -91,8 +91,8 @@ namespace TeamOverlay.UI
             {
                 _durationLabel.fontSize = TotalFontSize;
                 _durationLabel.color = onBrightFill
-                    ? TeamOverlayPalette.Window
-                    : TeamOverlayPalette.TextPrimary;
+                    ? DOTORIONPalette.Window
+                    : DOTORIONPalette.TextPrimary;
                 _durationLabel.text = TeamPeriodStatRowView.FormatDuration(attendance);
                 return;
             }
@@ -101,12 +101,12 @@ namespace TeamOverlay.UI
             // colours carry the meaning instead. They are the same three the
             // ranking metrics use, and the legend under the grid names them.
             _durationLabel.fontSize = BreakdownFontSize;
-            _durationLabel.color = TeamOverlayPalette.TextPrimary;
+            _durationLabel.color = DOTORIONPalette.TextPrimary;
             _durationLabel.text = string.Join(
                 "\n",
-                Tinted(stat.WorkSeconds, TeamOverlayPalette.Working),
-                Tinted(stat.BreakSeconds, TeamOverlayPalette.Break),
-                Tinted(stat.MealSeconds, TeamOverlayPalette.Meal));
+                Tinted(stat.WorkSeconds, DOTORIONPalette.Working),
+                Tinted(stat.BreakSeconds, DOTORIONPalette.Break),
+                Tinted(stat.MealSeconds, DOTORIONPalette.Meal));
         }
 
         private const int TotalFontSize = 11;

@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
-    public static class TeamOverlayPalette
+    public static class DOTORIONPalette
     {
         public static readonly Color Window = Hex("101621");
         public static readonly Color TopBar = Hex("171F2D");

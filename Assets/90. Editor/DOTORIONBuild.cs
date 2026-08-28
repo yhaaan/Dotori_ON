@@ -8,24 +8,24 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
-namespace TeamOverlay.Editor
+namespace DOTORION.Editor
 {
-    public static class TeamOverlayBuild
+    public static class DOTORIONBuild
     {
         private const string SceneFolder = "Assets/00. Scenes";
-        private const string ScenePath = SceneFolder + "/TeamOverlay.unity";
+        private const string ScenePath = SceneFolder + "/DOTORION.unity";
         private const string BuildPath = "Builds/Windows/DOTORI ON.exe";
 
-        [MenuItem("Team Overlay/Configure Project")]
+        [MenuItem("DOTORI ON/Configure Project")]
         public static void ConfigureProject()
         {
             if (!TryConfigureProject())
             {
-                Debug.LogWarning("Team Overlay configuration was cancelled because an open scene has unsaved changes.");
+                Debug.LogWarning("DOTORI ON configuration was cancelled because an open scene has unsaved changes.");
             }
         }
 
-        [MenuItem("Team Overlay/Build Windows x86_64")]
+        [MenuItem("DOTORI ON/Build Windows x86_64")]
         public static void BuildWindows()
         {
             if (!TryConfigureProject())
@@ -47,17 +47,17 @@ namespace TeamOverlay.Editor
             if (summary.result != BuildResult.Succeeded)
             {
                 throw new InvalidOperationException(
-                    $"Team Overlay Windows build failed: {summary.result} ({summary.totalErrors} errors)");
+                    $"DOTORI ON Windows build failed: {summary.result} ({summary.totalErrors} errors)");
             }
 
-            Debug.Log($"Team Overlay Windows build completed: {Path.GetFullPath(BuildPath)}");
+            Debug.Log($"DOTORI ON Windows build completed: {Path.GetFullPath(BuildPath)}");
         }
 
         public static void ConfigureProjectFromCommandLine()
         {
             if (!TryConfigureProject())
             {
-                throw new InvalidOperationException("Could not configure the Team Overlay project.");
+                throw new InvalidOperationException("Could not configure the DOTORI ON project.");
             }
         }
 
@@ -111,7 +111,7 @@ namespace TeamOverlay.Editor
             };
 
             AssetDatabase.SaveAssets();
-            Debug.Log("Team Overlay project configured for a 480x220 Windows mock build.");
+            Debug.Log("DOTORI ON project configured for a 480x220 Windows mock build.");
             return true;
         }
 
@@ -134,7 +134,7 @@ namespace TeamOverlay.Editor
 
             if (!EditorSceneManager.SaveScene(scene, ScenePath))
             {
-                throw new InvalidOperationException("Failed to create the Team Overlay bootstrap scene.");
+                throw new InvalidOperationException("Failed to create the DOTORI ON bootstrap scene.");
             }
         }
 

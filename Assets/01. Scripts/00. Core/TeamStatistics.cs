@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TeamOverlay.Core
+namespace DOTORION.Core
 {
     /// <summary>How wide a slice of history the statistics panel is showing.</summary>
     public enum StatisticsPeriod

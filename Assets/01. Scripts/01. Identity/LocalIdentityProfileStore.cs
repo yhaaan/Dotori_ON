@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace TeamOverlay.Identity
+namespace DOTORION.Identity
 {
     public enum IdentityProfileLoadStatus
     {

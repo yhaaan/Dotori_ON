@@ -1,9 +1,9 @@
 using System;
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>The editable per-member card prefab.</summary>
     public sealed class TeamMemberCardView : MonoBehaviour
@@ -110,18 +110,18 @@ namespace TeamOverlay.UI
             var isOnline = MemberStatusDisplay.IsOnline(member);
             var accent = MemberStatusDisplay.Accent(member);
 
-            _background.color = isOnline ? TeamOverlayPalette.Card : TeamOverlayPalette.CardOffline;
+            _background.color = isOnline ? DOTORIONPalette.Card : DOTORIONPalette.CardOffline;
             _avatarBackground.color = accent;
             BindAvatar(member, isOnline);
             _nameText.text = member.DisplayName;
-            _nameText.color = isLocalMember ? TeamOverlayPalette.Accent : TeamOverlayPalette.TextPrimary;
+            _nameText.color = isLocalMember ? DOTORIONPalette.Accent : DOTORIONPalette.TextPrimary;
             _statusText.text = MemberStatusDisplay.Label(member);
             _statusText.color = accent;
 
             if (isOnline && member.CheckedInAtUtc.HasValue)
             {
                 _timerText.text = FormatElapsed(member.GetAttendanceElapsed(nowUtc));
-                _timerText.color = TeamOverlayPalette.TextPrimary;
+                _timerText.color = DOTORIONPalette.TextPrimary;
 
                 // The note is what the person chose to say about right now, so it
                 // outranks the check-in time, which the timer already implies.
@@ -130,17 +130,17 @@ namespace TeamOverlay.UI
                     ? member.StatusNote
                     : "출근 " + FormatKoreaTime(member.CheckedInAtUtc.Value, includeDate: false);
                 _detailText.color = hasNote
-                    ? TeamOverlayPalette.TextPrimary
-                    : TeamOverlayPalette.TextSecondary;
+                    ? DOTORIONPalette.TextPrimary
+                    : DOTORIONPalette.TextSecondary;
             }
             else
             {
                 _timerText.text = "--:--:--";
-                _timerText.color = TeamOverlayPalette.Offline;
+                _timerText.color = DOTORIONPalette.Offline;
                 _detailText.text = member.LastCheckedOutAtUtc.HasValue
                     ? "마지막 퇴근\n" + FormatKoreaTime(member.LastCheckedOutAtUtc.Value, includeDate: true)
                     : "출근 기록 없음";
-                _detailText.color = TeamOverlayPalette.TextSecondary;
+                _detailText.color = DOTORIONPalette.TextSecondary;
             }
         }
 

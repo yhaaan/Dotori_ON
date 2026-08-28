@@ -1,8 +1,8 @@
-using TeamOverlay.Core;
+using DOTORION.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TeamOverlay.UI
+namespace DOTORION.UI
 {
     /// <summary>
     /// One line of the mini overlay: a name and a status pill, and nothing else.
@@ -27,8 +27,8 @@ namespace TeamOverlay.UI
             {
                 _nameText.text = member.DisplayName;
                 _nameText.color = isOnline
-                    ? TeamOverlayPalette.TextPrimary
-                    : TeamOverlayPalette.TextSecondary;
+                    ? DOTORIONPalette.TextPrimary
+                    : DOTORIONPalette.TextSecondary;
             }
 
             if (_pill != null) _pill.color = accent;
@@ -36,11 +36,11 @@ namespace TeamOverlay.UI
             // one. Every online colour in the palette is a light pastel and the
             // usual near-white label disappears into it. The dot stays light for
             // the same reason in reverse: it has to read against the pill.
-            if (_dot != null) _dot.color = TeamOverlayPalette.TextPrimary;
+            if (_dot != null) _dot.color = DOTORIONPalette.TextPrimary;
             if (_statusText != null)
             {
                 _statusText.text = MemberStatusDisplay.Label(member);
-                _statusText.color = TeamOverlayPalette.Window;
+                _statusText.color = DOTORIONPalette.Window;
             }
         }
     }
