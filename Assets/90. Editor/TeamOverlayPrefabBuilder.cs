@@ -63,8 +63,7 @@ namespace TeamOverlay.Editor
         private const float CalendarHeaderHeight = 14f;
         private const float CalendarLeft = 9f;
         private const float CalendarCellWidth = 65f;
-        private const float CalendarCellHeight = 44f;
-        private const float CalendarLegendHeight = 14f;
+        private const float CalendarCellHeight = 46f;
         private const float CalendarCellGap = 1f;
 
         /// <summary>
@@ -749,20 +748,7 @@ namespace TeamOverlay.Editor
                     CalendarHeaderHeight + 2f + (row * (CalendarCellHeight + CalendarCellGap)));
             }
 
-            // Under the grid: six rows of 44 plus the header leave just enough,
-            // and a square that can be clicked looks exactly like one that cannot.
-            var legend = UiFactory.CreateText("Legend", calendar.transform, font, 9,
-                TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary);
-            legend.text = "칸을 누르면 작업 · 휴식 · 식사";
-            UiFactory.AnchorTop(
-                legend.rectTransform,
-                CalendarLeft,
-                CalendarHeaderHeight + 4f + (TeamCalendarView.WeekCount * (CalendarCellHeight + CalendarCellGap)),
-                464f,
-                CalendarLegendHeight);
-
             var serialized = new SerializedObject(calendarView);
-            Set(serialized, "_legendLabel", legend);
             SetArray(serialized, "_cells", cells);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             calendar.SetActive(false);

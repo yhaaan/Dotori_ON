@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using TeamOverlay.Core;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace TeamOverlay.UI
 {
@@ -25,8 +24,6 @@ namespace TeamOverlay.UI
 
         [Header("Prefab references")]
         [SerializeField] private TeamCalendarDayView[] _cells = new TeamCalendarDayView[CellCount];
-        [SerializeField] private Text _legendLabel;
-
         private StatisticsRange _range;
         private IReadOnlyList<MemberPeriodStat> _stats;
         private bool _showBreakdown;
@@ -49,8 +46,6 @@ namespace TeamOverlay.UI
             {
                 if (cell != null) cell.Clicked += ToggleBreakdown;
             }
-
-            BindLegend();
         }
 
         private void ToggleBreakdown()
@@ -68,7 +63,6 @@ namespace TeamOverlay.UI
         {
             _range = range;
             _stats = stats;
-            BindLegend();
             if (range == null || range.Bucket != StatisticsBucket.Day)
             {
                 ClearAll();
@@ -123,30 +117,6 @@ namespace TeamOverlay.UI
             {
                 cell?.Clear();
             }
-        }
-
-        /// <summary>
-        /// Names the three colours in breakdown mode, and in total mode says the
-        /// breakdown is there at all. A square that can be clicked looks exactly
-        /// like one that cannot, so something has to say so.
-        /// </summary>
-        private void BindLegend()
-        {
-            if (_legendLabel == null)
-            {
-                return;
-            }
-
-            _legendLabel.text = _showBreakdown
-                ? Tinted("작업", TeamOverlayPalette.Working) + "  " +
-                  Tinted("휴식", TeamOverlayPalette.Break) + "  " +
-                  Tinted("식사", TeamOverlayPalette.Meal) + "  ·  칸을 누르면 총 시간"
-                : "칸을 누르면 작업 · 휴식 · 식사";
-        }
-
-        private static string Tinted(string label, Color color)
-        {
-            return "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + label + "</color>";
         }
 
         /// <summary>
