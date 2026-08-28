@@ -14,7 +14,7 @@ namespace TeamOverlay.Editor
     {
         private const string SceneFolder = "Assets/00. Scenes";
         private const string ScenePath = SceneFolder + "/TeamOverlay.unity";
-        private const string BuildPath = "Builds/Windows/TeamOverlay.exe";
+        private const string BuildPath = "Builds/Windows/DOTORI ON.exe";
 
         [MenuItem("Team Overlay/Configure Project")]
         public static void ConfigureProject()
@@ -73,8 +73,8 @@ namespace TeamOverlay.Editor
                 return false;
             }
 
-            PlayerSettings.companyName = "Project DDD";
-            PlayerSettings.productName = "Team Overlay";
+            PlayerSettings.companyName = "DotoriDoguldan";
+            PlayerSettings.productName = "DOTORI ON";
             PlayerSettings.defaultScreenWidth = 480;
             PlayerSettings.defaultScreenHeight = 220;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
