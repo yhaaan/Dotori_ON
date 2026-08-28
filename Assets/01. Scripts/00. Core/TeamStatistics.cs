@@ -67,11 +67,14 @@ namespace TeamOverlay.Core
             switch (period)
             {
                 case StatisticsPeriod.ThisMonth:
+                    // Days, not weeks: the month is drawn as a calendar, where a
+                    // week-sized bucket has nowhere to go. Thirty-one rows would
+                    // not fit a list, but thirty-one squares fit a grid.
                     return new StatisticsRange(
                         period,
                         new DateTime(today.Year, today.Month, 1),
                         today,
-                        StatisticsBucket.Week);
+                        StatisticsBucket.Day);
                 case StatisticsPeriod.AllTime:
                     return new StatisticsRange(period, null, today, StatisticsBucket.Month);
                 default:

@@ -35,6 +35,7 @@ namespace TeamOverlay.UI
         [SerializeField] private Text _feedbackText;
         [SerializeField] private TeamPeriodStatRowView[] _statRows;
         [SerializeField] private TeamRankingRowView[] _rankingRows;
+        [SerializeField] private TeamCalendarView _calendar;
 
         private bool _initialized;
         private bool _showRanking;
@@ -119,7 +120,7 @@ namespace TeamOverlay.UI
             _localMemberId = localMemberId;
             _ranking = ranking ?? Array.Empty<TeamRankingEntry>();
             var buckets = stats ?? Array.Empty<MemberPeriodStat>();
-            BindStatRows(buckets);
+            BindDailyContent(range, buckets);
             BindSummary(buckets);
             BindRankingRows();
             ShowFeedback(string.Empty, false);
@@ -134,6 +135,29 @@ namespace TeamOverlay.UI
             {
                 _summaryText.text = string.Empty;
             }
+        }
+
+        /// <summary>
+        /// The month gets the calendar and the other periods keep the list. They
+        /// are two readings of the same daily buckets, so only one is ever shown
+        /// and the other is emptied rather than left holding a stale month.
+        /// </summary>
+        private void BindDailyContent(StatisticsRange range, IReadOnlyList<MemberPeriodStat> stats)
+        {
+            var showCalendar = range != null && range.Period == StatisticsPeriod.ThisMonth;
+            if (_calendar != null)
+            {
+                _calendar.gameObject.SetActive(showCalendar);
+            }
+
+            if (showCalendar)
+            {
+                foreach (var row in _statRows) row.gameObject.SetActive(false);
+                _calendar?.Bind(range, stats);
+                return;
+            }
+
+            BindStatRows(stats);
         }
 
         private void BindStatRows(IReadOnlyList<MemberPeriodStat> stats)
@@ -225,6 +249,10 @@ namespace TeamOverlay.UI
         {
             foreach (var row in _statRows) row.gameObject.SetActive(visible);
             foreach (var row in _rankingRows) row.gameObject.SetActive(visible);
+            if (!visible)
+            {
+                _calendar?.ClearAll();
+            }
         }
 
         private void SetPeriodLabel(StatisticsRange range)

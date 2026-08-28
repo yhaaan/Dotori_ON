@@ -53,6 +53,18 @@ namespace TeamOverlay.Editor
         internal const float MiniRowHeight = 30f;
         internal const float MiniRowSpacing = 2f;
         internal const int MiniRowCount = 4;
+        /// <summary>
+        /// Month calendar geometry, in pixels inside the statistics content area.
+        /// Seven columns across the panel's 480 with a pixel between them, and six
+        /// rows that fit the 340 the content area has.
+        /// </summary>
+        private const float CalendarTop = 24f;
+        private const float CalendarHeight = 306f;
+        private const float CalendarHeaderHeight = 14f;
+        private const float CalendarLeft = 9f;
+        private const float CalendarCellWidth = 65f;
+        private const float CalendarCellHeight = 46f;
+        private const float CalendarCellGap = 1f;
 
         /// <summary>
         /// How large a profile icon is drawn, on the card and in the picker
@@ -642,6 +654,11 @@ namespace TeamOverlay.Editor
                 statRows[index] = BuildPeriodStatRow(dailyContent.transform, font, 24f + index * 42f);
             }
 
+            // Shares the space the rows use, because the month and the other
+            // periods are two readings of the same daily buckets and only one of
+            // them is ever on screen.
+            var calendar = BuildCalendar(dailyContent.transform, font);
+
             var rankingContent = CreateStatisticsContent("RankingContent", panel.transform);
             var metricButtons = new Button[4];
             var metricLabels = new[] { "\uC791\uC5C5", "\uCD1D\uC2DC\uAC04", "\uD734\uC2DD", "\uC2DD\uC0AC" };
@@ -682,9 +699,89 @@ namespace TeamOverlay.Editor
             SetArray(serialized, "_metricButtons", metricButtons);
             SetArray(serialized, "_statRows", statRows);
             SetArray(serialized, "_rankingRows", rankingRows);
+            Set(serialized, "_calendar", calendar);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             panel.gameObject.SetActive(false);
             return panelView;
+        }
+
+        /// <summary>
+        /// Six rows of seven squares under a weekday header, Monday first. The
+        /// sixth row is there for the months that need it - a 31 day month
+        /// starting on a Saturday - and stays switched off the rest of the time.
+        /// </summary>
+        private static TeamCalendarView BuildCalendar(Transform parent, Font font)
+        {
+            var calendar = UiFactory.CreateRect("Calendar", parent);
+            var calendarRect = calendar.GetComponent<RectTransform>();
+            calendarRect.anchorMin = new Vector2(0f, 1f);
+            calendarRect.anchorMax = new Vector2(1f, 1f);
+            calendarRect.pivot = new Vector2(0.5f, 1f);
+            calendarRect.anchoredPosition = new Vector2(0f, -CalendarTop);
+            calendarRect.sizeDelta = new Vector2(0f, CalendarHeight);
+            var calendarView = calendar.AddComponent<TeamCalendarView>();
+
+            var weekdays = new[] { "월", "화", "수", "목", "금", "토", "일" };
+            for (var column = 0; column < weekdays.Length; column++)
+            {
+                var label = UiFactory.CreateText("Weekday_" + weekdays[column], calendar.transform, font, 9,
+                    TextAnchor.MiddleCenter, TeamOverlayPalette.TextSecondary, FontStyle.Bold);
+                label.text = weekdays[column];
+                UiFactory.AnchorTop(
+                    label.rectTransform,
+                    CalendarLeft + (column * (CalendarCellWidth + CalendarCellGap)),
+                    0f,
+                    CalendarCellWidth,
+                    CalendarHeaderHeight);
+            }
+
+            var cells = new TeamCalendarDayView[TeamCalendarView.CellCount];
+            for (var index = 0; index < cells.Length; index++)
+            {
+                var column = index % TeamCalendarView.DaysPerWeek;
+                var row = index / TeamCalendarView.DaysPerWeek;
+                cells[index] = BuildCalendarDay(
+                    calendar.transform,
+                    font,
+                    index,
+                    CalendarLeft + (column * (CalendarCellWidth + CalendarCellGap)),
+                    CalendarHeaderHeight + 2f + (row * (CalendarCellHeight + CalendarCellGap)));
+            }
+
+            var serialized = new SerializedObject(calendarView);
+            SetArray(serialized, "_cells", cells);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            calendar.SetActive(false);
+            return calendarView;
+        }
+
+        private static TeamCalendarDayView BuildCalendarDay(
+            Transform parent,
+            Font font,
+            int index,
+            float left,
+            float top)
+        {
+            var background = UiFactory.CreateImage(
+                "CalendarDay_" + (index + 1), parent, TeamOverlayPalette.Card);
+            UiFactory.AnchorTop(
+                background.rectTransform, left, top, CalendarCellWidth, CalendarCellHeight);
+            background.raycastTarget = false;
+            var cell = background.gameObject.AddComponent<TeamCalendarDayView>();
+
+            var day = UiFactory.CreateText("Day", background.transform, font, 9,
+                TextAnchor.UpperLeft, TeamOverlayPalette.TextSecondary);
+            day.text = "1";
+            UiFactory.AnchorTop(day.rectTransform, 4f, 3f, 24f, 12f);
+
+            var duration = UiFactory.CreateText("Duration", background.transform, font, 11,
+                TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+            duration.text = "00:00";
+            UiFactory.AnchorTop(duration.rectTransform, 0f, 16f, CalendarCellWidth, 20f);
+
+            Assign(cell,
+                ("_background", background), ("_dayLabel", day), ("_durationLabel", duration));
+            return cell;
         }
 
         private static GameObject CreateStatisticsContent(string name, Transform parent)
