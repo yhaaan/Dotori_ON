@@ -73,7 +73,7 @@ namespace TeamOverlay.UI
             var firstOfMonth = new DateTime(month.Year, month.Month, 1);
             var daysInMonth = DateTime.DaysInMonth(month.Year, month.Month);
             var offset = MondayFirstIndex(firstOfMonth.DayOfWeek);
-            var today = DateTime.Today;
+            var today = TeamDay.Today;
 
             var byDay = new Dictionary<int, MemberPeriodStat>();
             var maximumSeconds = 0;

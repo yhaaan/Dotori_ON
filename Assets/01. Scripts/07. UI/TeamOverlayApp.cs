@@ -767,7 +767,7 @@ namespace TeamOverlay.UI
 
             try
             {
-                var range = StatisticsRange.Resolve(StatisticsPeriod.LastSevenDays, DateTime.Today);
+                var range = StatisticsRange.Resolve(StatisticsPeriod.LastSevenDays, TeamDay.Today);
                 var stats = await statistics.GetPeriodStatsAsync(
                     requestedBackend.LocalMemberId,
                     range,
@@ -801,7 +801,7 @@ namespace TeamOverlay.UI
                 return null;
             }
 
-            var today = DateTime.Today;
+            var today = TeamDay.Today;
             foreach (var stat in stats)
             {
                 if (stat.BucketStart == today && stat.HasActivity)
@@ -1268,7 +1268,7 @@ namespace TeamOverlay.UI
         {
             _statisticsPeriod = period;
             _view.SetStatisticsPeriod(period);
-            var range = StatisticsRange.Resolve(period, DateTime.Today);
+            var range = StatisticsRange.Resolve(period, TeamDay.Today);
             _view.ShowStatisticsLoading(range);
 
             var requestedBackend = _backend;
