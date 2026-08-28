@@ -654,7 +654,95 @@ namespace TeamOverlay.UI
 
         private void HandleCheckOutRequested()
         {
-            RunMutation(token => _backend.CheckOutAsync(CheckoutReason.Manual, token), "퇴근했습니다.");
+            RunMutation(
+                token => _backend.CheckOutAsync(CheckoutReason.Manual, token),
+                "퇴근했습니다.",
+                ShowTodaySummary);
+        }
+
+        /// <summary>
+        /// Replaces the plain "퇴근했습니다" with what the day came to. The numbers
+        /// are the ones the statistics panel already reports, asked for after the
+        /// checkout has landed so the session just closed is counted in them.
+        /// A backend without history, or a day the server has nothing for, simply
+        /// leaves the original message alone.
+        /// </summary>
+        private async void ShowTodaySummary()
+        {
+            var requestedBackend = _backend;
+            if (!(requestedBackend is ITeamStatistics statistics))
+            {
+                return;
+            }
+
+            try
+            {
+                var range = StatisticsRange.Resolve(StatisticsPeriod.LastSevenDays, DateTime.Today);
+                var stats = await statistics.GetPeriodStatsAsync(
+                    requestedBackend.LocalMemberId,
+                    range,
+                    _lifetime.Token);
+                if (_view == null || !ReferenceEquals(_backend, requestedBackend))
+                {
+                    return;
+                }
+
+                var today = TodayFrom(stats);
+                if (today != null)
+                {
+                    _view.ShowFeedback(TodaySummary(today));
+                }
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                // A summary is a nicety on top of a checkout that already
+                // succeeded, so a failure here stays in the log.
+                Debug.LogWarning("Could not load the checkout summary: " + exception.Message);
+            }
+        }
+
+        private static MemberPeriodStat TodayFrom(IReadOnlyList<MemberPeriodStat> stats)
+        {
+            if (stats == null)
+            {
+                return null;
+            }
+
+            var today = DateTime.Today;
+            foreach (var stat in stats)
+            {
+                if (stat.BucketStart == today && stat.HasActivity)
+                {
+                    return stat;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Break and meal are dropped when they are zero rather than shown as
+        /// 00:00: the line has to fit the feedback strip, and a zero says nothing
+        /// the reader did not already know.
+        /// </summary>
+        private static string TodaySummary(MemberPeriodStat today)
+        {
+            var summary = "오늘 근무 " + TeamPeriodStatRowView.FormatDuration(today.AttendanceSeconds) +
+                          " · 작업 " + TeamPeriodStatRowView.FormatDuration(today.WorkSeconds);
+            if (today.BreakSeconds > 0)
+            {
+                summary += " · 휴식 " + TeamPeriodStatRowView.FormatDuration(today.BreakSeconds);
+            }
+
+            if (today.MealSeconds > 0)
+            {
+                summary += " · 식사 " + TeamPeriodStatRowView.FormatDuration(today.MealSeconds);
+            }
+
+            return summary;
         }
 
         /// <summary>
@@ -1034,7 +1122,14 @@ namespace TeamOverlay.UI
             }
         }
 
-        private async void RunMutation(Func<CancellationToken, Task> mutation, string successMessage)
+        /// <summary>
+        /// <paramref name="onSucceeded"/> runs only after the change landed and
+        /// the roster was refreshed, so a follow-up request sees the new state.
+        /// </summary>
+        private async void RunMutation(
+            Func<CancellationToken, Task> mutation,
+            string successMessage,
+            Action onSucceeded = null)
         {
             if (_mutationInProgress || _quitting || _signOutInProgress || _backend == null || _view == null)
             {
@@ -1048,6 +1143,7 @@ namespace TeamOverlay.UI
                 await mutation(_lifetime.Token);
                 await RefreshStateAsync();
                 _view?.ShowFeedback(successMessage);
+                onSucceeded?.Invoke();
             }
             catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
             {
