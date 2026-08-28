@@ -973,9 +973,10 @@ namespace TeamOverlay.UI
                 _view.SetDailyCheckIn(state, true);
                 // Pressing twice is an ordinary thing to do, so the second press
                 // reports where things stand rather than reading as a failure.
+                var streak = state.StreakDays > 0 ? " · " + state.StreakDays + "일 연속" : string.Empty;
                 _view.ShowFeedback(state.AwardedPoints > 0
-                    ? "출석했습니다. +" + state.AwardedPoints + "P (누적 " + state.TotalPoints + "P)"
-                    : "오늘은 이미 출석했습니다. 누적 " + state.TotalPoints + "P");
+                    ? "출석했습니다. +" + state.AwardedPoints + "P (누적 " + state.TotalPoints + "P)" + streak
+                    : "오늘은 이미 출석했습니다. 누적 " + state.TotalPoints + "P" + streak);
             }
             catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
             {

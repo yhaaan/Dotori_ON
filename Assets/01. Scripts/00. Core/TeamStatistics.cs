@@ -151,7 +151,9 @@ namespace TeamOverlay.Core
             int workSeconds,
             int attendanceSeconds,
             int breakSeconds,
-            int mealSeconds)
+            int mealSeconds,
+            int totalPoints,
+            int streakDays)
         {
             if (string.IsNullOrWhiteSpace(memberId))
             {
@@ -165,6 +167,8 @@ namespace TeamOverlay.Core
             AttendanceSeconds = Math.Max(0, attendanceSeconds);
             BreakSeconds = Math.Max(0, breakSeconds);
             MealSeconds = Math.Max(0, mealSeconds);
+            TotalPoints = Math.Max(0, totalPoints);
+            StreakDays = Math.Max(0, streakDays);
         }
 
         public string MemberId { get; }
@@ -180,6 +184,16 @@ namespace TeamOverlay.Core
         public int BreakSeconds { get; }
 
         public int MealSeconds { get; }
+
+        /// <summary>
+        /// Check-in points and the run of days behind them. Unlike everything
+        /// else here they do not belong to the ranked date range - they are the
+        /// whole record - and they travel with the entry because the ranking is
+        /// the screen where teammates are read side by side.
+        /// </summary>
+        public int TotalPoints { get; }
+
+        public int StreakDays { get; }
 
         public int SecondsFor(RankingMetric metric)
         {

@@ -276,21 +276,23 @@ namespace TeamOverlay.Editor
                 var version = UiFactory.CreateText("Version", dragArea.transform, font, 9,
                     TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
                 version.text = "v0.0";
-                UiFactory.AnchorTop(version.rectTransform, 82f, 0f, 60f, 32f);
+                UiFactory.AnchorTop(version.rectTransform, 82f, 0f, 40f, 32f);
 
                 Button fake = null;
                 var teamNudge = TopButton(topBar.transform, font, "TeamNudge", "전체호출", 105f, 52f);
                 teamNudge.GetComponentInChildren<Text>().fontSize = 9;
-                // The strip between the drag area and the first button was empty,
-                // which is the only place left on the bar wide enough for a label
-                // that grows as the total does.
-                var dailyCheckIn = TopButton(topBar.transform, font, "DailyCheckIn", "출석", 160f, 36f,
-                    TeamOverlayPalette.Accent);
+                // Inside the drag area, which is the only part of the bar with
+                // room left: everything to the right of it is buttons, edge to
+                // edge, and the first attempt at this sat underneath 소형. A
+                // Button consumes its own pointer-down, so the window still drags
+                // from everywhere around it.
+                var dailyCheckIn = TopButtonAt(dragArea.transform, font, "DailyCheckIn", "출석",
+                    126f, 36f, TeamOverlayPalette.Accent);
                 dailyCheckIn.GetComponentInChildren<Text>().fontSize = 9;
-                var checkInPoints = UiFactory.CreateText("DailyCheckInPoints", topBar.transform, font, 9,
-                    TextAnchor.MiddleRight, TeamOverlayPalette.Accent, FontStyle.Bold);
+                var checkInPoints = UiFactory.CreateText("DailyCheckInPoints", dragArea.transform, font, 9,
+                    TextAnchor.MiddleLeft, TeamOverlayPalette.Accent, FontStyle.Bold);
                 checkInPoints.text = "0P";
-                UiFactory.AnchorRight(checkInPoints.rectTransform, 200f, 5f, 40f, 22f);
+                UiFactory.AnchorTop(checkInPoints.rectTransform, 166f, 5f, 40f, 22f);
                 // Takes over the slot and the width the rename button had, so the
                 // rest of the bar keeps the offsets it was tuned with. Renaming
                 // moved onto the name it changes, where a double click does it.
@@ -1011,6 +1013,12 @@ namespace TeamOverlay.Editor
             var name = UiFactory.CreateText("Name", background.transform, font, 12,
                 TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
             UiFactory.AnchorTop(name.rectTransform, 46f, 3f, 104f, 22f);
+            // Under the name, where a second line about the person fits without
+            // crowding the numbers the ranking is actually sorted by.
+            var points = UiFactory.CreateText("Points", background.transform, font, 9,
+                TextAnchor.UpperLeft, TeamOverlayPalette.Accent);
+            UiFactory.AnchorTop(points.rectTransform, 46f, 24f, 104f, 18f);
+            points.text = "0P";
             var work = UiFactory.CreateText("Work", background.transform, font, 10,
                 TextAnchor.MiddleLeft, TeamOverlayPalette.Working, FontStyle.Bold);
             UiFactory.AnchorTop(work.rectTransform, 158f, 3f, 96f, 20f);
@@ -1021,7 +1029,8 @@ namespace TeamOverlay.Editor
                 TeamOverlayPalette.Working);
             Assign(view,
                 ("_background", background), ("_rankLabel", rank), ("_nameLabel", name),
-                ("_workLabel", work), ("_attendanceLabel", attendance), ("_workBar", workBar));
+                ("_pointsLabel", points), ("_workLabel", work),
+                ("_attendanceLabel", attendance), ("_workBar", workBar));
             return view;
         }
 
@@ -1042,6 +1051,18 @@ namespace TeamOverlay.Editor
             fill.rectTransform.anchoredPosition = Vector2.zero;
             fill.rectTransform.sizeDelta = Vector2.zero;
             return fill;
+        }
+
+        /// <summary>
+        /// A top-bar button placed from the left. The usual one measures from the
+        /// right, which is what the packed right-hand side of the bar needs.
+        /// </summary>
+        private static Button TopButtonAt(Transform parent, Font font, string name, string label,
+            float left, float width, Color? color = null)
+        {
+            var button = UiFactory.CreateButton(name, parent, font, label, null, color);
+            UiFactory.AnchorTop(button.GetComponent<RectTransform>(), left, 4f, width, 24f);
+            return button;
         }
 
         private static void SetArray<T>(SerializedObject serialized, string name, T[] values)

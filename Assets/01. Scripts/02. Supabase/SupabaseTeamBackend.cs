@@ -362,7 +362,9 @@ namespace TeamOverlay.Supabase
                     item.work_seconds,
                     item.attendance_seconds,
                     item.break_seconds,
-                    item.meal_seconds));
+                    item.meal_seconds,
+                    item.total_points,
+                    item.streak_days));
             }
 
             return new ReadOnlyCollection<TeamRankingEntry>(results);
@@ -503,7 +505,8 @@ namespace TeamOverlay.Supabase
             }
 
             var row = document.items[0];
-            return new DailyCheckInState(row.claimed, row.total_points, row.awarded);
+            return new DailyCheckInState(
+                row.claimed, row.total_points, row.awarded, row.streak_days);
         }
 
         public async Task SendHeartbeatAsync(CancellationToken cancellationToken)
@@ -984,6 +987,7 @@ namespace TeamOverlay.Supabase
             // same meaning a claim that arrived second has.
             public int awarded;
             public int total_points;
+            public int streak_days;
         }
 
         [Serializable]
@@ -1025,6 +1029,8 @@ namespace TeamOverlay.Supabase
             public int attendance_seconds;
             public int break_seconds;
             public int meal_seconds;
+            public int total_points;
+            public int streak_days;
         }
 
         [Serializable]

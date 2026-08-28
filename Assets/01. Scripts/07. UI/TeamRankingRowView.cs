@@ -9,6 +9,7 @@ namespace TeamOverlay.UI
         [SerializeField] private Image _background;
         [SerializeField] private Text _rankLabel;
         [SerializeField] private Text _nameLabel;
+        [SerializeField] private Text _pointsLabel;
         [SerializeField] private Text _workLabel;
         [SerializeField] private Text _attendanceLabel;
         [SerializeField] private Image _workBar;
@@ -22,6 +23,14 @@ namespace TeamOverlay.UI
         {
             _rankLabel.text = rank.ToString();
             _nameLabel.text = entry.DisplayName;
+            if (_pointsLabel != null)
+            {
+                // A streak of zero is left off rather than shown as "0일 연속",
+                // which reads as a boast about nothing.
+                _pointsLabel.text = entry.StreakDays > 0
+                    ? entry.TotalPoints + "P  ·  " + entry.StreakDays + "일 연속"
+                    : entry.TotalPoints + "P";
+            }
             _workLabel.text = MetricName(metric) + " "
                 + TeamPeriodStatRowView.FormatDuration(entry.SecondsFor(metric));
             _workLabel.color = MetricColor(metric);

@@ -10,17 +10,29 @@ namespace TeamOverlay.Core
     /// </summary>
     public sealed class DailyCheckInState
     {
-        public DailyCheckInState(bool claimedToday, int totalPoints, int awardedPoints)
+        public DailyCheckInState(
+            bool claimedToday,
+            int totalPoints,
+            int awardedPoints,
+            int streakDays)
         {
             ClaimedToday = claimedToday;
             TotalPoints = totalPoints < 0 ? 0 : totalPoints;
             AwardedPoints = awardedPoints < 0 ? 0 : awardedPoints;
+            StreakDays = streakDays < 0 ? 0 : streakDays;
         }
 
         /// <summary>True once today has been claimed, however it was found out.</summary>
         public bool ClaimedToday { get; }
 
         public int TotalPoints { get; }
+
+        /// <summary>
+        /// Days in a row, ending today or yesterday. Yesterday counts so the
+        /// number does not read as broken every morning before the button is
+        /// pressed; a run that ended earlier than that is over and reads zero.
+        /// </summary>
+        public int StreakDays { get; }
 
         /// <summary>
         /// What this particular call earned. Zero when reading the status, and
