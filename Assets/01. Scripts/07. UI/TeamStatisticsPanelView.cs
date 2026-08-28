@@ -61,6 +61,7 @@ namespace TeamOverlay.UI
             }
 
             _initialized = true;
+            _calendar?.Initialize();
             _dailyTabButton?.onClick.AddListener(() => SelectTab(false));
             _rankingTabButton?.onClick.AddListener(() => SelectTab(true));
 

@@ -4,6 +4,7 @@ using TeamOverlay.Core;
 using TeamOverlay.UI;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace TeamOverlay.Tests.EditMode
@@ -49,6 +50,7 @@ namespace TeamOverlay.Tests.EditMode
         private static MemberPeriodStat Day(int dayOfMonth, int workSeconds)
         {
             var date = new DateTime(2026, 8, dayOfMonth);
+            // Attendance first: the square shows the total until it is clicked.
             return new MemberPeriodStat(date, date, workSeconds, workSeconds, 0, 0);
         }
 
@@ -141,6 +143,50 @@ namespace TeamOverlay.Tests.EditMode
                 {
                     Assert.That(cell.gameObject.activeSelf, Is.False);
                 }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(canvas);
+            }
+        }
+
+        [Test]
+        public void ClickingASquare_SwapsEverySquareBetweenTheTotalAndTheBreakdown()
+        {
+            var canvas = Canvas();
+            try
+            {
+                var calendar = canvas.GetComponentInChildren<TeamCalendarView>(true);
+                calendar.Initialize();
+                var date = new DateTime(2026, 8, 3);
+                calendar.Bind(
+                    StatisticsRange.Resolve(StatisticsPeriod.ThisMonth, new DateTime(2026, 8, 27)),
+                    new[] { new MemberPeriodStat(date, date, 32400, 20400, 4200, 3000) });
+
+                var cells = Cells(canvas);
+                // The 3rd is a Monday: offset five plus two squares. The square
+                // opens on the total, which is the whole open-to-close span.
+                Assert.That(DurationLabel(cells[7]), Is.EqualTo("09:00"));
+
+                cells[7].OnPointerClick(new PointerEventData(null)
+                {
+                    button = PointerEventData.InputButton.Left
+                });
+
+                // Work, break and meal, coloured rather than labelled because
+                // three labels do not fit a square this size.
+                var breakdown = DurationLabel(cells[7]);
+                Assert.That(breakdown, Does.Contain("05:40"));
+                Assert.That(breakdown, Does.Contain("01:10"));
+                Assert.That(breakdown, Does.Contain("00:50"));
+                Assert.That(breakdown, Does.Not.Contain("09:00"));
+
+                // Any square toggles, so the same one puts it back.
+                cells[7].OnPointerClick(new PointerEventData(null)
+                {
+                    button = PointerEventData.InputButton.Left
+                });
+                Assert.That(DurationLabel(cells[7]), Is.EqualTo("09:00"));
             }
             finally
             {

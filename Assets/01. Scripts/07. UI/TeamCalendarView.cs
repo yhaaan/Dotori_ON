@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TeamOverlay.Core;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TeamOverlay.UI
 {
@@ -24,6 +25,39 @@ namespace TeamOverlay.UI
 
         [Header("Prefab references")]
         [SerializeField] private TeamCalendarDayView[] _cells = new TeamCalendarDayView[CellCount];
+        [SerializeField] private Text _legendLabel;
+
+        private StatisticsRange _range;
+        private IReadOnlyList<MemberPeriodStat> _stats;
+        private bool _showBreakdown;
+        private bool _initialized;
+
+        /// <summary>
+        /// Squares are only clickable to swap what every square shows, so which
+        /// one was hit does not matter. Hooking them here rather than in the
+        /// prefab keeps the grid's one interaction in one place.
+        /// </summary>
+        public void Initialize()
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            _initialized = true;
+            foreach (var cell in _cells)
+            {
+                if (cell != null) cell.Clicked += ToggleBreakdown;
+            }
+
+            BindLegend();
+        }
+
+        private void ToggleBreakdown()
+        {
+            _showBreakdown = !_showBreakdown;
+            Bind(_range, _stats);
+        }
 
         /// <summary>
         /// Fills the grid from daily buckets. Anything that is not a day bucket is
@@ -32,6 +66,9 @@ namespace TeamOverlay.UI
         /// </summary>
         public void Bind(StatisticsRange range, IReadOnlyList<MemberPeriodStat> stats)
         {
+            _range = range;
+            _stats = stats;
+            BindLegend();
             if (range == null || range.Bucket != StatisticsBucket.Day)
             {
                 ClearAll();
@@ -56,9 +93,9 @@ namespace TeamOverlay.UI
                     }
 
                     byDay[stat.BucketStart.Day] = stat;
-                    if (stat.WorkSeconds > maximumSeconds)
+                    if (stat.AttendanceSeconds > maximumSeconds)
                     {
-                        maximumSeconds = stat.WorkSeconds;
+                        maximumSeconds = stat.AttendanceSeconds;
                     }
                 }
             }
@@ -76,7 +113,7 @@ namespace TeamOverlay.UI
 
                 byDay.TryGetValue(dayOfMonth, out var stat);
                 var date = firstOfMonth.AddDays(dayOfMonth - 1);
-                cell.Bind(dayOfMonth, stat, maximumSeconds, date == today);
+                cell.Bind(dayOfMonth, stat, maximumSeconds, date == today, _showBreakdown);
             }
         }
 
@@ -86,6 +123,30 @@ namespace TeamOverlay.UI
             {
                 cell?.Clear();
             }
+        }
+
+        /// <summary>
+        /// Names the three colours in breakdown mode, and in total mode says the
+        /// breakdown is there at all. A square that can be clicked looks exactly
+        /// like one that cannot, so something has to say so.
+        /// </summary>
+        private void BindLegend()
+        {
+            if (_legendLabel == null)
+            {
+                return;
+            }
+
+            _legendLabel.text = _showBreakdown
+                ? Tinted("작업", TeamOverlayPalette.Working) + "  " +
+                  Tinted("휴식", TeamOverlayPalette.Break) + "  " +
+                  Tinted("식사", TeamOverlayPalette.Meal) + "  ·  칸을 누르면 총 시간"
+                : "칸을 누르면 작업 · 휴식 · 식사";
+        }
+
+        private static string Tinted(string label, Color color)
+        {
+            return "<color=#" + ColorUtility.ToHtmlStringRGB(color) + ">" + label + "</color>";
         }
 
         /// <summary>
