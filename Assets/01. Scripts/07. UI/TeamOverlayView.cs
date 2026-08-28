@@ -409,7 +409,7 @@ namespace TeamOverlay.UI
                     isClockedIn
                     && member.MemberId != localMemberId
                     && member.AttendanceStatus == AttendanceStatus.ClockedIn);
-                card.SetRenameAvailable(member.MemberId == localMemberId && !isClockedIn);
+                card.SetRenameAvailable(member.MemberId == localMemberId);
             }
 
             _miniPanel?.Bind(orderedMembers);

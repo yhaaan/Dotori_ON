@@ -75,10 +75,11 @@ namespace TeamOverlay.UI
         }
 
         /// <summary>
-        /// Only your own name, and only after you have gone home. Changing a name
-        /// is really a sign-out and sign-in, so on a clocked-in card a stray
-        /// double click would end the session that is being timed. Requiring the
-        /// session to be over already removes that outcome entirely.
+        /// Only your own name. It used to require being clocked out as well,
+        /// because renaming was a sign-out and sign-in and a stray double click
+        /// would end the session being timed. Renaming happens in place now - the
+        /// member id never changes and the session is untouched - so there is
+        /// nothing left for that restriction to protect.
         /// </summary>
         public void SetRenameAvailable(bool available)
         {
