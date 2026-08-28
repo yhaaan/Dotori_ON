@@ -102,6 +102,13 @@ namespace TeamOverlay.Platform.Windows
         /// prefab, which PrefabAssetTests pins so the two cannot drift apart.
         /// Roughly one member card, which is all a name-and-status list needs.
         /// </summary>
+        /// <summary>
+        /// Extra height the developer dashboard needs. Like the statistics panel
+        /// it is taken off the bottom, and it mirrors the panel's own height in
+        /// the prefab; PrefabAssetTests pins the pair.
+        /// </summary>
+        public const int DashboardPanelHeight = 300;
+
         public const int MiniWindowWidth = 130;
 
         public const int MiniWindowHeight = 150;
@@ -133,10 +140,33 @@ namespace TeamOverlay.Platform.Windows
         private bool _sessionEndReported;
         private bool _statisticsExpanded;
         private bool _avatarPickerExpanded;
+        private bool _dashboardExpanded;
         private bool _growsUpward;
         private int _windowStateDirty;
         private float _nextWindowAudit;
 #endif
+
+        /// <summary>Grows the window so the developer dashboard fits under the overlay.</summary>
+        public void ExpandForDashboard()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _dashboardExpanded = true;
+            _statisticsExpanded = false;
+            _avatarPickerExpanded = false;
+            _growsUpward = false;
+            ApplyContentSize();
+#endif
+        }
+
+        /// <summary>Shrinks the window back down from the developer dashboard.</summary>
+        public void CollapseDashboard()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _dashboardExpanded = false;
+            _growsUpward = false;
+            ApplyContentSize();
+#endif
+        }
 
         /// <summary>Grows the window so the statistics panel fits under the compact layout.</summary>
         public void ExpandForStatistics()
@@ -210,6 +240,7 @@ namespace TeamOverlay.Platform.Windows
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
             _statisticsExpanded = false;
             _avatarPickerExpanded = false;
+            _dashboardExpanded = false;
             _growsUpward = false;
             ApplyWindowOpacity();
             ApplyContentSize();
@@ -263,7 +294,8 @@ namespace TeamOverlay.Platform.Windows
                 ? MiniWindowHeight
                 : CompactWindowHeight +
                   (_statisticsExpanded ? StatisticsPanelHeight : 0) +
-                  (_avatarPickerExpanded ? AvatarPickerPanelHeight : 0);
+                  (_avatarPickerExpanded ? AvatarPickerPanelHeight : 0) +
+                  (_dashboardExpanded ? DashboardPanelHeight : 0);
             var widthDelta = contentWidth - client.Width;
             var heightDelta = contentHeight - client.Height;
             if (widthDelta == 0 && heightDelta == 0)

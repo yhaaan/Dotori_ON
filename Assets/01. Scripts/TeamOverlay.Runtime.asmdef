@@ -2,7 +2,8 @@
   "name": "TeamOverlay.Runtime",
   "rootNamespace": "TeamOverlay",
   "references": [
-    "UnityEngine.UI"
+    "UnityEngine.UI",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

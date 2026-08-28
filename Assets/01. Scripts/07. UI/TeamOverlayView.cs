@@ -39,6 +39,7 @@ namespace TeamOverlay.UI
         [SerializeField] private RectTransform _windowBackground;
         [SerializeField] private AvatarPickerPanelView _avatarPickerPanel;
         [SerializeField] private MiniOverlayPanelView _miniPanel;
+        [SerializeField] private DeveloperDashboardView _dashboardPanel;
 
         private readonly List<Button> _interactiveButtons = new List<Button>();
         private Canvas _canvas;
@@ -93,6 +94,11 @@ namespace TeamOverlay.UI
         public bool IsAvatarPickerVisible => _avatarPickerPanel != null && _avatarPickerPanel.gameObject.activeSelf;
 
         public bool IsMiniModeVisible => _miniPanel != null && _miniPanel.gameObject.activeSelf;
+
+        public bool IsDashboardVisible => _dashboardPanel != null && _dashboardPanel.gameObject.activeSelf;
+
+        /// <summary>The dashboard itself, so the app can wire its buttons directly.</summary>
+        public DeveloperDashboardView Dashboard => _dashboardPanel;
 
         /// <summary>
         /// How much taller the window has to be while the picker is open. Read
@@ -179,6 +185,12 @@ namespace TeamOverlay.UI
                 _avatarPickerPanel.AvatarPicked += key => AvatarPicked?.Invoke(key);
                 _avatarPickerPanel.CloseRequested += () => AvatarPickerCloseRequested?.Invoke();
                 SetAvatarPickerVisible(false);
+            }
+
+            if (_dashboardPanel != null)
+            {
+                _dashboardPanel.Initialize();
+                _dashboardPanel.gameObject.SetActive(false);
             }
 
             if (_miniPanel != null)
@@ -310,6 +322,14 @@ namespace TeamOverlay.UI
                 _dailyCheckInPointsLabel.color = state.ClaimedToday
                     ? TeamOverlayPalette.TextSecondary
                     : TeamOverlayPalette.Accent;
+            }
+        }
+
+        public void SetDashboardVisible(bool visible)
+        {
+            if (_dashboardPanel != null)
+            {
+                _dashboardPanel.gameObject.SetActive(visible);
             }
         }
 

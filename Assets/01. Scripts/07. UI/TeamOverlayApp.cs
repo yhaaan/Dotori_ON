@@ -12,6 +12,7 @@ using TeamOverlay.Identity;
 using TeamOverlay.Platform.Windows;
 using TeamOverlay.Supabase;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TeamOverlay.UI
 {
@@ -94,6 +95,7 @@ namespace TeamOverlay.UI
         private bool _signOutInProgress;
         private bool _renamePending;
         private bool _renameInProgress;
+        private bool _dashboardBusy;
         private bool _mutationInProgress;
         private int _statisticsRequestId;
         private StatisticsPeriod _statisticsPeriod = StatisticsPeriod.LastSevenDays;
@@ -271,6 +273,11 @@ namespace TeamOverlay.UI
             {
                 _nextIdleCheck = now + IdleCheckSeconds;
                 ApplyIdleActivity();
+            }
+
+            if (DashboardShortcutPressed())
+            {
+                ToggleDashboard();
             }
 
             if (_members != null && now >= _nextTimerRefresh)
@@ -601,6 +608,13 @@ namespace TeamOverlay.UI
             _view.AvatarPicked += HandleAvatarPicked;
             _view.MiniModeRequested += HandleMiniModeRequested;
             _view.DailyCheckInRequested += HandleDailyCheckInRequested;
+            if (_view.Dashboard != null)
+            {
+                _view.Dashboard.RefreshRequested += LoadDashboard;
+                _view.Dashboard.DeleteConfirmed += HandleDeleteMemberConfirmed;
+                _view.Dashboard.SignOutRequested += HandleDashboardSignOutRequested;
+                _view.Dashboard.CloseRequested += CloseDashboard;
+            }
             _view.MiniModeExitRequested += HandleMiniModeExitRequested;
             _view.SetAvatarCatalog(_avatarCatalog);
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
@@ -636,6 +650,7 @@ namespace TeamOverlay.UI
         private void TeardownSession()
         {
             _idlePolicy.Reset();
+            CloseDashboard();
             // The name screen is a full size window, and the stored preference is
             // left alone so signing back in comes up the way it was left.
             ApplyMiniMode(false);
@@ -688,6 +703,13 @@ namespace TeamOverlay.UI
             _view.AvatarPicked -= HandleAvatarPicked;
             _view.MiniModeRequested -= HandleMiniModeRequested;
             _view.DailyCheckInRequested -= HandleDailyCheckInRequested;
+            if (_view.Dashboard != null)
+            {
+                _view.Dashboard.RefreshRequested -= LoadDashboard;
+                _view.Dashboard.DeleteConfirmed -= HandleDeleteMemberConfirmed;
+                _view.Dashboard.SignOutRequested -= HandleDashboardSignOutRequested;
+                _view.Dashboard.CloseRequested -= CloseDashboard;
+            }
             _view.MiniModeExitRequested -= HandleMiniModeExitRequested;
         }
 
@@ -962,6 +984,188 @@ namespace TeamOverlay.UI
             {
                 Debug.LogException(exception);
                 _view?.ShowFeedback(BackendError(exception), true);
+            }
+        }
+
+        /// <summary>
+        /// Ctrl+Shift+D, read straight from the keyboard rather than through a
+        /// button, because the dashboard is not part of the overlay anybody uses.
+        /// The new Input System is the only handler this project builds with, so
+        /// there is no legacy Input to fall back to.
+        /// </summary>
+        private static bool DashboardShortcutPressed()
+        {
+            var keyboard = Keyboard.current;
+            return keyboard != null
+                && keyboard.dKey.wasPressedThisFrame
+                && keyboard.ctrlKey.isPressed
+                && keyboard.shiftKey.isPressed;
+        }
+
+        private void ToggleDashboard()
+        {
+            if (_view == null || _backend == null || _quitting || _signOutInProgress)
+            {
+                return;
+            }
+
+            if (_view.IsDashboardVisible)
+            {
+                CloseDashboard();
+                return;
+            }
+
+            if (!(_backend is ITeamAdmin))
+            {
+                _view.ShowFeedback("현재 백엔드는 대시보드를 지원하지 않습니다.", true);
+                return;
+            }
+
+            // The panels below all move the window themselves, so none of them may
+            // be left open while the dashboard owns the window rect.
+            CloseStatisticsPanel();
+            CloseAvatarPicker();
+            if (_view.IsMiniModeVisible)
+            {
+                ApplyMiniMode(false);
+                PersistMiniMode(false);
+            }
+
+            _view.SetDashboardVisible(true);
+            _window.ExpandForDashboard();
+            LoadDashboard();
+        }
+
+        private void CloseDashboard()
+        {
+            _view?.SetDashboardVisible(false);
+            _window?.CollapseDashboard();
+        }
+
+        private async void LoadDashboard()
+        {
+            var requestedBackend = _backend;
+            if (_view?.Dashboard == null || !(requestedBackend is ITeamAdmin admin))
+            {
+                return;
+            }
+
+            _dashboardBusy = true;
+            _view.Dashboard.SetBusy(true);
+            _view.Dashboard.ShowFeedback("불러오는 중…", false);
+            try
+            {
+                var members = await admin.GetMemberOverviewAsync(_lifetime.Token);
+                if (_view?.Dashboard == null || !ReferenceEquals(_backend, requestedBackend))
+                {
+                    return;
+                }
+
+                _view.Dashboard.Bind(members, requestedBackend.LocalMemberId);
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                _view?.Dashboard?.ShowFeedback(BackendError(exception), true);
+            }
+            finally
+            {
+                _dashboardBusy = false;
+                _view?.Dashboard?.SetBusy(false);
+            }
+        }
+
+        /// <summary>
+        /// The view has already asked, naming the member. There is no undo, and
+        /// the server refuses to erase the caller.
+        /// </summary>
+        private async void HandleDeleteMemberConfirmed(string memberId)
+        {
+            var requestedBackend = _backend;
+            if (_dashboardBusy || _view?.Dashboard == null || !(requestedBackend is ITeamAdmin admin))
+            {
+                return;
+            }
+
+            _dashboardBusy = true;
+            _view.Dashboard.SetBusy(true);
+            try
+            {
+                await admin.DeleteMemberAsync(memberId, _lifetime.Token);
+                if (!ReferenceEquals(_backend, requestedBackend))
+                {
+                    return;
+                }
+
+                await RefreshStateAsync();
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                _view?.Dashboard?.ShowFeedback(BackendError(exception), true);
+            }
+            finally
+            {
+                _dashboardBusy = false;
+                _view?.Dashboard?.SetBusy(false);
+            }
+
+            LoadDashboard();
+        }
+
+        /// <summary>
+        /// Forgets which member this PC is signed in as and returns to the name
+        /// screen, where any existing name signs back in to that member. The
+        /// session is closed first: it was opened by this install's client
+        /// instance id, and signing back in mints a new one that the server would
+        /// refuse to heartbeat or close it with.
+        /// </summary>
+        private async void HandleDashboardSignOutRequested()
+        {
+            if (_quitting || _signOutInProgress || _identityActivationInProgress || _backend == null)
+            {
+                return;
+            }
+
+            _signOutInProgress = true;
+            var previousName = _identityProfile?.DisplayName;
+            _view?.Dashboard?.SetBusy(true);
+            try
+            {
+                try
+                {
+                    if (IsLocalMemberClockedIn())
+                    {
+                        await _backend.CheckOutAsync(CheckoutReason.Manual, _lifetime.Token);
+                    }
+                }
+                catch (Exception exception) when (!(exception is OperationCanceledException))
+                {
+                    Debug.LogWarning("Best-effort checkout before sign-out failed: " + exception.Message);
+                }
+
+                CloseDashboard();
+                TeardownSession();
+                _identityStore.Clear();
+                _firstRunNameView.Show(previousName);
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+            {
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                _view?.Dashboard?.ShowFeedback("로그아웃하지 못했습니다: " + exception.Message, true);
+            }
+            finally
+            {
+                _signOutInProgress = false;
             }
         }
 

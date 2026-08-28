@@ -20,7 +20,7 @@ namespace TeamOverlay.Supabase
     /// a Realtime subscription later only has to replace <see cref="Poll"/>.
     /// </summary>
     public sealed class SupabaseTeamBackend
-        : ITeamBackend, ITeamStatistics, ITeamNudges, ITeamCheckIn, ITeamMemberRename, IDisposable
+        : ITeamBackend, ITeamStatistics, ITeamNudges, ITeamCheckIn, ITeamMemberRename, ITeamAdmin, IDisposable
     {
         private const string NudgeSelect = "id,actor_member_id,target_member_id,created_at";
 
@@ -390,6 +390,52 @@ namespace TeamOverlay.Supabase
                 p_avatar_key = string.IsNullOrWhiteSpace(avatarKey) ? string.Empty : avatarKey.Trim()
             });
             await CallRpcAsync("set_avatar_key", body, cancellationToken);
+        }
+
+        public async Task<IReadOnlyList<AdminMemberSummary>> GetMemberOverviewAsync(
+            CancellationToken cancellationToken)
+        {
+            var response = await CallRpcAsync("admin_member_overview", "{}", cancellationToken);
+
+            AdminMemberArrayDocument document;
+            try
+            {
+                document = JsonUtility.FromJson<AdminMemberArrayDocument>(
+                    "{\"items\":" + response.Body + "}");
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException(
+                    "Could not read the member overview: " + exception.Message);
+            }
+
+            var items = document?.items ?? Array.Empty<AdminMemberDocument>();
+            var summaries = new List<AdminMemberSummary>(items.Length);
+            foreach (var item in items)
+            {
+                summaries.Add(new AdminMemberSummary(
+                    item.member_id,
+                    item.display_name,
+                    item.is_active,
+                    item.is_admin,
+                    item.session_count,
+                    item.attendance_seconds,
+                    item.total_points,
+                    ParseTimestamp(item.last_checked_out_at)));
+            }
+
+            return new ReadOnlyCollection<AdminMemberSummary>(summaries);
+        }
+
+        public async Task DeleteMemberAsync(string memberId, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(memberId))
+            {
+                throw new ArgumentException("A member id is required.", nameof(memberId));
+            }
+
+            var body = JsonUtility.ToJson(new DeleteMemberRequest { p_member_id = memberId });
+            await CallRpcAsync("admin_delete_member", body, cancellationToken);
         }
 
         /// <summary>
@@ -894,6 +940,31 @@ namespace TeamOverlay.Supabase
         private sealed class RankingFromStartRequest
         {
             public string p_to;
+        }
+
+        [Serializable]
+        private sealed class DeleteMemberRequest
+        {
+            public string p_member_id;
+        }
+
+        [Serializable]
+        private sealed class AdminMemberDocument
+        {
+            public string member_id;
+            public string display_name;
+            public bool is_active;
+            public bool is_admin;
+            public int session_count;
+            public int attendance_seconds;
+            public int total_points;
+            public string last_checked_out_at;
+        }
+
+        [Serializable]
+        private sealed class AdminMemberArrayDocument
+        {
+            public AdminMemberDocument[] items;
         }
 
         [Serializable]

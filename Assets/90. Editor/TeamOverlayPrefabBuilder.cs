@@ -47,6 +47,18 @@ namespace TeamOverlay.Editor
 
         public const float MiniPanelHeight = 150f;
 
+        /// <summary>
+        /// The developer dashboard's height in the prefab. The window grows by
+        /// exactly this much, so it has to match
+        /// <c>WindowsOverlayWindow.DashboardPanelHeight</c>; PrefabAssetTests pins
+        /// the pair. Six rows plus a header, a footer and the confirmation.
+        /// </summary>
+        public const float DashboardPanelHeight = 300f;
+
+        private const float DashboardRowTop = 60f;
+        private const float DashboardRowHeight = 32f;
+        private const float DashboardRowSpacing = 2f;
+
         /// <summary>Mini overlay geometry, in pixels from the top of the panel.</summary>
         internal const float MiniDragStripHeight = 18f;
         internal const float MiniRowTop = 20f;
@@ -358,6 +370,9 @@ namespace TeamOverlay.Editor
                 // it, for a different reason: the mini overlay replaces the whole
                 // overlay instead of folding out of it.
                 var miniPanel = BuildMiniPanel(root.transform, font);
+                // A child of the window background, like the statistics panel: it
+                // unfolds downwards under the overlay rather than replacing it.
+                var dashboard = BuildDashboardPanel(background.transform, font);
                 var view = root.GetComponent<TeamOverlayView>();
                 var serialized = new SerializedObject(view);
                 serialized.FindProperty("_cards").arraySize = cards.Length;
@@ -385,6 +400,7 @@ namespace TeamOverlay.Editor
                 Set(serialized, "_windowBackground", background.rectTransform);
                 Set(serialized, "_avatarPickerPanel", avatarPicker);
                 Set(serialized, "_miniPanel", miniPanel);
+                Set(serialized, "_dashboardPanel", dashboard);
                 serialized.ApplyModifiedPropertiesWithoutUndo();
                 return PrefabUtility.SaveAsPrefabAsset(root, MainViewPath).GetComponent<TeamOverlayView>();
             }
@@ -801,6 +817,148 @@ namespace TeamOverlay.Editor
             Assign(cell,
                 ("_background", background), ("_dayLabel", day), ("_durationLabel", duration));
             return cell;
+        }
+
+        /// <summary>
+        /// The developer dashboard: the roster as rows of numbers. Plain on
+        /// purpose - it is read far more often than it is acted on, and the one
+        /// thing it can destroy is behind a confirmation that names its target.
+        /// </summary>
+        private static DeveloperDashboardView BuildDashboardPanel(Transform parent, Font font)
+        {
+            var panel = UiFactory.CreateImage("DashboardPanel", parent, TeamOverlayPalette.Window);
+            var panelRect = panel.rectTransform;
+            panelRect.anchorMin = new Vector2(0f, 1f);
+            panelRect.anchorMax = new Vector2(1f, 1f);
+            panelRect.pivot = new Vector2(0.5f, 1f);
+            panelRect.anchoredPosition = new Vector2(0f, -220f);
+            panelRect.sizeDelta = new Vector2(0f, DashboardPanelHeight);
+            var panelView = panel.gameObject.AddComponent<DeveloperDashboardView>();
+
+            var heading = UiFactory.CreateText("Heading", panel.transform, font, 14,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+            heading.text = "\uAC1C\uBC1C\uC790 \uB300\uC2DC\uBCF4\uB4DC";
+            UiFactory.AnchorTop(heading.rectTransform, 14f, 8f, 200f, 24f);
+
+            var refresh = UiFactory.CreateButton("Refresh", panel.transform, font, "\uC0C8\uB85C\uACE0\uCE68");
+            refresh.GetComponentInChildren<Text>().fontSize = 10;
+            UiFactory.AnchorRight(refresh.GetComponent<RectTransform>(), 156f, 8f, 72f, 24f);
+            var signOut = UiFactory.CreateButton(
+                "SignOut", panel.transform, font, "\uB2E4\uB978 \uC774\uB984\uC73C\uB85C \uB85C\uADF8\uC778");
+            signOut.GetComponentInChildren<Text>().fontSize = 9;
+            UiFactory.AnchorRight(signOut.GetComponent<RectTransform>(), 42f, 8f, 110f, 24f);
+            var close = UiFactory.CreateButton("Close", panel.transform, font, "\u00D7");
+            UiFactory.AnchorRight(close.GetComponent<RectTransform>(), 12f, 8f, 26f, 24f);
+
+            var rows = new DeveloperDashboardRowView[DeveloperDashboardView.RowCount];
+            for (var index = 0; index < rows.Length; index++)
+            {
+                rows[index] = BuildDashboardRow(
+                    panel.transform,
+                    font,
+                    index,
+                    DashboardRowTop + (index * (DashboardRowHeight + DashboardRowSpacing)));
+            }
+
+            var feedback = UiFactory.CreateText("DashboardFeedback", panel.transform, font, 10,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+            feedback.text = "\uBD88\uB7EC\uC624\uB294 \uC911\u2026";
+            UiFactory.AnchorTop(feedback.rectTransform, 14f, 268f, 452f, 20f);
+
+            var confirm = BuildDashboardConfirm(panel.transform, font,
+                out var confirmText, out var confirmDelete, out var cancelDelete);
+
+            var serialized = new SerializedObject(panelView);
+            SetArray(serialized, "_rows", rows);
+            Set(serialized, "_feedbackText", feedback);
+            Set(serialized, "_refreshButton", refresh);
+            Set(serialized, "_signOutButton", signOut);
+            Set(serialized, "_closeButton", close);
+            Set(serialized, "_confirmPanel", confirm);
+            Set(serialized, "_confirmText", confirmText);
+            Set(serialized, "_confirmDeleteButton", confirmDelete);
+            Set(serialized, "_cancelDeleteButton", cancelDelete);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            panel.gameObject.SetActive(false);
+            return panelView;
+        }
+
+        private static DeveloperDashboardRowView BuildDashboardRow(
+            Transform parent,
+            Font font,
+            int index,
+            float top)
+        {
+            var background = UiFactory.CreateImage(
+                "DashboardRow_" + (index + 1), parent, TeamOverlayPalette.CardOffline);
+            UiFactory.AnchorTop(background.rectTransform, 14f, top, 452f, DashboardRowHeight);
+            var row = background.gameObject.AddComponent<DeveloperDashboardRowView>();
+
+            var name = UiFactory.CreateText("Name", background.transform, font, 11,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+            UiFactory.AnchorTop(name.rectTransform, 10f, 0f, 120f, DashboardRowHeight);
+            name.text = "\uAE40\uD558\uB298";
+            var sessions = DashboardCell(background.transform, font, "Sessions", 134f, 60f, "12");
+            var attendance = DashboardCell(background.transform, font, "Attendance", 198f, 80f, "48:20");
+            var points = DashboardCell(background.transform, font, "Points", 282f, 60f, "120P");
+            var lastSeen = DashboardCell(background.transform, font, "LastSeen", 346f, 90f, "08/27 19:02");
+
+            var delete = UiFactory.CreateButton("Delete", background.transform, font,
+                "\uC0AD\uC81C", null, TeamOverlayPalette.Danger);
+            delete.GetComponentInChildren<Text>().fontSize = 9;
+            UiFactory.AnchorRight(delete.GetComponent<RectTransform>(), 6f, 5f, 42f, 22f);
+
+            Assign(row,
+                ("_background", background), ("_nameLabel", name), ("_sessionsLabel", sessions),
+                ("_attendanceLabel", attendance), ("_pointsLabel", points),
+                ("_lastSeenLabel", lastSeen), ("_deleteButton", delete));
+            return row;
+        }
+
+        private static Text DashboardCell(
+            Transform parent,
+            Font font,
+            string name,
+            float left,
+            float width,
+            string sample)
+        {
+            var text = UiFactory.CreateText(name, parent, font, 10,
+                TextAnchor.MiddleLeft, TeamOverlayPalette.TextSecondary);
+            UiFactory.AnchorTop(text.rectTransform, left, 0f, width, DashboardRowHeight);
+            text.text = sample;
+            return text;
+        }
+
+        /// <summary>
+        /// Covers the whole panel while it is up, so the list underneath cannot be
+        /// clicked while a question about one of its rows is unanswered.
+        /// </summary>
+        private static GameObject BuildDashboardConfirm(
+            Transform parent,
+            Font font,
+            out Text message,
+            out Button confirm,
+            out Button cancel)
+        {
+            var backdrop = UiFactory.CreateImage(
+                "DeleteConfirm", parent, new Color(0.02f, 0.03f, 0.05f, 0.92f));
+            UiFactory.Stretch(backdrop.rectTransform);
+
+            message = UiFactory.CreateText("Message", backdrop.transform, font, 12,
+                TextAnchor.MiddleCenter, TeamOverlayPalette.TextPrimary, FontStyle.Bold);
+            message.text = "\uACC4\uC815\uACFC \uBAA8\uB4E0 \uAE30\uB85D\uC744 \uC9C0\uC6C1\uB2C8\uB2E4.";
+            message.horizontalOverflow = HorizontalWrapMode.Wrap;
+            UiFactory.AnchorTop(message.rectTransform, 40f, 110f, 400f, 44f);
+
+            confirm = UiFactory.CreateButton("ConfirmDelete", backdrop.transform, font,
+                "\uC9C0\uC6C1\uB2C8\uB2E4", null, TeamOverlayPalette.Danger);
+            UiFactory.AnchorTop(confirm.GetComponent<RectTransform>(), 130f, 164f, 100f, 32f);
+            cancel = UiFactory.CreateButton("CancelDelete", backdrop.transform, font, "\uCDE8\uC18C");
+            UiFactory.AnchorTop(cancel.GetComponent<RectTransform>(), 250f, 164f, 100f, 32f);
+
+            backdrop.gameObject.SetActive(false);
+            return backdrop.gameObject;
         }
 
         private static GameObject CreateStatisticsContent(string name, Transform parent)
