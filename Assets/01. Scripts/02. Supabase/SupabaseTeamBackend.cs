@@ -466,13 +466,15 @@ namespace DOTORION.Supabase
         public async Task<DailyCheckInState> GetDailyCheckInStateAsync(
             CancellationToken cancellationToken)
         {
-            return await ReadCheckInAsync("daily_check_in_status", cancellationToken);
+            return await ReadCheckInAsync("daily_check_in_status", false, cancellationToken);
         }
 
         public async Task<DailyCheckInState> ClaimDailyCheckInAsync(
             CancellationToken cancellationToken)
         {
-            return await ReadCheckInAsync("claim_daily_check_in", cancellationToken);
+            // Once the claim has returned, today is taken whichever way it
+            // went, so the answer does not come from the row.
+            return await ReadCheckInAsync("claim_daily_check_in", true, cancellationToken);
         }
 
         /// <summary>
@@ -480,9 +482,20 @@ namespace DOTORION.Supabase
         /// claiming it differ only in which one is called. Neither takes an
         /// argument: the server reads the member from the session, and taking a
         /// member id would invite a client to claim someone else's day.
+        ///
+        /// The shapes match but one column does not. <c>daily_check_in_status</c>
+        /// returns <c>claimed</c> as "today is taken", while
+        /// <c>claim_daily_check_in</c> returns it as "this call is what took it"
+        /// - false when the day was already claimed. Reading that as the state
+        /// told the button nobody had checked in yet, every press after the
+        /// first. So the claim path does not read the column: the insert has
+        /// either just happened or was already there, and either way today is
+        /// taken by the time the call returns. <c>awarded</c> is what tells the
+        /// two apart, and it already does.
         /// </summary>
         private async Task<DailyCheckInState> ReadCheckInAsync(
             string function,
+            bool claimedByDefinition,
             CancellationToken cancellationToken)
         {
             var response = await CallRpcAsync(function, "{}", cancellationToken);
@@ -506,7 +519,10 @@ namespace DOTORION.Supabase
 
             var row = document.items[0];
             return new DailyCheckInState(
-                row.claimed, row.total_points, row.awarded, row.streak_days);
+                claimedByDefinition || row.claimed,
+                row.total_points,
+                row.awarded,
+                row.streak_days);
         }
 
         public async Task SendHeartbeatAsync(CancellationToken cancellationToken)
