@@ -439,7 +439,6 @@ namespace DOTORION.UI
             SetActive(_workingButton, isClockedIn);
             SetActive(_breakButton, isClockedIn);
             SetActive(_mealButton, isClockedIn);
-            if (isClockedIn) SetActivitySelection(localMember.ActivityStatus.GetValueOrDefault());
             BindStatusNote(localMember, isClockedIn);
             if (localMember != null) SetAvatarPickerSelection(localMember.AvatarKey);
         }
@@ -548,25 +547,6 @@ namespace DOTORION.UI
         private static void SetActive(Button button, bool active)
         {
             if (button != null) button.gameObject.SetActive(active);
-        }
-
-        /// <summary>
-        /// The one place the top row still paints: which status you are in is
-        /// the whole point of these three buttons, and the colour is the status
-        /// colour, not a panel default.
-        /// </summary>
-        private void SetActivitySelection(ActivityStatus selected)
-        {
-            Tint(_workingButton, selected == ActivityStatus.Working ? DOTORIONPalette.Working : DOTORIONPalette.Button);
-            Tint(_breakButton, selected == ActivityStatus.Break ? DOTORIONPalette.Break : DOTORIONPalette.Button);
-            Tint(_mealButton, selected == ActivityStatus.Meal ? DOTORIONPalette.Meal : DOTORIONPalette.Button);
-        }
-
-        private static void Tint(Button button, Color color)
-        {
-            if (button == null) return;
-            var background = button.GetComponent<Image>();
-            if (background != null) background.color = color;
         }
     }
 }
