@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6316cf5676e685543b16b7c8e5a9eb30
+guid: 33692c6e32be47240affb8738ae1ac13
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Galmuri14
+  - Gulim
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 2

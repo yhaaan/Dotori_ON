@@ -1385,12 +1385,12 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// The body face. The prefabs use three sizes of Galmuri - 9, 11 and 14 -
-        /// each rendered at its own em size (10, 12, 15) so one drawn dot lands
-        /// on exactly one screen pixel. The builder only knows the body one; a
-        /// rebuild is a reset, not a way to reproduce the typography.
+        /// The body face. Gulim carries hand-drawn bitmaps for 11px through
+        /// 25px, so any whole size in that range is crisp and anything below it
+        /// is not. The builder only knows this one face; a rebuild is a reset,
+        /// not a way to reproduce the typography.
         /// </summary>
-        internal const string UiFontPath = "Assets/Galmuri-v2.40.4/Galmuri9(10).ttf";
+        internal const string UiFontPath = "Assets/GULIM.TTC";
         private static void ConfigureScaler(CanvasScaler scaler)
         {
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
