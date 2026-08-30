@@ -22,7 +22,7 @@ namespace DOTORION.UI
         [SerializeField] private Button _breakButton;
         [SerializeField] private Button _mealButton;
         [SerializeField] private Button _fakeEventButton;
-        [SerializeField] private Button _topmostButton;
+        [SerializeField] private Button _settingsButton;
         [SerializeField] private Button _minimizeButton;
         [SerializeField] private Button _exitButton;
         [SerializeField] private Button _miniModeButton;
@@ -31,11 +31,11 @@ namespace DOTORION.UI
         [SerializeField] private Button _dailyCheckInButton;
         [SerializeField] private Text _dailyCheckInPointsLabel;
         [SerializeField] private InputField _statusNoteInput;
-        [SerializeField] private Text _topmostLabel;
         [SerializeField] private Text _feedbackText;
         [SerializeField] private Text _versionLabel;
         [SerializeField] private WindowDragHandle _windowDragHandle;
         [SerializeField] private TeamStatisticsPanelView _statisticsPanel;
+        [SerializeField] private SettingsPanelView _settingsPanel;
         [SerializeField] private RectTransform _windowBackground;
         [SerializeField] private AvatarPickerPanelView _avatarPickerPanel;
         [SerializeField] private MiniOverlayPanelView _miniPanel;
@@ -55,7 +55,12 @@ namespace DOTORION.UI
         public event Action CheckOutRequested;
         public event Action<ActivityStatus> ActivityChangeRequested;
         public event Action FakeCheckInRequested;
+        public event Action SettingsToggleRequested;
         public event Action AlwaysOnTopToggleRequested;
+
+        /// <summary>Silences the notification sounds, and brings them back.</summary>
+        public event Action MuteToggleRequested;
+
         public event Action MinimizeRequested;
         public event Action ExitRequested;
 
@@ -90,6 +95,8 @@ namespace DOTORION.UI
         public event Action<string> AvatarPicked;
 
         public bool IsStatisticsVisible => _statisticsPanel != null && _statisticsPanel.gameObject.activeSelf;
+
+        public bool IsSettingsVisible => _settingsPanel != null && _settingsPanel.gameObject.activeSelf;
 
         public bool IsAvatarPickerVisible => _avatarPickerPanel != null && _avatarPickerPanel.gameObject.activeSelf;
 
@@ -133,6 +140,7 @@ namespace DOTORION.UI
             // Application.version is the bundleVersion the build was stamped with,
             // so a teammate can read which zip they are running off the title bar.
             if (_versionLabel != null) _versionLabel.text = "v" + Application.version;
+            _settingsPanel?.SetVersion("DOTORI ON v" + Application.version);
 
             AddListener(_checkInButton, () => CheckInRequested?.Invoke());
             AddListener(_checkOutButton, () => CheckOutRequested?.Invoke());
@@ -140,7 +148,7 @@ namespace DOTORION.UI
             AddListener(_breakButton, () => ActivityChangeRequested?.Invoke(ActivityStatus.Break));
             AddListener(_mealButton, () => ActivityChangeRequested?.Invoke(ActivityStatus.Meal));
             AddListener(_fakeEventButton, () => FakeCheckInRequested?.Invoke());
-            AddListener(_topmostButton, () => AlwaysOnTopToggleRequested?.Invoke());
+            AddListener(_settingsButton, () => SettingsToggleRequested?.Invoke());
             AddListener(_minimizeButton, () => MinimizeRequested?.Invoke());
             AddListener(_exitButton, () => ExitRequested?.Invoke());
             AddListener(_miniModeButton, () => MiniModeRequested?.Invoke());
@@ -169,6 +177,7 @@ namespace DOTORION.UI
             AddInteractive(_miniModeButton);
             AddInteractive(_dailyCheckInButton);
             AddInteractive(_statsButton);
+            AddInteractive(_settingsButton);
             AddInteractive(_teamNudgeButton);
 
             if (_statisticsPanel != null)
@@ -177,6 +186,14 @@ namespace DOTORION.UI
                 _statisticsPanel.PeriodChangeRequested +=
                     period => StatisticsPeriodChangeRequested?.Invoke(period);
                 _statisticsPanel.gameObject.SetActive(false);
+            }
+
+            if (_settingsPanel != null)
+            {
+                _settingsPanel.Initialize();
+                _settingsPanel.AlwaysOnTopToggleRequested += () => AlwaysOnTopToggleRequested?.Invoke();
+                _settingsPanel.MuteToggleRequested += () => MuteToggleRequested?.Invoke();
+                _settingsPanel.gameObject.SetActive(false);
             }
 
             if (_avatarPickerPanel != null)
@@ -459,6 +476,7 @@ namespace DOTORION.UI
         {
             foreach (var button in _interactiveButtons) button.interactable = !busy;
             _avatarPickerPanel?.SetBusy(busy);
+            _settingsPanel?.SetBusy(busy);
             if (busy) _feedbackText.text = "상태를 반영하는 중…";
         }
 
@@ -470,11 +488,23 @@ namespace DOTORION.UI
 
         public void SetAlwaysOnTop(bool enabled)
         {
-            if (_topmostLabel != null) _topmostLabel.text = enabled ? "TOP✓" : "TOP";
-            if (_topmostButton == null) return;
-            var background = _topmostButton.GetComponent<Image>();
-            if (background != null)
-                background.color = enabled ? DOTORIONPalette.Accent : DOTORIONPalette.Button;
+            _settingsPanel?.SetAlwaysOnTop(enabled);
+        }
+
+        public void SetMuted(bool muted)
+        {
+            _settingsPanel?.SetMuted(muted);
+        }
+
+        /// <summary>Opens under the compact layout, the way the statistics panel does.</summary>
+        public void SetSettingsVisible(bool visible)
+        {
+            if (_settingsPanel != null)
+            {
+                _settingsPanel.gameObject.SetActive(visible);
+            }
+
+            Tint(_settingsButton, visible ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
         }
 
         public void SetStatisticsVisible(bool visible)

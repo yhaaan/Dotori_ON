@@ -14,6 +14,18 @@ namespace DOTORION.Audio
         private AudioClip _notificationClip;
         private AudioSource _audioSource;
         private DOTORIONSounds _sounds;
+        private bool _muted;
+
+        public bool IsMuted => _muted;
+
+        /// <summary>
+        /// Silences every notification. It is a mute rather than a volume of
+        /// zero so the sounds asset's own volume survives being turned back on.
+        /// </summary>
+        public void SetMuted(bool muted)
+        {
+            _muted = muted;
+        }
 
         /// <summary>Assigning null keeps the generated chime for every event.</summary>
         public void UseSounds(DOTORIONSounds sounds)
@@ -37,7 +49,7 @@ namespace DOTORION.Audio
 
         public void Play(TeamSound sound)
         {
-            if (_audioSource == null)
+            if (_audioSource == null || _muted)
             {
                 return;
             }

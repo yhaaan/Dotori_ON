@@ -55,6 +55,19 @@ namespace DOTORION.Editor
         /// </summary>
         public const float DashboardPanelHeight = 300f;
 
+        /// <summary>
+        /// The settings panel's own height in the prefab. The window grows
+        /// downwards by exactly this much, so it has to match
+        /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>; PrefabAssetTests pins
+        /// the pair. The heading and three rows fit in it.
+        /// </summary>
+        public const float SettingsPanelHeight = 160f;
+
+        /// <summary>Settings panel geometry, in pixels from the top of the panel.</summary>
+        private const float SettingsRowTop = 44f;
+        private const float SettingsRowHeight = 28f;
+        private const float SettingsRowSpacing = 8f;
+
         private const float DashboardRowTop = 60f;
         private const float DashboardRowHeight = 32f;
         private const float DashboardRowSpacing = 2f;
@@ -298,7 +311,8 @@ namespace DOTORION.Editor
                 // moved onto the name it changes, where a double click does it.
                 var miniMode = TopButton(topBar.transform, font, "MiniMode", "소형", 161f, 54f);
                 var stats = TopButton(topBar.transform, font, "Statistics", "\uD1B5\uACC4", 219f, 48f);
-                var topmost = TopButton(topBar.transform, font, "AlwaysOnTop", "TOP", 63f, 38f);
+                var settings = TopButton(topBar.transform, font, "Settings", "설정", 63f, 38f);
+                settings.GetComponentInChildren<Text>().fontSize = 11;
                 var minimize = TopButton(topBar.transform, font, "Minimize", "—", 32f, 28f);
                 var exit = TopButton(topBar.transform, font, "Exit", "×", 3f, 27f, DOTORIONPalette.Danger);
 
@@ -363,6 +377,9 @@ namespace DOTORION.Editor
                 UiFactory.Stretch(feedback.rectTransform, 4f, 0f, 4f, 31f);
 
                 var statisticsPanel = BuildStatisticsPanel(background.transform, font);
+                // A child of the window background like the statistics panel, and
+                // it unfolds downwards the same way.
+                var settingsPanel = BuildSettingsPanel(background.transform, font);
                 // A sibling of the window background rather than a child of it:
                 // the picker owns the top strip of the canvas and the background
                 // is pushed down under it, which is what lets the window grow
@@ -385,13 +402,12 @@ namespace DOTORION.Editor
                 Set(serialized, "_breakButton", rest);
                 Set(serialized, "_mealButton", meal);
                 Set(serialized, "_fakeEventButton", fake);
-                Set(serialized, "_topmostButton", topmost);
+                Set(serialized, "_settingsButton", settings);
                 Set(serialized, "_minimizeButton", minimize);
                 Set(serialized, "_exitButton", exit);
                 Set(serialized, "_miniModeButton", miniMode);
                 Set(serialized, "_statusNoteInput", noteInput);
                 Set(serialized, "_statsButton", stats);
-                Set(serialized, "_topmostLabel", topmost.GetComponentInChildren<Text>());
                 Set(serialized, "_feedbackText", feedback);
                 Set(serialized, "_versionLabel", version);
                 Set(serialized, "_teamNudgeButton", teamNudge);
@@ -399,6 +415,7 @@ namespace DOTORION.Editor
                 Set(serialized, "_dailyCheckInPointsLabel", checkInPoints);
                 Set(serialized, "_windowDragHandle", dragHandle);
                 Set(serialized, "_statisticsPanel", statisticsPanel);
+                Set(serialized, "_settingsPanel", settingsPanel);
                 Set(serialized, "_windowBackground", background.rectTransform);
                 Set(serialized, "_avatarPickerPanel", avatarPicker);
                 Set(serialized, "_miniPanel", miniPanel);
@@ -733,6 +750,90 @@ namespace DOTORION.Editor
             serialized.ApplyModifiedPropertiesWithoutUndo();
             panel.gameObject.SetActive(false);
             return panelView;
+        }
+
+        /// <summary>
+        /// The settings panel. The switches that used to cost a slot each on the
+        /// top bar live here as labelled rows, which is also the only place with
+        /// room to say what each one does.
+        /// </summary>
+        private static SettingsPanelView BuildSettingsPanel(Transform parent, Font font)
+        {
+            var panel = UiFactory.CreateImage("SettingsPanel", parent, DOTORIONPalette.Window);
+            var panelRect = panel.rectTransform;
+            panelRect.anchorMin = new Vector2(0f, 1f);
+            panelRect.anchorMax = new Vector2(1f, 1f);
+            panelRect.pivot = new Vector2(0.5f, 1f);
+            panelRect.anchoredPosition = new Vector2(0f, -220f);
+            panelRect.sizeDelta = new Vector2(0f, SettingsPanelHeight);
+            var panelView = panel.gameObject.AddComponent<SettingsPanelView>();
+
+            var heading = UiFactory.CreateText("Heading", panel.transform, font, 14,
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
+            heading.text = "설정";
+            UiFactory.AnchorTop(heading.rectTransform, 14f, 8f, 200f, 24f);
+
+            var alwaysOnTop = SettingsSwitchRow(panel.transform, font, "AlwaysOnTop",
+                "항상 위", "다른 창 위에 계속 띄워 둡니다.", SettingsRowTop);
+            var mute = SettingsSwitchRow(panel.transform, font, "Mute",
+                "알림음", "출근과 호출을 소리로 알립니다.",
+                SettingsRowTop + SettingsRowHeight + SettingsRowSpacing);
+
+            var versionTop = SettingsRowTop + ((SettingsRowHeight + SettingsRowSpacing) * 2f);
+            SettingsRowLabel(panel.transform, font, "VersionLabel", "버전", versionTop);
+            var version = UiFactory.CreateText("VersionValue", panel.transform, font, 11,
+                TextAnchor.MiddleRight, DOTORIONPalette.TextSecondary);
+            version.text = "DOTORI ON v0.0";
+            UiFactory.AnchorRight(version.rectTransform, 14f, versionTop, 300f, SettingsRowHeight);
+
+            var serialized = new SerializedObject(panelView);
+            Set(serialized, "_alwaysOnTopButton", alwaysOnTop);
+            Set(serialized, "_alwaysOnTopValue", alwaysOnTop.GetComponentInChildren<Text>());
+            Set(serialized, "_muteButton", mute);
+            Set(serialized, "_muteValue", mute.GetComponentInChildren<Text>());
+            Set(serialized, "_versionText", version);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            panel.gameObject.SetActive(false);
+            return panelView;
+        }
+
+        /// <summary>
+        /// A name, a line saying what it does, and the switch itself on the right.
+        /// The switch label is the value, so the panel writes 켜짐 and 꺼짐 into
+        /// the button's own text rather than keeping a second label beside it.
+        /// </summary>
+        private static Button SettingsSwitchRow(
+            Transform parent,
+            Font font,
+            string name,
+            string label,
+            string hint,
+            float top)
+        {
+            SettingsRowLabel(parent, font, name + "Label", label, top);
+            var hintText = UiFactory.CreateText(name + "Hint", parent, font, 10,
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextSecondary);
+            hintText.text = hint;
+            UiFactory.AnchorTop(hintText.rectTransform, 96f, top, 280f, SettingsRowHeight);
+
+            var toggle = UiFactory.CreateButton(name + "Toggle", parent, font, "켜짐");
+            toggle.GetComponentInChildren<Text>().fontSize = 11;
+            UiFactory.AnchorRight(toggle.GetComponent<RectTransform>(), 14f, top, 76f, SettingsRowHeight);
+            return toggle;
+        }
+
+        private static Text SettingsRowLabel(
+            Transform parent,
+            Font font,
+            string name,
+            string label,
+            float top)
+        {
+            var text = UiFactory.CreateText(name, parent, font, 12,
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
+            text.text = label;
+            UiFactory.AnchorTop(text.rectTransform, 14f, top, 80f, SettingsRowHeight);
+            return text;
         }
 
         /// <summary>

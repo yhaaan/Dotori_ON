@@ -109,6 +109,13 @@ namespace DOTORION.Platform.Windows
         /// </summary>
         public const int DashboardPanelHeight = 300;
 
+        /// <summary>
+        /// Extra height the settings panel needs. Like the statistics panel it is
+        /// taken off the bottom, and it mirrors the panel's own height in the
+        /// prefab; PrefabAssetTests pins the pair.
+        /// </summary>
+        public const int SettingsPanelHeight = 160;
+
         public const int MiniWindowWidth = 130;
 
         public const int MiniWindowHeight = 150;
@@ -141,6 +148,7 @@ namespace DOTORION.Platform.Windows
         private bool _statisticsExpanded;
         private bool _avatarPickerExpanded;
         private bool _dashboardExpanded;
+        private bool _settingsExpanded;
         private bool _growsUpward;
         private int _windowStateDirty;
         private float _nextWindowAudit;
@@ -153,6 +161,7 @@ namespace DOTORION.Platform.Windows
             _dashboardExpanded = true;
             _statisticsExpanded = false;
             _avatarPickerExpanded = false;
+            _settingsExpanded = false;
             _growsUpward = false;
             ApplyContentSize();
 #endif
@@ -163,6 +172,26 @@ namespace DOTORION.Platform.Windows
         {
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
             _dashboardExpanded = false;
+            _growsUpward = false;
+            ApplyContentSize();
+#endif
+        }
+
+        /// <summary>Grows the window so the settings panel fits under the compact layout.</summary>
+        public void ExpandForSettings()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _settingsExpanded = true;
+            _growsUpward = false;
+            ApplyContentSize();
+#endif
+        }
+
+        /// <summary>Shrinks the window back down from the settings panel.</summary>
+        public void CollapseSettings()
+        {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            _settingsExpanded = false;
             _growsUpward = false;
             ApplyContentSize();
 #endif
@@ -241,6 +270,7 @@ namespace DOTORION.Platform.Windows
             _statisticsExpanded = false;
             _avatarPickerExpanded = false;
             _dashboardExpanded = false;
+            _settingsExpanded = false;
             _growsUpward = false;
             ApplyWindowOpacity();
             ApplyContentSize();
@@ -295,7 +325,8 @@ namespace DOTORION.Platform.Windows
                 : CompactWindowHeight +
                   (_statisticsExpanded ? StatisticsPanelHeight : 0) +
                   (_avatarPickerExpanded ? AvatarPickerPanelHeight : 0) +
-                  (_dashboardExpanded ? DashboardPanelHeight : 0);
+                  (_dashboardExpanded ? DashboardPanelHeight : 0) +
+                  (_settingsExpanded ? SettingsPanelHeight : 0);
             var widthDelta = contentWidth - client.Width;
             var heightDelta = contentHeight - client.Height;
             if (widthDelta == 0 && heightDelta == 0)

@@ -54,6 +54,12 @@ namespace DOTORION.UI
         /// </summary>
         private const string MiniModePreferenceKey = "DOTORION.MiniMode";
 
+        /// <summary>
+        /// Whether the notification sounds are silenced. A view preference like
+        /// the mini overlay's, and kept in the same place for the same reason.
+        /// </summary>
+        private const string MutePreferenceKey = "DOTORION.Muted";
+
         [Header("Prefab references")]
         [SerializeField] private DOTORIONView _mainViewPrefab;
         [SerializeField] private FirstRunNameView _firstRunNamePrefab;
@@ -150,6 +156,7 @@ namespace DOTORION.UI
             _window.SetAlwaysOnTop(true);
             _tonePlayer = gameObject.AddComponent<NotificationTonePlayer>();
             _tonePlayer.UseSounds(_sounds);
+            _tonePlayer.SetMuted(PlayerPrefs.GetInt(MutePreferenceKey, 0) == 1);
 
             if (_firstRunNamePrefab == null)
             {
@@ -615,7 +622,9 @@ namespace DOTORION.UI
             _view.CheckOutRequested += HandleCheckOutRequested;
             _view.ActivityChangeRequested += HandleActivityChangeRequested;
             _view.FakeCheckInRequested += HandleFakeCheckInRequested;
+            _view.SettingsToggleRequested += HandleSettingsToggleRequested;
             _view.AlwaysOnTopToggleRequested += HandleAlwaysOnTopToggleRequested;
+            _view.MuteToggleRequested += HandleMuteToggleRequested;
             _view.MinimizeRequested += HandleMinimizeRequested;
             _view.ExitRequested += HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
@@ -638,6 +647,7 @@ namespace DOTORION.UI
             _view.MiniModeExitRequested += HandleMiniModeExitRequested;
             _view.SetAvatarCatalog(_avatarCatalog);
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
+            _view.SetMuted(_tonePlayer.IsMuted);
             _firstRunNameView.Hide();
             _view.SetDailyCheckIn(null, _backend is ITeamCheckIn);
             LoadDailyCheckIn();
@@ -671,6 +681,7 @@ namespace DOTORION.UI
         {
             _idlePolicy.Reset();
             CloseDashboard();
+            CloseSettingsPanel();
             // The name screen is a full size window, and the stored preference is
             // left alone so signing back in comes up the way it was left.
             ApplyMiniMode(false);
@@ -710,7 +721,9 @@ namespace DOTORION.UI
             _view.CheckOutRequested -= HandleCheckOutRequested;
             _view.ActivityChangeRequested -= HandleActivityChangeRequested;
             _view.FakeCheckInRequested -= HandleFakeCheckInRequested;
+            _view.SettingsToggleRequested -= HandleSettingsToggleRequested;
             _view.AlwaysOnTopToggleRequested -= HandleAlwaysOnTopToggleRequested;
+            _view.MuteToggleRequested -= HandleMuteToggleRequested;
             _view.MinimizeRequested -= HandleMinimizeRequested;
             _view.ExitRequested -= HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested -= HandleSwitchAccountRequested;
@@ -954,6 +967,58 @@ namespace DOTORION.UI
             return LocalMember()?.StatusNote;
         }
 
+        /// <summary>
+        /// The settings panel grows the window downwards the way the statistics
+        /// one does, so the two cannot be open at once, and neither can be open
+        /// while a panel that moves the window some other way is.
+        /// </summary>
+        private void HandleSettingsToggleRequested()
+        {
+            if (_view == null || _quitting || _signOutInProgress)
+            {
+                return;
+            }
+
+            if (_view.IsSettingsVisible)
+            {
+                CloseSettingsPanel();
+                return;
+            }
+
+            CloseStatisticsPanel();
+            CloseAvatarPicker();
+            CloseDashboard();
+            if (_view.IsMiniModeVisible)
+            {
+                ApplyMiniMode(false);
+                PersistMiniMode(false);
+            }
+
+            _view.SetSettingsVisible(true);
+            _window.ExpandForSettings();
+        }
+
+        private void CloseSettingsPanel()
+        {
+            _view?.SetSettingsVisible(false);
+            _window?.CollapseSettings();
+        }
+
+        private void HandleMuteToggleRequested()
+        {
+            if (_view == null || _tonePlayer == null)
+            {
+                return;
+            }
+
+            var muted = !_tonePlayer.IsMuted;
+            _tonePlayer.SetMuted(muted);
+            PlayerPrefs.SetInt(MutePreferenceKey, muted ? 1 : 0);
+            PlayerPrefs.Save();
+            _view.SetMuted(muted);
+            _view.ShowFeedback(muted ? "알림음을 껐습니다." : "알림음을 켰습니다.");
+        }
+
         private void HandleAlwaysOnTopToggleRequested()
         {
             _window.ToggleAlwaysOnTop();
@@ -1069,6 +1134,7 @@ namespace DOTORION.UI
             // The panels below all move the window themselves, so none of them may
             // be left open while the dashboard owns the window rect.
             CloseStatisticsPanel();
+            CloseSettingsPanel();
             CloseAvatarPicker();
             if (_view.IsMiniModeVisible)
             {
@@ -1246,6 +1312,7 @@ namespace DOTORION.UI
             if (enabled)
             {
                 CloseStatisticsPanel();
+                CloseSettingsPanel();
                 CloseAvatarPicker();
             }
 
@@ -1279,6 +1346,7 @@ namespace DOTORION.UI
                 return;
             }
 
+            CloseSettingsPanel();
             _view.SetStatisticsVisible(true);
             _window.ExpandForStatistics();
             LoadStatistics(_statisticsPeriod);
@@ -1393,6 +1461,7 @@ namespace DOTORION.UI
                 CloseStatisticsPanel();
             }
 
+            CloseSettingsPanel();
             _view.SetAvatarPickerVisible(true);
             _window.ExpandForAvatarPicker();
         }
