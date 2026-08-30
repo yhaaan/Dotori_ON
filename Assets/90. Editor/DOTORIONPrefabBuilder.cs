@@ -75,7 +75,7 @@ namespace DOTORION.Editor
 
         /// <summary>Mini overlay geometry, in pixels from the top of the panel.</summary>
         internal const float MiniDragStripHeight = 18f;
-        internal const float MiniRowTop = 20f;
+        internal const float MiniRowTop = 21f;
         internal const float MiniRowHeight = 25f;
         internal const float MiniRowSpacing = 2f;
         internal const int MiniRowCount = 4;

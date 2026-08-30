@@ -21674,6 +21674,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6632014706052814522}
+  - {fileID: 4875902721125988436}
   - {fileID: 2484343141072195367}
   - {fileID: 6768123759025998611}
   - {fileID: 6101066164675358414}
@@ -31676,7 +31677,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -74
+      value: -75
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -31713,7 +31714,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -101
+      value: -102
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -31742,15 +31743,31 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 2484343141072195367}
+    m_TransformParent: {fileID: 7559557576479075754}
     m_Modifications:
     - target: {fileID: 5781997557104530766, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_Name
       value: MiniRow_1
       objectReference: {fileID: 0}
     - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 1.4262085
+      objectReference: {fileID: 0}
+    - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -20
+      value: -21
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -31899,15 +31916,16 @@ PrefabInstance:
       value: MiniRow_2
       objectReference: {fileID: 0}
     - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 1.4262161
+      objectReference: {fileID: 0}
+    - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -47
+      value: -48
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4875902721125988436}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
 --- !u!224 &2484343141072195367 stripped
