@@ -157,6 +157,26 @@ namespace DOTORION.Tests.EditMode
                 main.transform.Find("WindowBackground/DashboardPanel/DeleteConfirm")
                     .gameObject.activeSelf,
                 Is.False);
+            AssertReference(mainData, "_settingsButton");
+            AssertReference(mainData, "_settingsPanel");
+            var settings = mainData.FindProperty("_settingsPanel").objectReferenceValue;
+            var settingsData = new SerializedObject(settings);
+            AssertReference(settingsData, "_alwaysOnTopButton");
+            AssertReference(settingsData, "_alwaysOnTopValue");
+            AssertReference(settingsData, "_muteButton");
+            AssertReference(settingsData, "_muteValue");
+            AssertReference(settingsData, "_versionText");
+            var settingsRect = main.transform
+                .Find("WindowBackground/SettingsPanel").GetComponent<RectTransform>();
+            // Keep in sync with WindowsOverlayWindow.SettingsPanelHeight: the
+            // window grows by exactly this much when the settings panel opens.
+            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(160f));
+            Assert.That(settingsRect.anchoredPosition.y, Is.EqualTo(-220f));
+            Assert.That(settingsRect.gameObject.activeSelf, Is.False);
+            // The always-on-top switch moved into the panel, so the top bar slot
+            // it used to hold now opens the panel instead.
+            Assert.That(main.transform.Find("WindowBackground/TopBar/AlwaysOnTop"), Is.Null);
+            Assert.That(main.transform.Find("WindowBackground/TopBar/Settings"), Is.Not.Null);
             AssertReference(mainData, "_miniPanel");
             var miniPanel = mainData.FindProperty("_miniPanel").objectReferenceValue;
             var miniData = new SerializedObject(miniPanel);
