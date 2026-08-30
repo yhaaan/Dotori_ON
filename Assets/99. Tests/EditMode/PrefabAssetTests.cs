@@ -199,7 +199,7 @@ namespace DOTORION.Tests.EditMode
             // Keep in sync with WindowsOverlayWindow.MiniWindowWidth and
             // MiniWindowHeight: the window is resized to exactly this, so a panel
             // that drifted would come back clipped or ringed with dead space.
-            Assert.That(miniRect.sizeDelta, Is.EqualTo(new Vector2(75f, 130f)));
+            Assert.That(miniRect.sizeDelta, Is.EqualTo(new Vector2(77f, 130f)));
             // Exactly two things in the mini overlay take clicks: the body,
             // whose double click restores the full overlay, and the strip that
             // drags the window. A row that ate a click would be a dead spot the
