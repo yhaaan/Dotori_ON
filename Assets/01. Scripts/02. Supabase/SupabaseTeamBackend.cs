@@ -492,6 +492,10 @@ namespace DOTORION.Supabase
         /// either just happened or was already there, and either way today is
         /// taken by the time the call returns. <c>awarded</c> is what tells the
         /// two apart, and it already does.
+        ///
+        /// The server was fixed to agree (<c>202608310010</c>), but the client
+        /// still decides for itself so that a database which has not had that
+        /// migration applied behaves the same.
         /// </summary>
         private async Task<DailyCheckInState> ReadCheckInAsync(
             string function,
