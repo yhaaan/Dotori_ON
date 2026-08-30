@@ -1373,7 +1373,18 @@ namespace DOTORION.Editor
             Debug.Log("Avatar catalog now lists " + catalog.Count + " icon(s) from " + AvatarSpriteFolder + ".");
         }
 
-        internal static Font PreviewFont() => Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        /// <summary>
+        /// The pixel font the UI is drawn in. Falls back to Unity's built-in
+        /// face only if the asset is missing, so a rebuild in a checkout that
+        /// lost the font still produces readable prefabs instead of blank ones.
+        /// </summary>
+        internal static Font PreviewFont()
+        {
+            var font = AssetDatabase.LoadAssetAtPath<Font>(UiFontPath);
+            return font != null ? font : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+
+        internal const string UiFontPath = "Assets/DungGeunMo.ttf";
         private static void ConfigureScaler(CanvasScaler scaler)
         {
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
