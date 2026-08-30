@@ -329,10 +329,8 @@ namespace DOTORION.UI
 
             // Claimed days stay visible rather than hidden: the button is also
             // where the point total lives, and a total that vanished for the rest
-            // of the day would read as having lost the points.
-            Tint(
-                _dailyCheckInButton,
-                state.ClaimedToday ? DOTORIONPalette.Button : DOTORIONPalette.Accent);
+            // of the day would read as having lost the points. Whether today is
+            // claimed shows in the point label alone - the button is artwork.
             if (_dailyCheckInPointsLabel != null)
             {
                 _dailyCheckInPointsLabel.text = state.TotalPoints + "P";
@@ -503,8 +501,6 @@ namespace DOTORION.UI
             {
                 _settingsPanel.gameObject.SetActive(visible);
             }
-
-            Tint(_settingsButton, visible ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
         }
 
         public void SetStatisticsVisible(bool visible)
@@ -513,8 +509,6 @@ namespace DOTORION.UI
             {
                 _statisticsPanel.gameObject.SetActive(visible);
             }
-
-            Tint(_statsButton, visible ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
         }
 
         public void SetStatisticsPeriod(StatisticsPeriod period)
@@ -556,6 +550,11 @@ namespace DOTORION.UI
             if (button != null) button.gameObject.SetActive(active);
         }
 
+        /// <summary>
+        /// The one place the top row still paints: which status you are in is
+        /// the whole point of these three buttons, and the colour is the status
+        /// colour, not a panel default.
+        /// </summary>
         private void SetActivitySelection(ActivityStatus selected)
         {
             Tint(_workingButton, selected == ActivityStatus.Working ? DOTORIONPalette.Working : DOTORIONPalette.Button);

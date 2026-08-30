@@ -45,11 +45,6 @@ namespace DOTORION.UI
             gameObject.SetActive(true);
             _memberId = member.MemberId;
 
-            if (_background != null)
-            {
-                _background.color = isLocalMember ? DOTORIONPalette.Card : DOTORIONPalette.CardOffline;
-            }
-
             if (_nameLabel != null)
             {
                 _nameLabel.text = member.DisplayName + (member.IsActive ? string.Empty : " (비활성)");

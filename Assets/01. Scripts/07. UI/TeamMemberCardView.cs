@@ -110,7 +110,9 @@ namespace DOTORION.UI
             var isOnline = MemberStatusDisplay.IsOnline(member);
             var accent = MemberStatusDisplay.Accent(member);
 
-            _background.color = isOnline ? DOTORIONPalette.Card : DOTORIONPalette.CardOffline;
+            // The card's own surface is prefab artwork now, so nothing here
+            // repaints it. The avatar tile still takes the status colour: that
+            // tile is what the card is read by from across the room.
             _avatarBackground.color = accent;
             BindAvatar(member, isOnline);
             _nameText.text = member.DisplayName;

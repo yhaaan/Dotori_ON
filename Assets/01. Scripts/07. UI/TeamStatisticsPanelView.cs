@@ -84,16 +84,13 @@ namespace DOTORION.UI
             SelectMetric(_metric);
         }
 
-        /// <summary>Marks which period is showing. The app owns the actual load.</summary>
+        /// <summary>
+        /// Remembers which period is showing. The app owns the actual load, and
+        /// the panel artwork owns how the choice looks.
+        /// </summary>
         public void SetPeriod(StatisticsPeriod period)
         {
             _period = period;
-            for (var index = 0; index < _periodButtons.Length && index < Periods.Length; index++)
-            {
-                Tint(
-                    _periodButtons[index],
-                    Periods[index] == period ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
-            }
         }
 
         public void ShowLoading(StatisticsRange range)
@@ -201,15 +198,6 @@ namespace DOTORION.UI
         private void SelectMetric(RankingMetric metric)
         {
             _metric = metric;
-            for (var index = 0; index < _metricButtons.Length && index < Metrics.Length; index++)
-            {
-                Tint(
-                    _metricButtons[index],
-                    Metrics[index] == metric
-                        ? TeamRankingRowView.MetricColor(metric)
-                        : DOTORIONPalette.Button);
-            }
-
             BindRankingRows();
         }
 
@@ -242,8 +230,6 @@ namespace DOTORION.UI
             _showRanking = showRanking;
             if (_dailyContent != null) _dailyContent.SetActive(!showRanking);
             if (_rankingContent != null) _rankingContent.SetActive(showRanking);
-            Tint(_dailyTabButton, showRanking ? DOTORIONPalette.Button : DOTORIONPalette.Accent);
-            Tint(_rankingTabButton, showRanking ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
         }
 
         private void SetRowsVisible(bool visible)
@@ -299,12 +285,6 @@ namespace DOTORION.UI
             _feedbackText.text = message;
             _feedbackText.color = isError ? DOTORIONPalette.Danger : DOTORIONPalette.TextSecondary;
             _feedbackText.gameObject.SetActive(!string.IsNullOrEmpty(message));
-        }
-
-        private static void Tint(Button button, Color color)
-        {
-            var image = button != null ? button.GetComponent<Image>() : null;
-            if (image != null) image.color = color;
         }
     }
 }

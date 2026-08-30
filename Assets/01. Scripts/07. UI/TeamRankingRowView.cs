@@ -40,10 +40,6 @@ namespace DOTORION.UI
                 _workBar.color = MetricColor(metric);
             }
 
-            _background.color = isLocalMember
-                ? new Color(0.14f, 0.25f, 0.37f, 1f)
-                : DOTORIONPalette.Card;
-
             // The second line is the number the ranked one is most often compared
             // against: work against the whole session, anything else against work.
             var comparison = metric == RankingMetric.Work

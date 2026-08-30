@@ -38,7 +38,7 @@ namespace DOTORION.UI
 
         public void SetAlwaysOnTop(bool enabled)
         {
-            SetSwitch(_alwaysOnTopButton, _alwaysOnTopValue, enabled);
+            SetSwitch(_alwaysOnTopValue, enabled);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace DOTORION.UI
         /// </summary>
         public void SetMuted(bool muted)
         {
-            SetSwitch(_muteButton, _muteValue, !muted);
+            SetSwitch(_muteValue, !muted);
         }
 
         public void SetVersion(string version)
@@ -65,19 +65,19 @@ namespace DOTORION.UI
             if (_muteButton != null) _muteButton.interactable = !busy;
         }
 
-        private static void SetSwitch(Button button, Text value, bool enabled)
+        /// <summary>
+        /// The row says which way the switch is set in words. The button's own
+        /// surface is artwork, so nothing repaints it.
+        /// </summary>
+        private static void SetSwitch(Text value, bool enabled)
         {
-            if (value != null)
+            if (value == null)
             {
-                value.text = enabled ? "켜짐" : "꺼짐";
-                value.color = enabled ? DOTORIONPalette.TextPrimary : DOTORIONPalette.TextSecondary;
+                return;
             }
 
-            var background = button != null ? button.GetComponent<Image>() : null;
-            if (background != null)
-            {
-                background.color = enabled ? DOTORIONPalette.Accent : DOTORIONPalette.Button;
-            }
+            value.text = enabled ? "켜짐" : "꺼짐";
+            value.color = enabled ? DOTORIONPalette.TextPrimary : DOTORIONPalette.TextSecondary;
         }
     }
 }

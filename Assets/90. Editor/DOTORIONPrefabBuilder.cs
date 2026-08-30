@@ -115,6 +115,10 @@ namespace DOTORION.Editor
         internal const float AvatarCellSpacing = 4f;
         internal const int AvatarGridColumns = 8;
 
+        /// <summary>
+        /// Safe to click: it only fills in prefabs that are missing entirely and
+        /// never overwrites one that exists.
+        /// </summary>
         [MenuItem("DOTORI ON/Create Missing Editable UI Prefabs")]
         public static void CreateMissingPrefabs()
         {
@@ -127,15 +131,14 @@ namespace DOTORION.Editor
             BuildAll();
         }
 
-        [MenuItem("DOTORI ON/Rebuild Editable UI Prefabs...")]
-        public static void RebuildPrefabsWithConfirmation()
-        {
-            if (!EditorUtility.DisplayDialog("Rebuild DOTORI ON UI prefabs?",
-                    "This replaces manual Inspector/layout changes in all four generated prefabs.",
-                    "Rebuild", "Cancel")) return;
-            BuildAll();
-        }
-
+        /// <summary>
+        /// Regenerating a prefab throws away everything an artist put into it -
+        /// sprites, nine-slice borders, hand-tuned rects - and the prefabs now
+        /// carry artwork that exists nowhere else. So the rebuilds are no longer
+        /// menu items: nothing in the DOTORI ON menu can destroy that work by
+        /// being clicked. They are still callable by name from a script or the
+        /// command line for the rare deliberate reset.
+        /// </summary>
         public static void RebuildPrefabsFromCommandLine() => BuildAll();
 
         /// <summary>
@@ -143,7 +146,6 @@ namespace DOTORION.Editor
         /// The name modal and the app prefab are generated too, so a full rebuild
         /// churns their YAML alongside a change that never involved them.
         /// </summary>
-        [MenuItem("DOTORI ON/Rebuild Card And Main View Prefabs")]
         public static void RebuildCardAndMainView()
         {
             BuildMainView(BuildCard());
