@@ -401,7 +401,7 @@ namespace DOTORION.UI
                 if (hasMember)
                 {
                     var member = orderedMembers[index];
-                    card.Bind(member, member.MemberId == localMemberId, nowUtc);
+                    card.Bind(member, nowUtc);
                 }
             }
 

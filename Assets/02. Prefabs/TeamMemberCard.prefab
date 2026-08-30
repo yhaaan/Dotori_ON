@@ -247,6 +247,11 @@ MonoBehaviour:
   _nudgeButton: {fileID: 534459047929955214}
   _nudgeRoot: {fileID: 1834720026730424601}
   _nameDoubleClick: {fileID: 1961062046088422119}
+  _workingColor: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+  _breakColor: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+  _mealColor: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+  _onlineColor: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  _offlineColor: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
 --- !u!1 &1408609108049136822
 GameObject:
   m_ObjectHideFlags: 0
@@ -536,7 +541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.33333334, g: 0.3882353, b: 0.5058824, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -544,12 +549,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 6316cf5676e685543b16b7c8e5a9eb30, type: 3}
-    m_FontSize: 15
-    m_FontStyle: 1
+    m_Font: {fileID: 12800000, guid: 8afdfc5a6ea9c2c4eacc0b711596c77d, type: 3}
+    m_FontSize: 12
+    m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
-    m_MaxSize: 40
+    m_MaxSize: 300
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1

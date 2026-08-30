@@ -30,6 +30,20 @@ namespace DOTORION.UI
         [SerializeField] private GameObject _nudgeRoot;
         [SerializeField] private DoubleClickHandle _nameDoubleClick;
 
+        /// <summary>
+        /// The status colours live on the card rather than in the palette so
+        /// they can be tuned against the artwork without a recompile. They are
+        /// the last colours code still paints here: everything else on the card
+        /// is whatever the prefab says, but the status has to change while the
+        /// app runs, so it cannot be baked into the art.
+        /// </summary>
+        [Header("Status colours")]
+        [SerializeField] private Color _workingColor = new Color(0.30980393f, 0.81960785f, 0.6313726f, 1f);
+        [SerializeField] private Color _breakColor = new Color(0.95686275f, 0.7882353f, 0.3647059f, 1f);
+        [SerializeField] private Color _mealColor = new Color(1f, 0.5568628f, 0.44705883f, 1f);
+        [SerializeField] private Color _onlineColor = new Color(0.43137255f, 0.65882355f, 0.99607843f, 1f);
+        [SerializeField] private Color _offlineColor = new Color(0.4f, 0.4509804f, 0.5254902f, 1f);
+
         private string _memberId;
         private TeamAvatarCatalog _avatarCatalog;
 
@@ -116,11 +130,11 @@ namespace DOTORION.UI
 
         private bool _initialized;
 
-        public void Bind(MemberState member, bool isLocalMember, DateTimeOffset nowUtc)
+        public void Bind(MemberState member, DateTimeOffset nowUtc)
         {
             _memberId = member.MemberId;
             var isOnline = MemberStatusDisplay.IsOnline(member);
-            var accent = MemberStatusDisplay.Accent(member);
+            var accent = AccentFor(member);
 
             // The card's own surface is prefab artwork now, so nothing here
             // repaints it. The avatar tile still takes the status colour: that
@@ -128,7 +142,6 @@ namespace DOTORION.UI
             _avatarBackground.color = accent;
             BindAvatar(member, isOnline);
             _nameText.text = member.DisplayName;
-            _nameText.color = isLocalMember ? DOTORIONPalette.Accent : DOTORIONPalette.TextPrimary;
             _statusText.text = MemberStatusDisplay.Label(member);
             _statusText.color = accent;
 
@@ -181,6 +194,27 @@ namespace DOTORION.UI
             var showInitial = sprite == null;
             _avatarText.text = showInitial ? InitialFor(member.DisplayName) : string.Empty;
             _avatarText.enabled = showInitial;
+        }
+
+        /// <summary>
+        /// Same rule as <see cref="MemberStatusDisplay.Accent"/>, reading the
+        /// colours off this component instead of the palette. The label still
+        /// comes from there, so the words and the colour cannot drift apart.
+        /// </summary>
+        private Color AccentFor(MemberState member)
+        {
+            if (!MemberStatusDisplay.IsOnline(member))
+            {
+                return _offlineColor;
+            }
+
+            switch (member.ActivityStatus)
+            {
+                case ActivityStatus.Working: return _workingColor;
+                case ActivityStatus.Break: return _breakColor;
+                case ActivityStatus.Meal: return _mealColor;
+                default: return _onlineColor;
+            }
         }
 
         private static string InitialFor(string displayName)
