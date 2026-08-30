@@ -41,29 +41,31 @@ namespace DOTORION.Tests.EditMode
         }
 
         [Test]
-        public void LeavingMovesYouToTheEnd()
+        public void LeavingPutsYouAheadOfEveryoneElseWhoIsGone()
         {
-            // D goes home. B is still on, and D falls behind the two who have not
-            // been on at all: they are absent, D has just finished.
+            // D goes home. B is still on, so D lands right behind B - ahead of
+            // the two who never came, who are further from being here than
+            // someone who has just finished.
             Assert.That(
                 Names(
                     Away("A", 0),
                     Here("B", 1, Morning.AddHours(1d)),
                     Away("C", 2),
                     Left("D", 3, Morning.AddHours(2d))),
-                Is.EqualTo(new[] { "B", "A", "C", "D" }));
+                Is.EqualTo(new[] { "B", "D", "A", "C" }));
         }
 
         [Test]
-        public void WhoeverLeftLast_IsFurthestRight()
+        public void AmongThoseWhoAreGone_TheLatestToLeaveLeads()
         {
+            // A left at noon, D at eleven, B at ten, and C never came at all.
             Assert.That(
                 Names(
                     Left("A", 0, Morning.AddHours(3d)),
                     Left("B", 1, Morning.AddHours(1d)),
                     Away("C", 2),
                     Left("D", 3, Morning.AddHours(2d))),
-                Is.EqualTo(new[] { "C", "B", "D", "A" }));
+                Is.EqualTo(new[] { "A", "D", "B", "C" }));
         }
 
         [Test]
