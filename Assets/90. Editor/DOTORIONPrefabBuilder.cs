@@ -44,7 +44,7 @@ namespace DOTORION.Editor
         /// Narrow enough to live down the side of a screen: the rows carry the
         /// name inside the status pill, so there is nothing to put side by side.
         /// </summary>
-        public const float MiniPanelWidth = 77f;
+        public const float MiniPanelWidth = 75f;
 
         public const float MiniPanelHeight = 130f;
 

@@ -116,7 +116,7 @@ namespace DOTORION.Platform.Windows
         /// </summary>
         public const int SettingsPanelHeight = 160;
 
-        public const int MiniWindowWidth = 77;
+        public const int MiniWindowWidth = 75;
 
         public const int MiniWindowHeight = 130;
 
