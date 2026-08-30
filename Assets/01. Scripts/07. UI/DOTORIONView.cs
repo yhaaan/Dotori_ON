@@ -30,6 +30,16 @@ namespace DOTORION.UI
         [SerializeField] private Button _dailyCheckInButton;
         [SerializeField] private Text _dailyCheckInPointsLabel;
         [SerializeField] private InputField _statusNoteInput;
+
+        /// <summary>
+        /// Two faces for the attendance button: one that says today is still
+        /// there to take, one that says it is already taken. Leaving either
+        /// empty keeps whatever the prefab draws, so the button is never blanked
+        /// by a field nobody filled in.
+        /// </summary>
+        [Header("Daily check-in sprites")]
+        [SerializeField] private Sprite _dailyCheckInAvailableSprite;
+        [SerializeField] private Sprite _dailyCheckInClaimedSprite;
         [SerializeField] private Text _feedbackText;
         [SerializeField] private Text _versionLabel;
         [SerializeField] private WindowDragHandle _windowDragHandle;
@@ -332,6 +342,24 @@ namespace DOTORION.UI
             if (_dailyCheckInPointsLabel != null)
             {
                 _dailyCheckInPointsLabel.text = state.TotalPoints + "P";
+            }
+
+            SetDailyCheckInSprite(state.ClaimedToday
+                ? _dailyCheckInClaimedSprite
+                : _dailyCheckInAvailableSprite);
+        }
+
+        private void SetDailyCheckInSprite(Sprite sprite)
+        {
+            if (sprite == null || _dailyCheckInButton == null)
+            {
+                return;
+            }
+
+            var image = _dailyCheckInButton.GetComponent<Image>();
+            if (image != null)
+            {
+                image.sprite = sprite;
             }
         }
 

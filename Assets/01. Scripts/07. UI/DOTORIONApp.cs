@@ -91,6 +91,9 @@ namespace DOTORION.UI
         private WindowsOverlayWindow _window;
         private float _nextTimerRefresh;
         private float _nextTeamStatePoll;
+
+        /// <summary>The team day the check-in state was last read for.</summary>
+        private DateTime _dailyCheckInDay = DateTime.MinValue;
         private float _nextHeartbeat;
         private float _nextIdleCheck;
         private readonly IdleActivityPolicy _idlePolicy = new IdleActivityPolicy(IdleBreakSeconds);
@@ -281,6 +284,15 @@ namespace DOTORION.UI
             {
                 _nextTeamStatePoll = now + TeamStatePollSeconds;
                 RefreshStateWithoutWaiting();
+
+                // The check-in state is read once and then only after claiming,
+                // so without this the button would still say "taken" the morning
+                // after. Six o'clock is when the team's day turns over, and the
+                // person watching should see the button change on its own.
+                if (_view != null && _dailyCheckInDay != TeamDay.Today)
+                {
+                    LoadDailyCheckIn();
+                }
             }
 
             if (now >= _nextHeartbeat)
@@ -1037,6 +1049,7 @@ namespace DOTORION.UI
         /// </summary>
         private async void LoadDailyCheckIn()
         {
+            _dailyCheckInDay = TeamDay.Today;
             var requestedBackend = _backend;
             if (!(requestedBackend is ITeamCheckIn checkIn))
             {
