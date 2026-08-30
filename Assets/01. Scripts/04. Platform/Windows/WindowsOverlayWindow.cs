@@ -116,9 +116,9 @@ namespace DOTORION.Platform.Windows
         /// </summary>
         public const int SettingsPanelHeight = 160;
 
-        public const int MiniWindowWidth = 130;
+        public const int MiniWindowWidth = 75;
 
-        public const int MiniWindowHeight = 150;
+        public const int MiniWindowHeight = 130;
 
         /// <summary>
         /// How opaque the mini overlay is, out of 255. It sits on top of whatever

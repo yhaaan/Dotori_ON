@@ -38,12 +38,14 @@ namespace DOTORION.UI
         [SerializeField] private Color _offlineColor = new Color(0.4f, 0.4509804f, 0.5254902f, 1f);
 
         /// <summary>
-        /// The dot stays light because it has to read against the pill, and the
-        /// pill is always one of the status colours.
+        /// The name sits on the pill, so it has to be dark: every online colour
+        /// is a light pastel and a near-white name disappears into it. The dot
+        /// stays light for the same reason in reverse - it reads against the
+        /// pill too, and the pill is always one of the status colours.
         /// </summary>
         [Header("Row colours")]
-        [SerializeField] private Color _nameOnlineColor = new Color(0.95686275f, 0.96862745f, 0.9843137f, 1f);
-        [SerializeField] private Color _nameOfflineColor = new Color(0.6627451f, 0.70980394f, 0.7764706f, 1f);
+        [SerializeField] private Color _nameOnlineColor = new Color(0.0627451f, 0.08627451f, 0.12941177f, 1f);
+        [SerializeField] private Color _nameOfflineColor = new Color(0.2f, 0.23137255f, 0.28235295f, 1f);
         [SerializeField] private Color _dotIdleColor = new Color(0.95686275f, 0.96862745f, 0.9843137f, 1f);
         [SerializeField] private Color _dotNoteColor = new Color(0.9137255f, 0.44313726f, 0.44313726f, 1f);
 

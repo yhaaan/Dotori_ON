@@ -41,11 +41,12 @@ namespace DOTORION.Editor
         /// and <c>MiniWindowHeight</c>; PrefabAssetTests pins the pairs. It is
         /// authored in real pixels rather than in the 480 wide reference space,
         /// because the canvas scaler is switched off while the mini overlay shows.
-        /// Roughly one member card, which is all a name-and-status list needs.
+        /// Narrow enough to live down the side of a screen: the rows carry the
+        /// name inside the status pill, so there is nothing to put side by side.
         /// </summary>
-        public const float MiniPanelWidth = 130f;
+        public const float MiniPanelWidth = 75f;
 
-        public const float MiniPanelHeight = 150f;
+        public const float MiniPanelHeight = 130f;
 
         /// <summary>
         /// The developer dashboard's height in the prefab. The window grows by
@@ -75,7 +76,7 @@ namespace DOTORION.Editor
         /// <summary>Mini overlay geometry, in pixels from the top of the panel.</summary>
         internal const float MiniDragStripHeight = 18f;
         internal const float MiniRowTop = 20f;
-        internal const float MiniRowHeight = 30f;
+        internal const float MiniRowHeight = 25f;
         internal const float MiniRowSpacing = 2f;
         internal const int MiniRowCount = 4;
         /// <summary>
@@ -624,27 +625,29 @@ namespace DOTORION.Editor
             rowRect.sizeDelta = new Vector2(0f, MiniRowHeight);
             var rowView = row.AddComponent<MiniMemberRowView>();
 
-            var name = UiFactory.CreateText("Name", row.transform, font, 11,
-                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
-            UiFactory.AnchorTop(name.rectTransform, 8f, 0f, 50f, MiniRowHeight);
-            name.text = "김햄초";
-            // Best fit rather than overflow: there is no room to spill into
-            // before the pill, and a name shrunk a point or two still reads.
-            name.horizontalOverflow = HorizontalWrapMode.Wrap;
-            name.resizeTextForBestFit = true;
-            name.resizeTextMinSize = 7;
-            name.resizeTextMaxSize = 11;
-
+            // The pill is the row. At 75px wide there is nothing to put beside
+            // it, so the name goes on top of the status colour instead of
+            // competing with it for the width.
             var pill = UiFactory.CreateImage("Pill", row.transform, DOTORIONPalette.Working);
-            UiFactory.AnchorRight(pill.rectTransform, 5f, 5f, 62f, 20f);
+            UiFactory.Stretch(pill.rectTransform, 4f, 0f, 4f, 0f);
             pill.sprite = BuiltinSprite("UI/Skin/UISprite.psd");
             pill.type = Image.Type.Sliced;
             pill.raycastTarget = false;
 
             var dot = UiFactory.CreateImage("Dot", pill.transform, DOTORIONPalette.TextPrimary);
-            UiFactory.AnchorTop(dot.rectTransform, 5f, 6f, 8f, 8f);
+            var dotRect = dot.rectTransform;
+            dotRect.anchorMin = dotRect.anchorMax = new Vector2(0f, 0.5f);
+            dotRect.pivot = new Vector2(0f, 0.5f);
+            dotRect.anchoredPosition = new Vector2(4f, 0f);
+            dotRect.sizeDelta = new Vector2(8f, 8f);
             dot.sprite = BuiltinSprite("UI/Skin/Knob.psd");
             dot.raycastTarget = false;
+
+            var name = UiFactory.CreateText("Name", pill.transform, font, 11,
+                TextAnchor.MiddleLeft, DOTORIONPalette.Window, FontStyle.Bold);
+            UiFactory.Stretch(name.rectTransform, 15f, 0f, 4f, 0f);
+            name.text = "김햄초";
+            name.raycastTarget = false;
 
             Assign(rowView, ("_nameText", name), ("_pill", pill), ("_dot", dot));
             return rowView;
