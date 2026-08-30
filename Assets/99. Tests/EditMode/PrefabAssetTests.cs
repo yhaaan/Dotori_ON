@@ -185,10 +185,11 @@ namespace DOTORION.Tests.EditMode
             foreach (var row in main.GetComponentsInChildren<MiniMemberRowView>(true))
             {
                 var rowData = new SerializedObject(row);
+                // No status label: at 75px wide the name sits on the pill and
+                // the colour is what says which status it is.
                 AssertReference(rowData, "_nameText");
                 AssertReference(rowData, "_pill");
                 AssertReference(rowData, "_dot");
-                AssertReference(rowData, "_statusText");
             }
             Assert.That(main.GetComponentsInChildren<MiniMemberRowView>(true).Length, Is.EqualTo(4));
             // A sibling of the window background, which it replaces rather than
