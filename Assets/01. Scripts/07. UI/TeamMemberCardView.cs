@@ -44,6 +44,15 @@ namespace DOTORION.UI
         [SerializeField] private Color _onlineColor = new Color(0.43137255f, 0.65882355f, 0.99607843f, 1f);
         [SerializeField] private Color _offlineColor = new Color(0.4f, 0.4509804f, 0.5254902f, 1f);
 
+        /// <summary>
+        /// Tints the card's own artwork. White leaves the sprite exactly as it
+        /// was drawn, so the offline one is the only colour doing any work here:
+        /// it says the card is asleep without a second graphic for it.
+        /// </summary>
+        [Header("Card colours")]
+        [SerializeField] private Color _onlineCardColor = Color.white;
+        [SerializeField] private Color _offlineCardColor = new Color(0.65f, 0.65f, 0.65f, 1f);
+
         private string _memberId;
         private TeamAvatarCatalog _avatarCatalog;
 
@@ -136,9 +145,13 @@ namespace DOTORION.UI
             var isOnline = MemberStatusDisplay.IsOnline(member);
             var accent = AccentFor(member);
 
-            // The card's own surface is prefab artwork now, so nothing here
-            // repaints it. The avatar tile still takes the status colour: that
-            // tile is what the card is read by from across the room.
+            if (_background != null)
+            {
+                _background.color = isOnline ? _onlineCardColor : _offlineCardColor;
+            }
+
+            // The avatar tile takes the status colour: that tile is what the
+            // card is read by from across the room.
             _avatarBackground.color = accent;
             BindAvatar(member, isOnline);
             _nameText.text = member.DisplayName;
