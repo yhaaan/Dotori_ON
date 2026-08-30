@@ -327,14 +327,11 @@ namespace DOTORION.UI
 
             // Claimed days stay visible rather than hidden: the button is also
             // where the point total lives, and a total that vanished for the rest
-            // of the day would read as having lost the points. Whether today is
-            // claimed shows in the point label alone - the button is artwork.
+            // of the day would read as having lost the points. The colour is the
+            // prefab's, like every other surface here; only the number changes.
             if (_dailyCheckInPointsLabel != null)
             {
                 _dailyCheckInPointsLabel.text = state.TotalPoints + "P";
-                _dailyCheckInPointsLabel.color = state.ClaimedToday
-                    ? DOTORIONPalette.TextSecondary
-                    : DOTORIONPalette.Accent;
             }
         }
 
