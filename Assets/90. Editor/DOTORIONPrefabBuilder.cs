@@ -112,8 +112,8 @@ namespace DOTORION.Editor
         /// <summary>Card geometry, in pixels from the top of the card.</summary>
         internal const float CardAvatarTop = 24f;
         internal const float CardNameTop = 73f;
-        internal const float CardStatusTop = 91f;
-        internal const float CardDetailTop = 109f;
+        internal const float CardStatusTop = 94f;
+        internal const float CardDetailTop = 110f;
 
         /// <summary>
         /// The picker cell is a little larger than the icon so the selected
@@ -234,7 +234,7 @@ namespace DOTORION.Editor
 
                 var name = UiFactory.CreateText("Name", root.transform, font, 13,
                     TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
-                SetCardLine(name, CardNameTop, 18f);
+                SetCardLine(name, CardNameTop, 21f);
                 name.text = "김햄초";
                 // Alone among the labels the name is clicked, so it is the only
                 // one that has to be a raycast target. The handle ships disabled:
@@ -245,7 +245,7 @@ namespace DOTORION.Editor
                 nameDoubleClick.enabled = false;
                 var status = UiFactory.CreateText("Status", root.transform, font, 11,
                     TextAnchor.MiddleCenter, DOTORIONPalette.Working, FontStyle.Bold);
-                SetCardLine(status, CardStatusTop, 18f);
+                SetCardLine(status, CardStatusTop, 16f);
                 status.text = "작업중";
                 var nudge = UiFactory.CreateButton("Nudge", root.transform, font, "\uCF55");
                 nudge.GetComponentInChildren<Text>().fontSize = 9;
@@ -257,7 +257,7 @@ namespace DOTORION.Editor
 
                 var detail = UiFactory.CreateText("Detail", root.transform, font, 9,
                     TextAnchor.MiddleCenter, DOTORIONPalette.TextSecondary);
-                SetCardLine(detail, CardDetailTop, 27f);
+                SetCardLine(detail, CardDetailTop, 26f);
                 detail.horizontalOverflow = HorizontalWrapMode.Wrap;
                 detail.text = "출근 09:00";
 
@@ -923,7 +923,7 @@ namespace DOTORION.Editor
             var day = UiFactory.CreateText("Day", background.transform, font, 9,
                 TextAnchor.UpperLeft, DOTORIONPalette.TextSecondary);
             day.text = "1";
-            UiFactory.AnchorTop(day.rectTransform, 4f, 3f, 24f, 12f);
+            UiFactory.AnchorTop(day.rectTransform, 4f, 3f, 24f, 13f);
 
             var duration = UiFactory.CreateText("Duration", background.transform, font, 11,
                 TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
@@ -1384,7 +1384,13 @@ namespace DOTORION.Editor
             return font != null ? font : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         }
 
-        internal const string UiFontPath = "Assets/DungGeunMo.ttf";
+        /// <summary>
+        /// The body face. The prefabs use three sizes of Galmuri - 9, 11 and 14 -
+        /// each rendered at its own em size (10, 12, 15) so one drawn dot lands
+        /// on exactly one screen pixel. The builder only knows the body one; a
+        /// rebuild is a reset, not a way to reproduce the typography.
+        /// </summary>
+        internal const string UiFontPath = "Assets/Galmuri-v2.40.4/Galmuri9.ttf";
         private static void ConfigureScaler(CanvasScaler scaler)
         {
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
