@@ -7399,6 +7399,7 @@ GameObject:
   - component: {fileID: 6632014706052814522}
   - component: {fileID: 6159812890848944641}
   - component: {fileID: 4076960502488679552}
+  - component: {fileID: 4164751040858798544}
   m_Layer: 0
   m_Name: MiniDragStrip
   m_TagString: Untagged
@@ -7424,7 +7425,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 18}
+  m_SizeDelta: {x: 0, y: 16}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &6159812890848944641
 CanvasRenderer:
@@ -10612,8 +10613,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -135.5, y: 0}
-  m_SizeDelta: {x: -271, y: 0}
+  m_AnchoredPosition: {x: -78.5, y: 0}
+  m_SizeDelta: {x: -157, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &506698445241468101
 CanvasRenderer:
@@ -12801,8 +12802,8 @@ MonoBehaviour:
   _dailyCheckInButton: {fileID: 2134400207570054107}
   _dailyCheckInPointsLabel: {fileID: 4818157336460562903}
   _statusNoteInput: {fileID: 1873065509840273366}
-  _dailyCheckInAvailableSprite: {fileID: -6707576332687999409, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
-  _dailyCheckInClaimedSprite: {fileID: -329239408103798631, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+  _dailyCheckInAvailableSprite: {fileID: -329239408103798631, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+  _dailyCheckInClaimedSprite: {fileID: -6707576332687999409, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
   _feedbackText: {fileID: 3031693403873836149}
   _versionLabel: {fileID: 6451234060585357868}
   _windowDragHandle: {fileID: 7598800284273923870}
@@ -17528,8 +17529,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -2}
-  m_SizeDelta: {x: -12, y: 13}
+  m_AnchoredPosition: {x: -2.5, y: -1}
+  m_SizeDelta: {x: -1, y: 14}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &6022279183290543388
 CanvasRenderer:
@@ -17566,7 +17567,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 40
-    m_Alignment: 3
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
@@ -21660,7 +21661,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7559557576479075754
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21683,7 +21684,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 75, y: 130}
+  m_SizeDelta: {x: 77, y: 130}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1849243804464468703
 CanvasRenderer:
@@ -21707,7 +21708,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -32170,3 +32171,33 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1630360747423831258, guid: 60d016d16e5c4aa40b259e07452257a2, type: 3}
   m_PrefabInstance: {fileID: 8601878179670069939}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4164751040858798544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2439252578943377799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.001}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
