@@ -14,18 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.TeamAvatarCatalog
   _icons:
   - {fileID: 21300000, guid: 76d424cbb54e18a4e9952b5d23afb89f, type: 3}
-  - {fileID: 21300000, guid: ed48040a3e3c45b42a7127db01e825cf, type: 3}
-  - {fileID: 21300000, guid: b4265a25547b1c04f95f629705a92337, type: 3}
-  - {fileID: 21300000, guid: bd885408aecd91a4ea99d3c3e71fdb6e, type: 3}
-  - {fileID: 21300000, guid: fe34db625a9aa574db0f7a74b7788931, type: 3}
-  - {fileID: 21300000, guid: 04f501c1e8548d74f89b5616c09bc7c5, type: 3}
-  - {fileID: 21300000, guid: e033a4bae51cc3a4592f24a92e3a5081, type: 3}
-  - {fileID: 21300000, guid: d53021b1e86a9fb4a92f0a085dd21e83, type: 3}
-  - {fileID: 21300000, guid: a577253f60f1ecc4ba389260680e8c41, type: 3}
-  - {fileID: 21300000, guid: bb3eaeb3b01c7ed44816e8ebc2295df1, type: 3}
-  - {fileID: 21300000, guid: 1a447352ea0ef4040a909cfda0f21868, type: 3}
-  - {fileID: 21300000, guid: c84799b205649044199b96f12816fa1a, type: 3}
-  - {fileID: 21300000, guid: 90a141a5f33a19b49ba9b2f65e8648c8, type: 3}
-  - {fileID: 21300000, guid: 8b647cb0619ccdc48942c02a9cda9dcf, type: 3}
-  - {fileID: 21300000, guid: 0b1fb364b4992d54f9f4dc1a575a7f96, type: 3}
-  - {fileID: 21300000, guid: 669288254fd3c5548ae10869bb771a7d, type: 3}
+  - {fileID: 21300000, guid: fafb9e206c9589446aa30487d1d1fbb7, type: 3}
+  - {fileID: 21300000, guid: 0dcbe840186b30848b0cf3f05e6f4c32, type: 3}
+  - {fileID: 21300000, guid: bef8da4e3642683458dc46de03c370b4, type: 3}
+  - {fileID: 21300000, guid: 018a32c0ce2ce4245b2971bee01ddcbe, type: 3}
+  - {fileID: 21300000, guid: a6080c34ad292c8418472d2047cffbca, type: 3}
+  - {fileID: 21300000, guid: f05e207525fc9bc4bacd7ef9ec6e155c, type: 3}
+  - {fileID: 21300000, guid: 8ac1b8571864d9243aa9e9a3aa914240, type: 3}
+  - {fileID: 21300000, guid: d257d94bec751fe4993499c9a827ad11, type: 3}
+  - {fileID: 21300000, guid: f934ef16ca3f17e439bff865fec0af33, type: 3}
+  - {fileID: 21300000, guid: 522d3b7b650d73d438869bd0902744b9, type: 3}
+  - {fileID: 21300000, guid: b9021f67ec6b86a43b49e63a0d7dd6b6, type: 3}
+  - {fileID: 21300000, guid: bcdd0750ec3a2c742b502c8ce17077b7, type: 3}
+  - {fileID: 21300000, guid: b3ac0a53d0595134a9f19cbc739c77c8, type: 3}
+  - {fileID: 21300000, guid: 7103d81b16514fb4c99f411955b9fd9e, type: 3}
+  - {fileID: 21300000, guid: e73e0d101f788914590e5dd251fa66f6, type: 3}

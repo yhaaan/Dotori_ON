@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 90a141a5f33a19b49ba9b2f65e8648c8
+guid: bef8da4e3642683458dc46de03c370b4
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7136755533056488923
-    second: RelicIcon6_0
+      213: -5001728716053290913
+    second: profile11_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: RelicIcon6_0
+      name: profile11_0
       rect:
         serializedVersion: 2
-        x: 3
+        x: 0
         y: 1
-        width: 19
-        height: 22
+        width: 48
+        height: 46
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bd5b2ac5859da0360800000000000000
-      internalID: 7136755533056488923
+      spriteID: f50e5c8ab3a469ab0800000000000000
+      internalID: -5001728716053290913
       vertices: []
       indices: 
       edges: []
