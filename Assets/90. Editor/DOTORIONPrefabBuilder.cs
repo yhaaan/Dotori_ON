@@ -1390,7 +1390,7 @@ namespace DOTORION.Editor
         /// on exactly one screen pixel. The builder only knows the body one; a
         /// rebuild is a reset, not a way to reproduce the typography.
         /// </summary>
-        internal const string UiFontPath = "Assets/Galmuri-v2.40.4/Galmuri9.ttf";
+        internal const string UiFontPath = "Assets/Galmuri-v2.40.4/Galmuri9(10).ttf";
         private static void ConfigureScaler(CanvasScaler scaler)
         {
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
