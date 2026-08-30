@@ -367,10 +367,10 @@ ScriptedImporter:
     customData: 
     rect:
       serializedVersion: 2
-      x: 934
-      y: 75
-      width: 130
-      height: 150
+      x: 940
+      y: 88
+      width: 76
+      height: 130
     spriteID: 270255064d4e1a14b9ec8b5692dd323c
     spriteBone: []
     spriteOutline: []
@@ -640,10 +640,10 @@ ScriptedImporter:
     customData: 
     rect:
       serializedVersion: 2
-      x: 1006
-      y: 41
-      width: 39
-      height: 14
+      x: 946
+      y: 33
+      width: 62
+      height: 18
     spriteID: 550aee61362b065428b00dbf05f14bfc
     spriteBone: []
     spriteOutline: []
@@ -787,10 +787,10 @@ ScriptedImporter:
     customData: 
     rect:
       serializedVersion: 2
-      x: 943
-      y: 41
-      width: 11
-      height: 12
+      x: 952
+      y: 64
+      width: 8
+      height: 8
     spriteID: 2489d7df15d9d9a449bfb593e4fa0797
     spriteBone: []
     spriteOutline: []
@@ -821,6 +821,27 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
+  - name: UI_sheet_32
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 730
+      y: 27
+      width: 11
+      height: 12
+    spriteID: f22d3c2c0389f5d488f6f5b9c3137fd8
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 0, y: 0}
   tileSetImportData: []
   asepriteLayers:
   - layerIndex: 0
@@ -841,7 +862,7 @@ ScriptedImporter:
       cellRect:
         x: 4
         y: 7
-        width: 1060
+        width: 1011
         height: 221
       spriteId: 9c256b60ad02cee4a882ce9cc27e9275
     linkedCells: []
@@ -889,5 +910,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 1068, y: 230}
-  previousTextureSize: {x: 2048, y: 256}
+  canvasSize: {x: 1027, y: 230}
+  previousTextureSize: {x: 1024, y: 256}
