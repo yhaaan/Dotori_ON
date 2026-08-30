@@ -40,6 +40,9 @@ namespace DOTORION.UI
         [Header("Daily check-in sprites")]
         [SerializeField] private Sprite _dailyCheckInAvailableSprite;
         [SerializeField] private Sprite _dailyCheckInClaimedSprite;
+
+        private bool _dailyCheckInSupported;
+        private bool _isClockedIn;
         [SerializeField] private Text _feedbackText;
         [SerializeField] private Text _versionLabel;
         [SerializeField] private WindowDragHandle _windowDragHandle;
@@ -324,11 +327,8 @@ namespace DOTORION.UI
         /// </summary>
         public void SetDailyCheckIn(DailyCheckInState state, bool supported)
         {
-            SetActive(_dailyCheckInButton, supported && state != null);
-            if (_dailyCheckInPointsLabel != null)
-            {
-                _dailyCheckInPointsLabel.gameObject.SetActive(supported && state != null);
-            }
+            _dailyCheckInSupported = supported && state != null;
+            ApplyDailyCheckInVisibility();
 
             if (!supported || state == null)
             {
@@ -347,6 +347,21 @@ namespace DOTORION.UI
             SetDailyCheckInSprite(state.ClaimedToday
                 ? _dailyCheckInClaimedSprite
                 : _dailyCheckInAvailableSprite);
+        }
+
+        /// <summary>
+        /// The button only shows while you are clocked in - the server refuses a
+        /// check-in from someone who has not arrived, and a button that is only
+        /// ever refused is worse than no button. The point total stays either
+        /// way: it is what you have earned, not something you can do right now.
+        /// </summary>
+        private void ApplyDailyCheckInVisibility()
+        {
+            SetActive(_dailyCheckInButton, _dailyCheckInSupported && _isClockedIn);
+            if (_dailyCheckInPointsLabel != null)
+            {
+                _dailyCheckInPointsLabel.gameObject.SetActive(_dailyCheckInSupported);
+            }
         }
 
         private void SetDailyCheckInSprite(Sprite sprite)
@@ -414,11 +429,7 @@ namespace DOTORION.UI
             DateTimeOffset nowUtc,
             UnreadNoteTracker unreadNotes)
         {
-            var orderedMembers = members
-                .OrderBy(member => member.SortOrder)
-                .ThenBy(member => member.MemberId, StringComparer.Ordinal)
-                .Take(MemberCount)
-                .ToArray();
+            var orderedMembers = MemberCardOrder.Sort(members, MemberCount);
 
             for (var index = 0; index < _cards.Length; index++)
             {
@@ -455,6 +466,9 @@ namespace DOTORION.UI
             }
 
             _miniPanel?.Bind(orderedMembers, unreadNotes);
+
+            _isClockedIn = isClockedIn;
+            ApplyDailyCheckInVisibility();
 
             SetActive(_teamNudgeButton, isClockedIn);
             SetActive(_checkInButton, !isClockedIn);
