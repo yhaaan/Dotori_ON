@@ -5,7 +5,8 @@ using UnityEngine.UI;
 namespace DOTORION.UI
 {
     /// <summary>
-    /// One line of the mini overlay: a name and a status pill, and nothing else.
+    /// One line of the mini overlay: a name and a coloured status pill, and
+    /// nothing else - not even the status in words.
     /// The full card's timer and note are deliberately absent - the mini overlay
     /// exists to be small enough to leave on screen, and everything it drops is a
     /// double click away.
@@ -22,7 +23,6 @@ namespace DOTORION.UI
         [SerializeField] private Text _nameText;
         [SerializeField] private Image _pill;
         [SerializeField] private Image _dot;
-        [SerializeField] private Text _statusText;
 
         /// <summary>
         /// The same five status colours the card carries. They are separate
@@ -38,15 +38,12 @@ namespace DOTORION.UI
         [SerializeField] private Color _offlineColor = new Color(0.4f, 0.4509804f, 0.5254902f, 1f);
 
         /// <summary>
-        /// The pill carries the status colour, so its text has to be the dark
-        /// one: every online colour is a light pastel and a near-white label
-        /// disappears into it. The dot stays light for the same reason in
-        /// reverse - it has to read against the pill.
+        /// The dot stays light because it has to read against the pill, and the
+        /// pill is always one of the status colours.
         /// </summary>
         [Header("Row colours")]
         [SerializeField] private Color _nameOnlineColor = new Color(0.95686275f, 0.96862745f, 0.9843137f, 1f);
         [SerializeField] private Color _nameOfflineColor = new Color(0.6627451f, 0.70980394f, 0.7764706f, 1f);
-        [SerializeField] private Color _pillTextColor = new Color(0.0627451f, 0.08627451f, 0.12941177f, 1f);
         [SerializeField] private Color _dotIdleColor = new Color(0.95686275f, 0.96862745f, 0.9843137f, 1f);
         [SerializeField] private Color _dotNoteColor = new Color(0.9137255f, 0.44313726f, 0.44313726f, 1f);
 
@@ -69,12 +66,9 @@ namespace DOTORION.UI
                 _nameText.color = isOnline ? _nameOnlineColor : _nameOfflineColor;
             }
 
+            // The pill is the status: its colour says which one, and dropping
+            // the word off it is what let the row shrink to a name and a mark.
             if (_pill != null) _pill.color = AccentFor(member);
-            if (_statusText != null)
-            {
-                _statusText.text = MemberStatusDisplay.Label(member);
-                _statusText.color = _pillTextColor;
-            }
         }
 
         /// <summary>

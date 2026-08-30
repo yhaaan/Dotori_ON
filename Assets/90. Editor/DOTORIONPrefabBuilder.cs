@@ -646,13 +646,7 @@ namespace DOTORION.Editor
             dot.sprite = BuiltinSprite("UI/Skin/Knob.psd");
             dot.raycastTarget = false;
 
-            var status = UiFactory.CreateText("Status", pill.transform, font, 10,
-                TextAnchor.MiddleCenter, DOTORIONPalette.Window, FontStyle.Bold);
-            status.text = "작업중";
-            UiFactory.Stretch(status.rectTransform, 16f, 0f, 5f, 0f);
-
-            Assign(rowView,
-                ("_nameText", name), ("_pill", pill), ("_dot", dot), ("_statusText", status));
+            Assign(rowView, ("_nameText", name), ("_pill", pill), ("_dot", dot));
             return rowView;
         }
 

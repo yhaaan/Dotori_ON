@@ -1,9 +1,10 @@
 # Unity에서 DOTORI ON UI 조정하기
 
-이제 화면은 런타임 코드로 생성되지 않고 아래 네 개의 실제 프리팹을 사용합니다.
+이제 화면은 런타임 코드로 생성되지 않고 아래의 실제 프리팹을 사용합니다.
 
 - `Assets/02. Prefabs/DOTORIONCanvas.prefab`: 메인 화면 전체
 - `Assets/02. Prefabs/TeamMemberCard.prefab`: 메인 화면에 중첩된 멤버 카드 원본
+- `Assets/02. Prefabs/MiniMemberRow.prefab`: 소형 모드에 중첩된 한 줄 원본
 - `Assets/02. Prefabs/FirstRunNameModal.prefab`: 최초 실행 이름 설정 화면
 - `Assets/Resources/DOTORION/DOTORIONApp.prefab`: 앱 시작점과 위 프리팹 참조
 
@@ -130,7 +131,13 @@ ColorTint는 **곱하기**라 흰색보다 밝게는 못 만듭니다. hover에�
 
 ## 소형 모드
 
-상단 바의 `소형`(`TopBar/MiniMode`, `DOTORIONView._miniModeButton`)을 누르면 창이 130x150으로 줄고 반투명해집니다. 이름과 상태만 네 줄로 보이며, **창 아무 곳이나 더블클릭하면** 원래 크기로 돌아옵니다. 맨 위 18px 띠(`MiniOverlayPanel/MiniDragStrip`)만 창을 끄는 손잡이입니다. 본문이 드래그까지 맡으면 네이티브 창 이동 루프가 마우스를 눌리는 순간 가져가 버려서, 더블클릭의 첫 번째 클릭이 사라집니다.
+상단 바의 `소형`(`TopBar/MiniMode`, `DOTORIONView._miniModeButton`)을 누르면 창이 130x150으로 줄고 반투명해집니다. 이름과 상태 pill만 네 줄로 보이며, **창 아무 곳이나 더블클릭하면** 원래 크기로 돌아옵니다. 맨 위 18px 띠(`MiniOverlayPanel/MiniDragStrip`)만 창을 끄는 손잡이입니다. 본문이 드래그까지 맡으면 네이티브 창 이동 루프가 마우스를 눌리는 순간 가져가 버려서, 더블클릭의 첫 번째 클릭이 사라집니다.
+
+### 한 줄은 프리팹입니다
+
+네 줄은 `MiniMemberRow.prefab`의 인스턴스이고, **인스턴스마다 다른 것은 세로 위치뿐입니다.** 그래서 한 줄만 고치면 네 줄이 같이 바뀝니다. 프리팹을 새로 뽑아야 할 일이 생기면 `DOTORI ON > Extract Mini Row Prefab`이 `MiniRow_1`을 에셋으로 저장하고 나머지 셋을 그 인스턴스로 갈아 끼운 뒤 `MiniOverlayPanelView._rows`를 다시 연결합니다. 이미 인스턴스인 캔버스에는 아무것도 하지 않습니다.
+
+**행에는 상태 글자가 없습니다.** 예전에는 pill 위에 "작업중" 같은 낱말을 얹었지만, 130px 폭에서 이름과 낱말이 자리를 다투었고 색이 이미 같은 말을 하고 있었습니다. 지금 상태를 말하는 것은 **pill의 색과 점**뿐이고, 정확한 낱말이 필요하면 더블클릭해서 전체 화면으로 돌아가면 됩니다.
 
 `MiniOverlayPanel`은 `WindowBackground`의 자식이 아니라 형제이고, 아바타 선택창과 달리 펼쳐지는 게 아니라 **`WindowBackground`를 통째로 끄고 대신 켜집니다.**
 
