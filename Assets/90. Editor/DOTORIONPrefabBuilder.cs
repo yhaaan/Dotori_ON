@@ -99,6 +99,16 @@ namespace DOTORION.Editor
         /// </summary>
         internal const float AvatarIconSize = 48f;
 
+        /// <summary>
+        /// The size one card actually gets on screen, and therefore the size its
+        /// artwork is drawn at. Four cards plus three 5px gaps have to land on
+        /// whole pixels or the pixel art resamples: 4*113 + 3*5 = 467, which is
+        /// why the row is 467 wide inside a 480 window rather than a rounder 468.
+        /// </summary>
+        internal const float CardWidth = 113f;
+        internal const float CardHeight = 138f;
+        internal const float CardRowSpacing = 5f;
+
         /// <summary>Card geometry, in pixels from the top of the card.</summary>
         internal const float CardAvatarTop = 24f;
         internal const float CardNameTop = 73f;
@@ -193,7 +203,7 @@ namespace DOTORION.Editor
             rootRect.anchorMin = rootRect.anchorMax = new Vector2(0.5f, 1f);
             rootRect.pivot = new Vector2(0.5f, 1f);
             rootRect.anchoredPosition = Vector2.zero;
-            rootRect.sizeDelta = new Vector2(100f, 100f);
+            rootRect.sizeDelta = new Vector2(CardWidth, CardHeight);
 
             try
             {
@@ -323,10 +333,15 @@ namespace DOTORION.Editor
                 cardsRect.anchorMin = new Vector2(0f, 1f);
                 cardsRect.anchorMax = new Vector2(1f, 1f);
                 cardsRect.pivot = new Vector2(0.5f, 1f);
-                cardsRect.anchoredPosition = new Vector2(0f, -36f);
-                cardsRect.sizeDelta = new Vector2(-12f, 138f);
+                // 6px in on the left, 7px on the right: the odd 13 is what makes
+                // each card exactly CardWidth instead of 113.25, and the half
+                // pixel is spent on the margin where nothing is drawn.
+                cardsRect.anchoredPosition = new Vector2(-0.5f, -36f);
+                cardsRect.sizeDelta = new Vector2(
+                    -(480f - ((CardWidth * 4f) + (CardRowSpacing * 3f))),
+                    CardHeight);
                 var horizontal = cardsRoot.AddComponent<HorizontalLayoutGroup>();
-                horizontal.spacing = 5f;
+                horizontal.spacing = CardRowSpacing;
                 horizontal.childAlignment = TextAnchor.UpperCenter;
                 horizontal.childControlWidth = horizontal.childControlHeight = true;
                 horizontal.childForceExpandWidth = horizontal.childForceExpandHeight = true;
