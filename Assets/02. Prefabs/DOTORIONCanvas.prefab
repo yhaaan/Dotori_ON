@@ -7447,6 +7447,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f125fa4aefba9644a83a074e1a059162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.WindowDragHandle
+--- !u!114 &4164751040858798544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2439252578943377799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.001}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &2441560596286085440
 GameObject:
   m_ObjectHideFlags: 0
@@ -21661,7 +21691,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7559557576479075754
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31751,6 +31781,10 @@ PrefabInstance:
       value: MiniRow_1
       objectReference: {fileID: 0}
     - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_LocalRotation.x
       value: -0
       objectReference: {fileID: 0}
@@ -31764,7 +31798,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1.4262085
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -31917,8 +31951,12 @@ PrefabInstance:
       value: MiniRow_2
       objectReference: {fileID: 0}
     - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1.4262161
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8954638227708495665, guid: a2d5f6c21d748804d840ae4b07e39bae, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -32171,33 +32209,3 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1630360747423831258, guid: 60d016d16e5c4aa40b259e07452257a2, type: 3}
   m_PrefabInstance: {fileID: 8601878179670069939}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4164751040858798544
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2439252578943377799}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.001}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
