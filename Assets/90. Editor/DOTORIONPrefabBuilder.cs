@@ -628,24 +628,31 @@ namespace DOTORION.Editor
             // The pill is the row. At 75px wide there is nothing to put beside
             // it, so the name goes on top of the status colour instead of
             // competing with it for the width.
+            // Anchored from the top with whole-pixel offsets rather than
+            // centred: 18 inside 25, and 7 inside 18, both land on a half pixel
+            // if you centre them, and a half pixel is where a pixel font blurs.
             var pill = UiFactory.CreateImage("Pill", row.transform, DOTORIONPalette.Working);
-            UiFactory.Stretch(pill.rectTransform, 4f, 0f, 4f, 0f);
+            var pillRect = pill.rectTransform;
+            pillRect.anchorMin = pillRect.anchorMax = new Vector2(0f, 1f);
+            pillRect.pivot = new Vector2(0f, 1f);
+            pillRect.anchoredPosition = new Vector2(6f, -3f);
+            pillRect.sizeDelta = new Vector2(62f, 18f);
             pill.sprite = BuiltinSprite("UI/Skin/UISprite.psd");
             pill.type = Image.Type.Sliced;
             pill.raycastTarget = false;
 
             var dot = UiFactory.CreateImage("Dot", pill.transform, DOTORIONPalette.TextPrimary);
             var dotRect = dot.rectTransform;
-            dotRect.anchorMin = dotRect.anchorMax = new Vector2(0f, 0.5f);
-            dotRect.pivot = new Vector2(0f, 0.5f);
-            dotRect.anchoredPosition = new Vector2(4f, 0f);
-            dotRect.sizeDelta = new Vector2(8f, 8f);
+            dotRect.anchorMin = dotRect.anchorMax = new Vector2(0f, 1f);
+            dotRect.pivot = new Vector2(0f, 1f);
+            dotRect.anchoredPosition = new Vector2(4f, -5f);
+            dotRect.sizeDelta = new Vector2(7f, 7f);
             dot.sprite = BuiltinSprite("UI/Skin/Knob.psd");
             dot.raycastTarget = false;
 
             var name = UiFactory.CreateText("Name", pill.transform, font, 11,
                 TextAnchor.MiddleLeft, DOTORIONPalette.Window, FontStyle.Bold);
-            UiFactory.Stretch(name.rectTransform, 15f, 0f, 4f, 0f);
+            UiFactory.Stretch(name.rectTransform, 14f, 0f, 4f, 0f);
             name.text = "김햄초";
             name.raycastTarget = false;
 
