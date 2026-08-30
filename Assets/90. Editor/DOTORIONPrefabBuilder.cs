@@ -266,6 +266,7 @@ namespace DOTORION.Editor
                     ("_avatarIcon", avatarIcon), ("_avatarButton", avatarButton),
                     ("_avatarText", initial), ("_timerText", timer), ("_nameText", name),
                     ("_statusText", status), ("_detailText", detail), ("_nudgeButton", nudge),
+                    ("_nudgeRoot", nudge.gameObject),
                     ("_nameDoubleClick", nameDoubleClick));
                 return PrefabUtility.SaveAsPrefabAsset(root, CardPath).GetComponent<TeamMemberCardView>();
             }

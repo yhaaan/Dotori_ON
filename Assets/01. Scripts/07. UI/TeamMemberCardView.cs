@@ -21,6 +21,13 @@ namespace DOTORION.UI
         [SerializeField] private Text _statusText;
         [SerializeField] private Text _detailText;
         [SerializeField] private Button _nudgeButton;
+
+        /// <summary>
+        /// The object that carries the whole poke widget - frame art and button
+        /// together. Left empty it falls back to the button's own object, which
+        /// is right only while the button is the entire widget.
+        /// </summary>
+        [SerializeField] private GameObject _nudgeRoot;
         [SerializeField] private DoubleClickHandle _nameDoubleClick;
 
         private string _memberId;
@@ -96,9 +103,14 @@ namespace DOTORION.UI
         /// </summary>
         public void SetNudgeAvailable(bool available)
         {
-            if (_nudgeButton != null)
+            // Hiding the button alone would leave its frame behind as an empty
+            // box, so the whole widget goes together.
+            var widget = _nudgeRoot != null
+                ? _nudgeRoot
+                : (_nudgeButton != null ? _nudgeButton.gameObject : null);
+            if (widget != null)
             {
-                _nudgeButton.gameObject.SetActive(available);
+                widget.SetActive(available);
             }
         }
 

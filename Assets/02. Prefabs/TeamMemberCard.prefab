@@ -245,6 +245,7 @@ MonoBehaviour:
   _statusText: {fileID: 4698884127424254874}
   _detailText: {fileID: 4136923742309522862}
   _nudgeButton: {fileID: 534459047929955214}
+  _nudgeRoot: {fileID: 1834720026730424601}
   _nameDoubleClick: {fileID: 1961062046088422119}
 --- !u!1 &1408609108049136822
 GameObject:
@@ -337,7 +338,7 @@ GameObject:
   - component: {fileID: 2493779026563058852}
   - component: {fileID: 7799548424043868159}
   m_Layer: 0
-  m_Name: Nudge
+  m_Name: NudgeBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
