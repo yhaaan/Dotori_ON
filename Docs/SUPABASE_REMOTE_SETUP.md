@@ -29,13 +29,13 @@ confirmed identical local and remote versions:
 Production seed data was not pushed. This avoids treating local fixture data as
 remote application data.
 
-## Pending migrations
+## Anonymous user cleanup
 
-These two are committed but **not yet pushed**. Run `npx supabase db push` before
-relying on them:
-
-- `202608270001_orphan_anonymous_user_cleanup.sql`
-- `202608270002_schedule_orphan_user_cleanup.sql`
+`202608270001_orphan_anonymous_user_cleanup.sql` and
+`202608270002_schedule_orphan_user_cleanup.sql` were listed here as pending for a
+while; `npx supabase db push --dry-run` on 2026-08-31 no longer offers them, so
+they are applied. Check the dry run rather than this list - it reads the remote
+migration history and this paragraph does not.
 
 They exist because signing in must happen before a name can be claimed, so every
 rejected claim leaves an anonymous Auth user that owns nothing and that the
