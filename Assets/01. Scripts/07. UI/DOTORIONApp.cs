@@ -30,6 +30,14 @@ namespace DOTORION.UI
         // on the next tick instead of leaving the roster stale until a reconnect.
         private const float TeamStatePollSeconds = 3f;
 
+        /// <summary>
+        /// How long to wait before asking again for a check-in state that did
+        /// not arrive. Long enough that a backend which is simply down is not
+        /// asked twenty times a minute, short enough that the button appears
+        /// while the person is still looking at the window.
+        /// </summary>
+        private const float DailyCheckInRetrySeconds = 60f;
+
         // Comfortably inside the server's three-minute stale-session timeout, so a
         // single failed heartbeat never clocks anyone out.
         private const float HeartbeatSeconds = 45f;
@@ -92,8 +100,14 @@ namespace DOTORION.UI
         private float _nextTimerRefresh;
         private float _nextTeamStatePoll;
 
-        /// <summary>The team day the check-in state was last read for.</summary>
+        /// <summary>
+        /// The team day the check-in state was last read for. Only a reply from
+        /// the server moves it, so a failed read is retried instead of leaving
+        /// the button hidden for the rest of the day.
+        /// </summary>
         private DateTime _dailyCheckInDay = DateTime.MinValue;
+
+        private float _nextDailyCheckInAttempt;
         private float _nextHeartbeat;
         private float _nextIdleCheck;
         private readonly IdleActivityPolicy _idlePolicy = new IdleActivityPolicy(IdleBreakSeconds);
@@ -288,9 +302,13 @@ namespace DOTORION.UI
                 // The check-in state is read once and then only after claiming,
                 // so without this the button would still say "taken" the morning
                 // after. Six o'clock is when the team's day turns over, and the
-                // person watching should see the button change on its own.
-                if (_view != null && _dailyCheckInDay != TeamDay.Today)
+                // person watching should see the button change on its own. The
+                // same check picks up a read that failed at sign-in, which would
+                // otherwise leave the button hidden until tomorrow.
+                if (_view != null && _dailyCheckInDay != TeamDay.Today &&
+                    now >= _nextDailyCheckInAttempt)
                 {
+                    _nextDailyCheckInAttempt = now + DailyCheckInRetrySeconds;
                     LoadDailyCheckIn();
                 }
             }
@@ -1049,10 +1067,12 @@ namespace DOTORION.UI
         /// </summary>
         private async void LoadDailyCheckIn()
         {
-            _dailyCheckInDay = TeamDay.Today;
             var requestedBackend = _backend;
             if (!(requestedBackend is ITeamCheckIn checkIn))
             {
+                // Nothing to read and nothing to retry: the button is hidden for
+                // good on a backend that has no check-in at all.
+                _dailyCheckInDay = TeamDay.Today;
                 return;
             }
 
@@ -1061,6 +1081,7 @@ namespace DOTORION.UI
                 var state = await checkIn.GetDailyCheckInStateAsync(_lifetime.Token);
                 if (_view != null && ReferenceEquals(_backend, requestedBackend))
                 {
+                    _dailyCheckInDay = TeamDay.Today;
                     _view.SetDailyCheckIn(state, true);
                 }
             }
