@@ -252,8 +252,8 @@ MonoBehaviour:
   _mealColor: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
   _onlineColor: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
   _offlineColor: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
-  _onlineCardColor: {r: 1, g: 1, b: 1, a: 1}
-  _offlineCardColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
+  _onlineCardColor: {r: 0.84705883, g: 0.8901961, b: 0.9764706, a: 1}
+  _offlineCardColor: {r: 0.74509805, g: 0.8039216, b: 0.92156863, a: 1}
 --- !u!1 &1408609108049136822
 GameObject:
   m_ObjectHideFlags: 0
