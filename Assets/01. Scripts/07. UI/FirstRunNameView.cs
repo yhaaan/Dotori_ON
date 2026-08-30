@@ -106,7 +106,6 @@ namespace DOTORION.UI
             {
                 _feedbackShowsBusy = true;
                 _feedbackText.text = "이름을 저장하고 있어요…";
-                _feedbackText.color = DOTORIONPalette.TextSecondary;
             }
             else if (_feedbackShowsBusy) ShowHint();
         }
@@ -116,7 +115,6 @@ namespace DOTORION.UI
             _feedbackShowsBusy = false;
             _feedbackText.text = string.IsNullOrWhiteSpace(message)
                 ? "이름을 저장하지 못했습니다. 다시 시도해주세요." : message;
-            _feedbackText.color = DOTORIONPalette.Danger;
             if (!_isBusy) FocusNameInput();
         }
 
@@ -156,7 +154,6 @@ namespace DOTORION.UI
         {
             _feedbackShowsBusy = false;
             _feedbackText.text = _isRename ? RenameHint : DefaultHint;
-            _feedbackText.color = DOTORIONPalette.TextSecondary;
         }
 
         private void FocusNameInput()

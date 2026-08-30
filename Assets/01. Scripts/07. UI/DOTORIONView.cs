@@ -500,10 +500,14 @@ namespace DOTORION.UI
             if (busy) _feedbackText.text = "상태를 반영하는 중…";
         }
 
+        /// <summary>
+        /// The colour is the prefab's. <paramref name="isError"/> stays in the
+        /// signature because every caller already says which it is, and the day
+        /// the line wants to look different again this is where it reads it.
+        /// </summary>
         public void ShowFeedback(string message, bool isError = false)
         {
             _feedbackText.text = message;
-            _feedbackText.color = isError ? DOTORIONPalette.Danger : DOTORIONPalette.TextSecondary;
         }
 
         public void SetAlwaysOnTop(bool enabled)

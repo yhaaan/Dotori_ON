@@ -283,7 +283,6 @@ namespace DOTORION.UI
             }
 
             _feedbackText.text = message;
-            _feedbackText.color = isError ? DOTORIONPalette.Danger : DOTORIONPalette.TextSecondary;
             _feedbackText.gameObject.SetActive(!string.IsNullOrEmpty(message));
         }
     }

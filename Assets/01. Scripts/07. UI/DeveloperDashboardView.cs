@@ -102,9 +102,6 @@ namespace DOTORION.UI
             }
 
             _feedbackText.text = message ?? string.Empty;
-            _feedbackText.color = isError
-                ? DOTORIONPalette.Danger
-                : DOTORIONPalette.TextSecondary;
         }
 
         public void SetBusy(bool busy)
