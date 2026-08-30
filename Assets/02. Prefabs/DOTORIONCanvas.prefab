@@ -10154,6 +10154,16 @@ MonoBehaviour:
   _pill: {fileID: 6318567885605905058}
   _dot: {fileID: 1036566388506857289}
   _statusText: {fileID: 6722810353756051482}
+  _workingColor: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+  _breakColor: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+  _mealColor: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+  _onlineColor: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  _offlineColor: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
+  _nameOnlineColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _nameOfflineColor: {r: 0.6627451, g: 0.70980394, b: 0.7764706, a: 1}
+  _pillTextColor: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
+  _dotIdleColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _dotNoteColor: {r: 0.9137255, g: 0.44313726, b: 0.44313726, a: 1}
 --- !u!1 &3172030042578675635
 GameObject:
   m_ObjectHideFlags: 0
@@ -17926,6 +17936,16 @@ MonoBehaviour:
   _pill: {fileID: 4943168626814816944}
   _dot: {fileID: 3126935589734025327}
   _statusText: {fileID: 3683690219102485288}
+  _workingColor: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+  _breakColor: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+  _mealColor: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+  _onlineColor: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  _offlineColor: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
+  _nameOnlineColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _nameOfflineColor: {r: 0.6627451, g: 0.70980394, b: 0.7764706, a: 1}
+  _pillTextColor: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
+  _dotIdleColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _dotNoteColor: {r: 0.9137255, g: 0.44313726, b: 0.44313726, a: 1}
 --- !u!1 &5343032552037572348
 GameObject:
   m_ObjectHideFlags: 0
@@ -30942,6 +30962,16 @@ MonoBehaviour:
   _pill: {fileID: 6967174509644696240}
   _dot: {fileID: 1264110780398884722}
   _statusText: {fileID: 5958017527243021703}
+  _workingColor: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+  _breakColor: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+  _mealColor: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+  _onlineColor: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  _offlineColor: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
+  _nameOnlineColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _nameOfflineColor: {r: 0.6627451, g: 0.70980394, b: 0.7764706, a: 1}
+  _pillTextColor: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
+  _dotIdleColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _dotNoteColor: {r: 0.9137255, g: 0.44313726, b: 0.44313726, a: 1}
 --- !u!1 &8575567354414393269
 GameObject:
   m_ObjectHideFlags: 0
@@ -31275,6 +31305,16 @@ MonoBehaviour:
   _pill: {fileID: 7800048669818402992}
   _dot: {fileID: 6654613366623828269}
   _statusText: {fileID: 6894787676807330662}
+  _workingColor: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+  _breakColor: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+  _mealColor: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+  _onlineColor: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  _offlineColor: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
+  _nameOnlineColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _nameOfflineColor: {r: 0.6627451, g: 0.70980394, b: 0.7764706, a: 1}
+  _pillTextColor: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
+  _dotIdleColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _dotNoteColor: {r: 0.9137255, g: 0.44313726, b: 0.44313726, a: 1}
 --- !u!1 &8749767451112499398
 GameObject:
   m_ObjectHideFlags: 0

@@ -148,7 +148,6 @@ namespace DOTORION.UI
             if (isOnline && member.CheckedInAtUtc.HasValue)
             {
                 _timerText.text = FormatElapsed(member.GetAttendanceElapsed(nowUtc));
-                _timerText.color = DOTORIONPalette.TextPrimary;
 
                 // The note is what the person chose to say about right now, so it
                 // outranks the check-in time, which the timer already implies.
@@ -156,18 +155,13 @@ namespace DOTORION.UI
                 _detailText.text = hasNote
                     ? member.StatusNote
                     : "출근 " + FormatKoreaTime(member.CheckedInAtUtc.Value, includeDate: false);
-                _detailText.color = hasNote
-                    ? DOTORIONPalette.TextPrimary
-                    : DOTORIONPalette.TextSecondary;
             }
             else
             {
                 _timerText.text = "--:--:--";
-                _timerText.color = DOTORIONPalette.Offline;
                 _detailText.text = member.LastCheckedOutAtUtc.HasValue
                     ? "마지막 퇴근\n" + FormatKoreaTime(member.LastCheckedOutAtUtc.Value, includeDate: true)
                     : "출근 기록 없음";
-                _detailText.color = DOTORIONPalette.TextSecondary;
             }
         }
 
