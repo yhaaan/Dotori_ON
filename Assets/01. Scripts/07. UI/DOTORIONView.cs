@@ -13,7 +13,6 @@ namespace DOTORION.UI
         private const int MemberCount = 4;
 
         [Header("Optional typography override")]
-        [SerializeField] private Font _fontOverride;
         [Header("Prefab references")]
         [SerializeField] private TeamMemberCardView[] _cards = new TeamMemberCardView[MemberCount];
         [SerializeField] private Button _checkInButton;
@@ -135,7 +134,6 @@ namespace DOTORION.UI
                 _fullScaleFactor = _canvasScaler.scaleFactor;
             }
 
-            UiFactory.ApplyApplicationFont(transform, _fontOverride);
             if (_windowDragHandle != null) _windowDragHandle.Initialize(beginWindowDrag);
             // Application.version is the bundleVersion the build was stamped with,
             // so a teammate can read which zip they are running off the title bar.

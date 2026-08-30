@@ -13256,7 +13256,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c288df5de56bcd44c91b40484131e41e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONView
-  _fontOverride: {fileID: 0}
   _cards:
   - {fileID: 6632931646757536626}
   - {fileID: 314477427328622368}

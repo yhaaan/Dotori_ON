@@ -1063,7 +1063,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f509f17aed7ec46a58eab6293ab974, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.FirstRunNameView
-  _fontOverride: {fileID: 0}
   _nameInput: {fileID: 3280763271362757311}
   _confirmButton: {fileID: 5775211558288259869}
   _cancelButton: {fileID: 2042715751007468891}

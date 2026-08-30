@@ -17,7 +17,6 @@ namespace DOTORION.UI
         private const string RenameHint = "기록은 그대로 따라옵니다.";
 
         [Header("Optional typography override")]
-        [SerializeField] private Font _fontOverride;
         [Header("Prefab references")]
         [SerializeField] private InputField _nameInput;
         [SerializeField] private Button _confirmButton;
@@ -42,7 +41,6 @@ namespace DOTORION.UI
             if (_initialized) return;
             _initialized = true;
             UiFactory.EnsureEventSystem();
-            UiFactory.ApplyApplicationFont(transform, _fontOverride);
             _confirmButton.onClick.AddListener(TrySubmit);
             if (_cancelButton != null)
             {

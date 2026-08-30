@@ -73,25 +73,6 @@ namespace DOTORION.UI
             else eventSystem.AddComponent<StandaloneInputModule>();
         }
 
-        public static Font CreateApplicationFont()
-        {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-            var font = Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "Segoe UI", "Arial" }, 16);
-            if (font != null)
-            {
-                font.name = "DOTORI ON UI Font";
-                return font;
-            }
-#endif
-            return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        }
-
-        public static void ApplyApplicationFont(Transform root, Font overrideFont)
-        {
-            var font = overrideFont != null ? overrideFont : CreateApplicationFont();
-            foreach (var text in root.GetComponentsInChildren<Text>(true)) text.font = font;
-        }
-
         public static void Stretch(RectTransform rect, float left = 0f, float bottom = 0f,
             float right = 0f, float top = 0f)
         {
