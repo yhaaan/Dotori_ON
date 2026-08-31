@@ -51,24 +51,49 @@ Unity 메뉴에서 **DOTORI ON > Build Windows x86_64** 를 실행한다.
 3. `Builds/Windows/` 에서 배포하면 안 되는 것(`*_DoNotShip`, 지난 zip, `구 빌드`)을
    빼고 `Builds/DOTORI_ON.zip` 으로 묶는다. 압축 안의 최상단은 `DOTORI ON/`
    폴더 하나다.
-4. 태그를 밀고 GitHub Release 를 만들면서 zip 을 자산으로 올린다. 릴리스 노트는
-   `--generate-notes` 로 커밋 목록에서 자동 생성된다. 직접 쓰려면 `-Notes "..."`.
+4. zip 의 sha256 을 재서 `version.json` 을 만든다.
+5. 태그를 밀고 GitHub Release 를 만들면서 zip 과 `version.json` 을 자산으로 올린다.
+   릴리스 노트는 `--generate-notes` 로 커밋 목록에서 자동 생성된다. 직접 쓰려면
+   `-Notes "..."`.
 
 zip 내용만 눈으로 확인하고 싶으면 `-DryRun` 을 붙인다. 태그와 릴리스는 건너뛴다.
 
 ---
 
+## version.json 은 손으로 고치지 않는다
+
+돌고 있는 앱이 시작할 때 읽는 파일이고, 릴리스할 때마다 zip 과 **같은 순간에**
+새로 만들어진다. 그래서 둘이 서로 다른 빌드를 가리킬 수가 없다.
+
+```json
+{
+  "version":  "0.10.0",
+  "download": "https://github.com/yhaaan/Dotori_ON/releases/latest/download/DOTORI_ON.zip",
+  "sha256":   "받은 zip 을 덮어쓰기 전에 이걸로 검증한다",
+  "notes":    "https://github.com/yhaaan/Dotori_ON/releases/latest"
+}
+```
+
+저장소에 두고 손으로 맞추는 방법도 있었지만 쓰지 않았다. 버전을 올릴 때 한 번만
+깜빡해도 앱이 틀린 버전을 보고, 그 사실을 아무도 모른 채 배포되기 때문이다.
+
+앱 쪽에서 이 파일을 읽고 판단하는 규칙은 `Assets/01. Scripts/06. Update/` 에 있다.
+sha256 이 없거나, 우리 릴리스가 아닌 주소를 담고 있으면 업데이트를 하지 않는다.
+
+---
+
 ## 자산 파일명은 고정이다
 
-릴리스 자산의 이름은 언제나 `DOTORI_ON.zip` 이다. 이 이름이 고정돼 있어야
-아래 URL 이 **항상 최신 릴리스**를 가리킨다.
+릴리스 자산의 이름은 언제나 `DOTORI_ON.zip` 과 `version.json` 이다. 이 이름이
+고정돼 있어야 아래 URL 이 **항상 최신 릴리스**를 가리킨다.
 
 ```
 https://github.com/yhaaan/Dotori_ON/releases/latest/download/DOTORI_ON.zip
+https://github.com/yhaaan/Dotori_ON/releases/latest/download/version.json
 ```
 
-다운로드 페이지의 버튼과 앞으로 붙을 자동 업데이트가 둘 다 이 URL 하나를 쓴다.
-이름을 바꾸면 이미 배포된 구버전의 업데이트 경로가 끊긴다.
+다운로드 페이지의 버튼과 자동 업데이트가 이 URL 들을 쓴다. 이름을 바꾸면 이미
+배포된 구버전은 업데이트 경로가 끊겨서 영원히 그 버전에 남는다.
 
 ---
 
