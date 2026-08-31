@@ -139,7 +139,7 @@ MonoBehaviour:
   _nameOnlineColor: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
   _nameOfflineColor: {r: 0.2, g: 0.23137255, b: 0.28235295, a: 1}
   _dotIdleColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
-  _dotNoteColor: {r: 0.9137255, g: 0.44313726, b: 0.44313726, a: 1}
+  _dotNoteColor: {r: 0.87058824, g: 0.13725491, b: 0.13725491, a: 1}
 --- !u!1 &7640377409392159986
 GameObject:
   m_ObjectHideFlags: 0
@@ -275,7 +275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
