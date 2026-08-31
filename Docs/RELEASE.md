@@ -64,7 +64,7 @@ zip 내용만 눈으로 확인하고 싶으면 `-DryRun` 을 붙인다. 태그�
 아래 URL 이 **항상 최신 릴리스**를 가리킨다.
 
 ```
-https://github.com/yhaaan/Project-DDD/releases/latest/download/DOTORI_ON.zip
+https://github.com/yhaaan/Dotori_ON/releases/latest/download/DOTORI_ON.zip
 ```
 
 다운로드 페이지의 버튼과 앞으로 붙을 자동 업데이트가 둘 다 이 URL 하나를 쓴다.
