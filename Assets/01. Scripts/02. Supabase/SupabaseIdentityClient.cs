@@ -76,8 +76,11 @@ namespace DOTORION.Supabase
                         // A dead refresh token used to be unrecoverable because the
                         // anonymous account had no other way in. The credentials are
                         // derived from the name now, so signing in again is safe and
-                        // lands on the very same account.
-                        _session = await SignInWithNameAsync(validation, cancellationToken);
+                        // lands on the very same account - or, if that account has
+                        // been deleted since, makes it again.
+                        var recovered = await SignInOrSignUpWithNameAsync(validation, cancellationToken);
+                        _session = recovered.Session;
+                        createdUser = recovered.CreatedUser;
                     }
                 }
             }
@@ -180,6 +183,21 @@ namespace DOTORION.Supabase
             return session;
         }
 
+        /// <summary>
+        /// Whether the failure says the Auth user behind the token is gone.
+        ///
+        /// The only foreign key a name claim can break is members.id, which
+        /// points at auth.users - and it can only break when the token names a
+        /// user that has been deleted. claim_member_name raises 23503 itself for
+        /// a missing team, with a stable machine-readable message, so that one
+        /// case is excluded by name rather than guessed at from prose.
+        /// </summary>
+        private static bool IsDeletedAccount(SupabaseApiException exception)
+        {
+            return exception.ErrorCode == "23503"
+                   && exception.ServerMessage != "team_not_found";
+        }
+
         private static bool IsUnknownAccount(SupabaseApiException exception)
         {
             return exception.StatusCode == 400
@@ -274,15 +292,35 @@ namespace DOTORION.Supabase
                 p_display_name = validation.DisplayName,
                 p_avatar_key = "default"
             });
+            var url = _projectUrl + "/rest/v1/rpc/claim_member_name";
             var response = await _transport.SendAsync(
-                CreateAuthorizedRequest(
-                    "POST",
-                    _projectUrl + "/rest/v1/rpc/claim_member_name",
-                    requestBody,
-                    session),
+                CreateAuthorizedRequest("POST", url, requestBody, session),
                 cancellationToken);
 
-            EnsureSuccess(response);
+            try
+            {
+                EnsureSuccess(response);
+            }
+            catch (SupabaseApiException exception) when (IsDeletedAccount(exception))
+            {
+                // Nothing rejected the token on the way here: it is signed and
+                // still in date, so PostgREST took it and auth.uid() named a user
+                // row that is no longer there. Only the insert notices, as a
+                // foreign key on members.id.
+                //
+                // A session pointing at a deleted account cannot be refreshed
+                // back to life, so it is thrown away and the name claimed from
+                // scratch - signing in if somebody has already remade the
+                // account for it, signing up if not.
+                _sessionStore.Delete();
+                var restarted = await SignInOrSignUpWithNameAsync(validation, cancellationToken);
+                _session = restarted.Session;
+                response = await _transport.SendAsync(
+                    CreateAuthorizedRequest("POST", url, requestBody, _session),
+                    cancellationToken);
+                EnsureSuccess(response);
+            }
+
             return ParseMember(response.Body);
         }
 
