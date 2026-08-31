@@ -1273,15 +1273,12 @@ namespace DOTORION.Editor
                 var cancel = UiFactory.CreateButton("Cancel", panel.transform, font, "×");
                 UiFactory.AnchorRight(cancel.GetComponent<RectTransform>(), 12f, 10f, 26f, 26f);
                 cancel.gameObject.SetActive(false);
-                var feedback = UiFactory.CreateText("Feedback", panel.transform, font, 10,
-                    TextAnchor.UpperLeft, DOTORIONPalette.TextSecondary);
-                feedback.text = "이름을 입력하면 팀 오버레이를 시작할 수 있어요.";
-                feedback.horizontalOverflow = HorizontalWrapMode.Wrap;
-                feedback.verticalOverflow = VerticalWrapMode.Overflow;
-                UiFactory.AnchorTop(feedback.rectTransform, 18f, 119f, 336f, 35f);
+                // The title is the only line that speaks: it invites, and then it
+                // says what was wrong with what was typed. A separate hint under
+                // the field would only be a second voice to contradict it.
                 Assign(root.GetComponent<FirstRunNameView>(), ("_nameInput", input),
-                    ("_confirmButton", confirm), ("_confirmLabel", confirm.GetComponentInChildren<Text>()),
-                    ("_cancelButton", cancel), ("_feedbackText", feedback));
+                    ("_confirmButton", confirm), ("_cancelButton", cancel),
+                    ("_messageText", title));
                 return PrefabUtility.SaveAsPrefabAsset(root, NameViewPath).GetComponent<FirstRunNameView>();
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
