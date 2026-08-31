@@ -73,6 +73,9 @@ namespace DOTORION.UI
         /// <summary>Silences the notification sounds, and brings them back.</summary>
         public event Action MuteToggleRequested;
 
+        /// <summary>Starts the app with Windows, or stops it doing so.</summary>
+        public event Action AutoStartToggleRequested;
+
         public event Action MinimizeRequested;
         public event Action ExitRequested;
 
@@ -204,6 +207,7 @@ namespace DOTORION.UI
                 _settingsPanel.Initialize();
                 _settingsPanel.AlwaysOnTopToggleRequested += () => AlwaysOnTopToggleRequested?.Invoke();
                 _settingsPanel.MuteToggleRequested += () => MuteToggleRequested?.Invoke();
+                _settingsPanel.AutoStartToggleRequested += () => AutoStartToggleRequested?.Invoke();
                 _settingsPanel.gameObject.SetActive(false);
             }
 
@@ -532,6 +536,11 @@ namespace DOTORION.UI
         public void SetMuted(bool muted)
         {
             _settingsPanel?.SetMuted(muted);
+        }
+
+        public void SetAutoStart(bool enabled)
+        {
+            _settingsPanel?.SetAutoStart(enabled);
         }
 
         /// <summary>Opens under the compact layout, the way the statistics panel does.</summary>

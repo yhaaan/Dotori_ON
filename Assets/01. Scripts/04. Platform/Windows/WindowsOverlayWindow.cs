@@ -114,7 +114,7 @@ namespace DOTORION.Platform.Windows
         /// taken off the bottom, and it mirrors the panel's own height in the
         /// prefab; PrefabAssetTests pins the pair.
         /// </summary>
-        public const int SettingsPanelHeight = 160;
+        public const int SettingsPanelHeight = 196;
 
         public const int MiniWindowWidth = 75;
 

@@ -16,6 +16,8 @@ namespace DOTORION.UI
         [SerializeField] private Text _alwaysOnTopValue;
         [SerializeField] private Button _muteButton;
         [SerializeField] private Text _muteValue;
+        [SerializeField] private Button _autoStartButton;
+        [SerializeField] private Text _autoStartValue;
         [SerializeField] private Text _versionText;
 
         private bool _initialized;
@@ -23,6 +25,8 @@ namespace DOTORION.UI
         public event Action AlwaysOnTopToggleRequested;
 
         public event Action MuteToggleRequested;
+
+        public event Action AutoStartToggleRequested;
 
         public void Initialize()
         {
@@ -34,6 +38,7 @@ namespace DOTORION.UI
             _initialized = true;
             _alwaysOnTopButton?.onClick.AddListener(() => AlwaysOnTopToggleRequested?.Invoke());
             _muteButton?.onClick.AddListener(() => MuteToggleRequested?.Invoke());
+            _autoStartButton?.onClick.AddListener(() => AutoStartToggleRequested?.Invoke());
         }
 
         public void SetAlwaysOnTop(bool enabled)
@@ -51,6 +56,17 @@ namespace DOTORION.UI
             SetSwitch(_muteValue, !muted);
         }
 
+        /// <summary>
+        /// Whether Windows starts the app at login. Unlike the two switches
+        /// above it, this one is not a preference the app keeps - it reflects a
+        /// registry entry the person can also remove from Task Manager, so the
+        /// row is repainted from what the registry says rather than from a field.
+        /// </summary>
+        public void SetAutoStart(bool enabled)
+        {
+            SetSwitch(_autoStartValue, enabled);
+        }
+
         public void SetVersion(string version)
         {
             if (_versionText != null)
@@ -63,6 +79,7 @@ namespace DOTORION.UI
         {
             if (_alwaysOnTopButton != null) _alwaysOnTopButton.interactable = !busy;
             if (_muteButton != null) _muteButton.interactable = !busy;
+            if (_autoStartButton != null) _autoStartButton.interactable = !busy;
         }
 
         /// <summary>

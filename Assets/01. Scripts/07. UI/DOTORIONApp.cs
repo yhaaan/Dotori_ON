@@ -655,6 +655,7 @@ namespace DOTORION.UI
             _view.SettingsToggleRequested += HandleSettingsToggleRequested;
             _view.AlwaysOnTopToggleRequested += HandleAlwaysOnTopToggleRequested;
             _view.MuteToggleRequested += HandleMuteToggleRequested;
+            _view.AutoStartToggleRequested += HandleAutoStartToggleRequested;
             _view.MinimizeRequested += HandleMinimizeRequested;
             _view.ExitRequested += HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
@@ -678,6 +679,7 @@ namespace DOTORION.UI
             _view.SetAvatarCatalog(_avatarCatalog);
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _view.SetMuted(_tonePlayer.IsMuted);
+            _view.SetAutoStart(WindowsStartupRegistration.IsEnabled());
             _firstRunNameView.Hide();
             _view.SetDailyCheckIn(null, _backend is ITeamCheckIn);
             LoadDailyCheckIn();
@@ -754,6 +756,7 @@ namespace DOTORION.UI
             _view.SettingsToggleRequested -= HandleSettingsToggleRequested;
             _view.AlwaysOnTopToggleRequested -= HandleAlwaysOnTopToggleRequested;
             _view.MuteToggleRequested -= HandleMuteToggleRequested;
+            _view.AutoStartToggleRequested -= HandleAutoStartToggleRequested;
             _view.MinimizeRequested -= HandleMinimizeRequested;
             _view.ExitRequested -= HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested -= HandleSwitchAccountRequested;
@@ -1054,6 +1057,39 @@ namespace DOTORION.UI
             _window.ToggleAlwaysOnTop();
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _view.ShowFeedback(_window.IsAlwaysOnTop ? "항상 위를 켰습니다." : "항상 위를 껐습니다.");
+        }
+
+        /// <summary>
+        /// The one switch here with nothing behind it in PlayerPrefs. The
+        /// registry entry is the setting, so the state is read back rather than
+        /// tracked, and a write that Windows refuses puts the row back to
+        /// whatever it actually says instead of leaving it lying.
+        /// </summary>
+        private void HandleAutoStartToggleRequested()
+        {
+            if (_view == null)
+            {
+                return;
+            }
+
+            if (!WindowsStartupRegistration.IsSupported)
+            {
+                _view.ShowFeedback("자동 시작은 윈도우 빌드에서만 됩니다.", true);
+                return;
+            }
+
+            var enable = !WindowsStartupRegistration.IsEnabled();
+            if (!WindowsStartupRegistration.SetEnabled(enable))
+            {
+                _view.SetAutoStart(WindowsStartupRegistration.IsEnabled());
+                _view.ShowFeedback("자동 시작을 바꾸지 못했습니다.", true);
+                return;
+            }
+
+            _view.SetAutoStart(enable);
+            _view.ShowFeedback(enable
+                ? "윈도우를 켤 때 같이 실행합니다."
+                : "윈도우를 켤 때 실행하지 않습니다.");
         }
 
         private void HandleMinimizeRequested()

@@ -60,14 +60,28 @@ namespace DOTORION.Editor
         /// The settings panel's own height in the prefab. The window grows
         /// downwards by exactly this much, so it has to match
         /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>; PrefabAssetTests pins
-        /// the pair. The heading and three rows fit in it.
+        /// the pair. The heading and four rows fit in it.
         /// </summary>
-        public const float SettingsPanelHeight = 160f;
+        public const float SettingsPanelHeight = 196f;
+
+        /// <summary>Shared with the migration so the two rows read identically.</summary>
+        public const string AutoStartRowLabel = "자동 시작";
+
+        /// <summary>Shared with the migration so the two rows read identically.</summary>
+        public const string AutoStartRowHint = "윈도우를 켤 때 같이 실행합니다.";
 
         /// <summary>Settings panel geometry, in pixels from the top of the panel.</summary>
         private const float SettingsRowTop = 44f;
         private const float SettingsRowHeight = 28f;
         private const float SettingsRowSpacing = 8f;
+
+        /// <summary>
+        /// How far down the next settings row starts. Public because the
+        /// migration that adds a row to a prefab already in hand has to move the
+        /// rows below it by exactly this much, and guessing it twice is how the
+        /// two drift apart.
+        /// </summary>
+        public const float SettingsRowStep = SettingsRowHeight + SettingsRowSpacing;
 
         private const float DashboardRowTop = 60f;
         private const float DashboardRowHeight = 32f;
@@ -799,9 +813,12 @@ namespace DOTORION.Editor
                 "항상 위", "다른 창 위에 계속 띄워 둡니다.", SettingsRowTop);
             var mute = SettingsSwitchRow(panel.transform, font, "Mute",
                 "알림음", "출근과 호출을 소리로 알립니다.",
-                SettingsRowTop + SettingsRowHeight + SettingsRowSpacing);
+                SettingsRowTop + SettingsRowStep);
+            var autoStart = SettingsSwitchRow(panel.transform, font, "AutoStart",
+                AutoStartRowLabel, AutoStartRowHint,
+                SettingsRowTop + (SettingsRowStep * 2f));
 
-            var versionTop = SettingsRowTop + ((SettingsRowHeight + SettingsRowSpacing) * 2f);
+            var versionTop = SettingsRowTop + (SettingsRowStep * 3f);
             SettingsRowLabel(panel.transform, font, "VersionLabel", "버전", versionTop);
             var version = UiFactory.CreateText("VersionValue", panel.transform, font, 11,
                 TextAnchor.MiddleRight, DOTORIONPalette.TextSecondary);
@@ -813,6 +830,8 @@ namespace DOTORION.Editor
             Set(serialized, "_alwaysOnTopValue", alwaysOnTop.GetComponentInChildren<Text>());
             Set(serialized, "_muteButton", mute);
             Set(serialized, "_muteValue", mute.GetComponentInChildren<Text>());
+            Set(serialized, "_autoStartButton", autoStart);
+            Set(serialized, "_autoStartValue", autoStart.GetComponentInChildren<Text>());
             Set(serialized, "_versionText", version);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             panel.gameObject.SetActive(false);
