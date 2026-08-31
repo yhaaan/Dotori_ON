@@ -42,7 +42,7 @@ namespace DOTORION.Platform.Windows
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
             try
             {
-                return WindowsStartupPolicy.Matches(ReadRunValue(), GetExecutablePath());
+                return WindowsStartupPolicy.Matches(ReadRunValue(), WindowsExecutablePath.Current);
             }
             catch (Exception error)
             {
@@ -65,7 +65,7 @@ namespace DOTORION.Platform.Windows
             try
             {
                 return enabled
-                    ? WriteRunValue(WindowsStartupPolicy.BuildCommand(GetExecutablePath()))
+                    ? WriteRunValue(WindowsStartupPolicy.BuildCommand(WindowsExecutablePath.Current))
                     : DeleteRunValue();
             }
             catch (Exception error)
@@ -190,19 +190,6 @@ namespace DOTORION.Platform.Windows
             }
         }
 
-        /// <summary>
-        /// The running executable's own path, asked of Windows rather than
-        /// rebuilt from Application.dataPath and the product name. A build that
-        /// was renamed, or a second copy run from another folder, then registers
-        /// the file that is actually running instead of one that may not exist.
-        /// </summary>
-        private static string GetExecutablePath()
-        {
-            var buffer = new StringBuilder(1024);
-            var length = GetModuleFileName(IntPtr.Zero, buffer, buffer.Capacity);
-            return length > 0 ? buffer.ToString(0, length) : null;
-        }
-
         [DllImport("advapi32.dll", EntryPoint = "RegOpenKeyExW", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int RegOpenKeyEx(
             IntPtr key, string subKey, int options, int desiredAccess, out IntPtr result);
@@ -232,9 +219,6 @@ namespace DOTORION.Platform.Windows
 
         [DllImport("advapi32.dll")]
         private static extern int RegCloseKey(IntPtr key);
-
-        [DllImport("kernel32.dll", EntryPoint = "GetModuleFileNameW", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern int GetModuleFileName(IntPtr module, StringBuilder fileName, int size);
 #endif
     }
 }
