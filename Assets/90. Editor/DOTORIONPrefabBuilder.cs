@@ -15,6 +15,7 @@ namespace DOTORION.Editor
         public const string CardPath = PrefabFolder + "/TeamMemberCard.prefab";
         public const string MainViewPath = PrefabFolder + "/DOTORIONCanvas.prefab";
         public const string NameViewPath = PrefabFolder + "/FirstRunNameModal.prefab";
+        public const string UpdatePromptPath = PrefabFolder + "/UpdatePromptModal.prefab";
 
         // Resources.Load resolves paths relative to a folder named exactly
         // "Resources", so this one keeps its engine-given name and sits at the
@@ -191,7 +192,8 @@ namespace DOTORION.Editor
         public static bool AllPrefabsExist()
         {
             return File.Exists(CardPath) && File.Exists(MainViewPath) &&
-                   File.Exists(NameViewPath) && File.Exists(AppPath);
+                   File.Exists(NameViewPath) && File.Exists(AppPath) &&
+                   File.Exists(UpdatePromptPath);
         }
 
         private static void BuildAll()
@@ -1285,6 +1287,68 @@ namespace DOTORION.Editor
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
 
+        /// <summary>
+        /// The "there is a newer version" modal. Laid out like the first-run name
+        /// modal because it interrupts the same way, and sits above it in the
+        /// sorting order for the one case where both could want the screen.
+        /// </summary>
+        public static UpdatePromptView BuildUpdatePrompt()
+        {
+            var root = new GameObject("UpdatePromptModal", typeof(RectTransform), typeof(Canvas),
+                typeof(CanvasScaler), typeof(GraphicRaycaster), typeof(UpdatePromptView));
+            try
+            {
+                var canvas = root.GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.overrideSorting = true;
+                canvas.sortingOrder = 2100;
+                ConfigureScaler(root.GetComponent<CanvasScaler>());
+                var font = PreviewFont();
+
+                var backdrop = UiFactory.CreateImage(
+                    "ModalBackdrop", root.transform, new Color(0.025f, 0.035f, 0.055f, 0.88f));
+                UiFactory.Stretch(backdrop.rectTransform);
+
+                var panel = UiFactory.CreateImage("UpdatePanel", backdrop.transform, DOTORIONPalette.Card);
+                var panelRect = panel.rectTransform;
+                panelRect.anchorMin = panelRect.anchorMax = panelRect.pivot = new Vector2(0.5f, 0.5f);
+                panelRect.sizeDelta = new Vector2(372f, 164f);
+
+                var accent = UiFactory.CreateImage("Accent", panel.transform, DOTORIONPalette.Accent);
+                UiFactory.AnchorTop(accent.rectTransform, 0f, 0f, 372f, 3f);
+
+                var message = UiFactory.CreateText("Message", panel.transform, font, 15,
+                    TextAnchor.UpperLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
+                message.text = "새로운 버전이 나왔습니다.\n업데이트 할까요?";
+                message.horizontalOverflow = HorizontalWrapMode.Wrap;
+                message.verticalOverflow = VerticalWrapMode.Overflow;
+                UiFactory.AnchorTop(message.rectTransform, 18f, 22f, 336f, 48f);
+
+                var status = UiFactory.CreateText("Status", panel.transform, font, 11,
+                    TextAnchor.UpperLeft, DOTORIONPalette.TextSecondary);
+                status.text = string.Empty;
+                status.horizontalOverflow = HorizontalWrapMode.Wrap;
+                UiFactory.AnchorTop(status.rectTransform, 18f, 78f, 336f, 24f);
+
+                // 네 carries the accent because it is the answer being offered;
+                // 나중에 is the quiet one beside it rather than a second shout.
+                var confirm = UiFactory.CreateButton(
+                    "Confirm", panel.transform, font, "네", null, DOTORIONPalette.Accent);
+                UiFactory.AnchorTop(confirm.GetComponent<RectTransform>(), 274f, 110f, 80f, 36f);
+
+                var later = UiFactory.CreateButton("Later", panel.transform, font, "나중에");
+                UiFactory.AnchorTop(later.GetComponent<RectTransform>(), 186f, 110f, 80f, 36f);
+
+                Assign(root.GetComponent<UpdatePromptView>(),
+                    ("_messageText", message),
+                    ("_statusText", status),
+                    ("_confirmButton", confirm),
+                    ("_laterButton", later));
+                return PrefabUtility.SaveAsPrefabAsset(root, UpdatePromptPath).GetComponent<UpdatePromptView>();
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
         private static void BuildApp(DOTORIONView mainPrefab, FirstRunNameView namePrefab)
         {
             var root = new GameObject("DOTORIONApp", typeof(DOTORIONApp));
@@ -1294,6 +1358,7 @@ namespace DOTORION.Editor
                     root.GetComponent<DOTORIONApp>(),
                     ("_mainViewPrefab", mainPrefab),
                     ("_firstRunNamePrefab", namePrefab),
+                    ("_updatePromptPrefab", BuildUpdatePrompt()),
                     ("_sounds", EnsureSoundsAsset()),
                     ("_avatarCatalog", EnsureAvatarCatalogAsset()));
                 PrefabUtility.SaveAsPrefabAsset(root, AppPath);

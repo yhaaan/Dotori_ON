@@ -11,6 +11,7 @@ using DOTORION.Core;
 using DOTORION.Identity;
 using DOTORION.Platform.Windows;
 using DOTORION.Supabase;
+using DOTORION.Update;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -77,11 +78,19 @@ namespace DOTORION.UI
 
         [Tooltip("프로필 아이콘 목록 에셋. 비워 두면 아이콘 대신 이름 첫 글자만 보입니다.")]
         [SerializeField] private TeamAvatarCatalog _avatarCatalog;
+
+        [Tooltip("새 버전을 알리는 모달 프리팹. 비워 두면 업데이트 확인을 하지 않습니다.")]
+        [SerializeField] private UpdatePromptView _updatePromptPrefab;
         [Header("Development")]
         [Tooltip("Runs the overlay against the in-memory roster instead of Supabase. Identity still uses the real project.")]
         [SerializeField] private bool _useMockBackend;
 
         private static DOTORIONApp _instance;
+
+        private UpdatePromptView _updatePrompt;
+        private UpdateDownloader _updateDownloader;
+        private UpdateManifest _offeredUpdate;
+        private bool _updateInProgress;
 
         private readonly ConcurrentQueue<TeamEvent> _pendingEvents = new ConcurrentQueue<TeamEvent>();
         private CancellationTokenSource _lifetime;
@@ -183,6 +192,15 @@ namespace DOTORION.UI
 
             _firstRunNameView = Instantiate(_firstRunNamePrefab, transform);
             _firstRunNameView.name = _firstRunNamePrefab.name;
+
+            if (_updatePromptPrefab != null)
+            {
+                _updatePrompt = Instantiate(_updatePromptPrefab, transform);
+                _updatePrompt.name = _updatePromptPrefab.name;
+                _updatePrompt.Initialize();
+                _updatePrompt.Confirmed += HandleUpdateConfirmed;
+                _updatePrompt.Dismissed += HandleUpdateDismissed;
+            }
             _firstRunNameView.Initialize();
             _firstRunNameView.Submitted += HandleFirstRunNameSubmitted;
             _firstRunNameView.Cancelled += HandleRenameCancelled;
@@ -681,6 +699,7 @@ namespace DOTORION.UI
             _view.SetMuted(_tonePlayer.IsMuted);
             _view.SetAutoStart(WindowsStartupRegistration.IsEnabled());
             _firstRunNameView.Hide();
+            CheckForUpdate();
             _view.SetDailyCheckIn(null, _backend is ITeamCheckIn);
             LoadDailyCheckIn();
             if (PlayerPrefs.GetInt(MiniModePreferenceKey, 0) == 1)
@@ -1090,6 +1109,101 @@ namespace DOTORION.UI
             _view.ShowFeedback(enable
                 ? "윈도우를 켤 때 같이 실행합니다."
                 : "윈도우를 켤 때 실행하지 않습니다.");
+        }
+
+        /// <summary>
+        /// Asks GitHub what the newest release is, once, after the overlay is up.
+        ///
+        /// Nothing is said when this fails. Somebody working without a route to
+        /// GitHub would otherwise be told so every single time they start, about
+        /// a thing they did not ask for.
+        /// </summary>
+        private async void CheckForUpdate()
+        {
+            if (_updatePrompt == null || !WindowsUpdateApplier.IsSupported)
+            {
+                return;
+            }
+
+            try
+            {
+                _updateDownloader = _updateDownloader ?? new UpdateDownloader();
+                var manifest = await _updateDownloader.FetchManifestAsync(_lifetime.Token);
+                if (_quitting || _updatePrompt == null)
+                {
+                    return;
+                }
+
+                if (UpdateCheck.Evaluate(Application.version, manifest, out var offered)
+                    != UpdateAvailability.Available)
+                {
+                    return;
+                }
+
+                _offeredUpdate = manifest;
+                _updatePrompt.Show(offered.ToString());
+            }
+            catch (Exception exception) when (!(exception is OperationCanceledException))
+            {
+                Debug.LogWarning("Update check failed: " + exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Downloads the release, starts the helper, and only then quits.
+        ///
+        /// The order matters both ways round. Quitting before the helper exists
+        /// would leave the person with a closed app and no update; starting the
+        /// helper and then staying up would leave it waiting on a process that
+        /// never goes away.
+        /// </summary>
+        private async void HandleUpdateConfirmed()
+        {
+            if (_updateInProgress || _offeredUpdate == null || _updatePrompt == null)
+            {
+                return;
+            }
+
+            _updateInProgress = true;
+            try
+            {
+                var progress = new Progress<float>(fraction => _updatePrompt?.ShowProgress(fraction));
+                var zipPath = await _updateDownloader.DownloadAsync(
+                    _offeredUpdate, WindowsUpdateApplier.WorkFolder, progress, _lifetime.Token);
+
+                if (_quitting || _updatePrompt == null)
+                {
+                    return;
+                }
+
+                var script = Resources.Load<TextAsset>("DOTORION/ApplyUpdate.ps1");
+                if (!WindowsUpdateApplier.Launch(zipPath, script != null ? script.text : null))
+                {
+                    _updateInProgress = false;
+                    _updatePrompt.ShowError("업데이트를 시작하지 못했습니다.");
+                    return;
+                }
+
+                _updatePrompt.ShowApplying();
+                // The ordinary exit: the clock-out still has to happen, and the
+                // helper is already waiting for this process to be gone.
+                HandleClockOutAndExitRequested();
+            }
+            catch (Exception exception) when (!(exception is OperationCanceledException))
+            {
+                _updateInProgress = false;
+                _updatePrompt?.ShowError("내려받지 못했습니다. 잠시 뒤 다시 시도해 주세요.");
+                Debug.LogWarning("Update download failed: " + exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// Not now. Nothing is remembered - the check runs again on the next
+        /// start, which is the only reminder an overlay like this should give.
+        /// </summary>
+        private void HandleUpdateDismissed()
+        {
+            _updatePrompt?.Hide();
         }
 
         private void HandleMinimizeRequested()
@@ -1847,6 +1961,7 @@ namespace DOTORION.UI
 
             _lifetime?.Cancel();
             _eventSubscription?.Dispose();
+            _updateDownloader?.Dispose();
             (_backend as IDisposable)?.Dispose();
             _supabaseTransport?.Dispose();
             _lifetime?.Dispose();
