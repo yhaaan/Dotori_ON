@@ -31,6 +31,9 @@ namespace DOTORION.UI
         [SerializeField] private Text _dailyCheckInPointsLabel;
         [SerializeField] private InputField _statusNoteInput;
 
+        [Tooltip("출근 전에만 보이는 배경. 비워 두어도 나머지는 그대로 동작합니다.")]
+        [SerializeField] private GameObject _offlineBackground;
+
         /// <summary>
         /// Two faces for the attendance button: one that says today is still
         /// there to take, one that says it is already taken. Leaving either
@@ -476,6 +479,9 @@ namespace DOTORION.UI
 
             SetActive(_teamNudgeButton, isClockedIn);
             SetActive(_checkInButton, !isClockedIn);
+            // Shown exactly while the check-in button is: the window reads as
+            // asleep until the person is actually on the clock.
+            if (_offlineBackground != null) _offlineBackground.SetActive(!isClockedIn);
             SetActive(_checkOutButton, isClockedIn);
             SetActive(_workingButton, isClockedIn);
             SetActive(_breakButton, isClockedIn);
