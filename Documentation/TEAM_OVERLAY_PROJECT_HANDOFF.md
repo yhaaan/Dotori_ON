@@ -323,7 +323,7 @@ Assets/
     DOTORION/
 ```
 
-폴더 번호는 `Docs/FolderNumberingConvention.md`를 따른다. `Resources`만 번호가 없는데, Resources.Load가 `Resources`라는 폴더 이름 자체에 의존하기 때문이다(같은 문서 5.1의 "도구·엔진이 위치를 정하는 폴더" 예외).
+폴더 번호는 `Documentation/FolderNumberingConvention.md`를 따른다. `Resources`만 번호가 없는데, Resources.Load가 `Resources`라는 폴더 이름 자체에 의존하기 때문이다(같은 문서 5.1의 "도구·엔진이 위치를 정하는 폴더" 예외).
 
 핵심 인터페이스 예시:
 
@@ -413,6 +413,6 @@ UI와 상태 로직은 `ITeamBackend`만 알게 하고, `MockTeamBackend`와 `Su
 
 ## 20. 새 프로젝트에서의 바로 다음 작업
 
-Unity LTS 2D 프로젝트를 만든 뒤, 이 문서를 저장소의 `Docs/TEAM_OVERLAY_PROJECT_HANDOFF.md` 또는 루트의 `PROJECT_CONTEXT.md`로 복사한다. 새 Codex 채팅이 이 문서를 먼저 읽게 한 다음, **Mock 데이터로 동작하는 첫 번째 마일스톤**부터 구현한다.
+Unity LTS 2D 프로젝트를 만든 뒤, 이 문서를 저장소의 `Documentation/TEAM_OVERLAY_PROJECT_HANDOFF.md` 또는 루트의 `PROJECT_CONTEXT.md`로 복사한다. 새 Codex 채팅이 이 문서를 먼저 읽게 한 다음, **Mock 데이터로 동작하는 첫 번째 마일스톤**부터 구현한다.
 
 프로젝트에 지속적으로 적용할 짧은 규칙은 추후 `AGENTS.md`에 옮긴다. 제품 요구사항과 설계 결정은 이 문서처럼 저장소 안의 문서로 유지한다.

@@ -79,7 +79,7 @@ The Auth/member-registration portion of this boundary is now implemented. Unity
 creates or restores an anonymous Supabase Auth session, stores it in Windows
 Credential Manager, queries the Auth-UUID-backed member row, and calls
 `claim_member_name` before committing the local profile. See
-`Docs/MILESTONE_3_IDENTITY_INTEGRATION.md`.
+`Documentation/MILESTONE_3_IDENTITY_INTEGRATION.md`.
 
 The team-state backend is still the deterministic mock. The next implementation
 stage is to replace it with Supabase attendance RPCs and Realtime subscriptions

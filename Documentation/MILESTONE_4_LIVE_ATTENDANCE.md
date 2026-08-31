@@ -125,5 +125,5 @@ configuration.
 
 - `team_events` is not read. Nudges, emotes and messages will need it.
 - Cross-PC name handover still fails with `member_name_taken`; see
-  `Docs/PREFAB_UI_EDITING.md`.
+  `Documentation/PREFAB_UI_EDITING.md`.
 - Statistics screens (daily/cumulative rankings) are untouched.
