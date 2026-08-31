@@ -22,11 +22,23 @@ namespace DOTORION.Tests.EditMode
                 "Assets/02. Prefabs/FirstRunNameModal.prefab");
             var app = AssetDatabase.LoadAssetAtPath<DOTORIONApp>(
                 "Assets/Resources/DOTORION/DOTORIONApp.prefab");
+            var updatePrompt = AssetDatabase.LoadAssetAtPath<UpdatePromptView>(
+                "Assets/02. Prefabs/UpdatePromptModal.prefab");
 
             Assert.That(card, Is.Not.Null);
             Assert.That(main, Is.Not.Null);
             Assert.That(name, Is.Not.Null);
             Assert.That(app, Is.Not.Null);
+            Assert.That(updatePrompt, Is.Not.Null);
+
+            // The app only offers updates when it has the modal to ask with, so
+            // an unwired field would turn the whole feature off silently.
+            AssertReference(new SerializedObject(app), "_updatePromptPrefab");
+            var updateData = new SerializedObject(updatePrompt);
+            AssertReference(updateData, "_messageText");
+            AssertReference(updateData, "_statusText");
+            AssertReference(updateData, "_confirmButton");
+            AssertReference(updateData, "_laterButton");
 
             var mainData = new SerializedObject(main);
             var cardData = new SerializedObject(card);
