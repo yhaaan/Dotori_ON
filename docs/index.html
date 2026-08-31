@@ -9,7 +9,9 @@
   /* The app's own palette, so the page and the window it hands over look related. */
   :root {
     --window: #101621;
+    --card: #1C2635;
     --text: #F4F7FB;
+    --muted: #A9B5C6;
     --button: #273449;
     --button-hover: #34445D;
     --accent: #6EA8FE;
@@ -28,7 +30,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2.75rem;
+    gap: 2rem;
     background: var(--window);
     color: var(--text);
     font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -45,7 +47,36 @@
     line-height: 1;
   }
 
-  a {
+  /* Tabs ------------------------------------------------------------------ */
+
+  .tabs {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .tab {
+    padding: 0.5rem 1.1rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .tab[aria-selected="true"] {
+    background: var(--button);
+    color: var(--text);
+  }
+
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* Panels ---------------------------------------------------------------- */
+
+  [role="tabpanel"][hidden] { display: none; }
+
+  .download {
     display: inline-block;
     padding: 0.95rem 2.6rem;
     border-radius: 999px;
@@ -57,14 +88,139 @@
     transition: background 120ms ease;
   }
 
-  a:hover { background: var(--button-hover); }
-  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-  a:active { background: var(--button-hover); }
+  .download:hover { background: var(--button-hover); }
+  .download:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .download:active { background: var(--button-hover); }
+
+  /* Older versions -------------------------------------------------------- */
+
+  #older {
+    width: min(30rem, 100%);
+    /* A long history should scroll inside its own box rather than pushing the
+       title off the top of the screen. */
+    max-height: min(22rem, 45dvh);
+    overflow-y: auto;
+    background: var(--card);
+    border-radius: 0.75rem;
+    padding: 0.4rem;
+  }
+
+  .release {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: 0.5rem;
+    color: var(--text);
+    text-decoration: none;
+    text-align: left;
+  }
+
+  .release:hover { background: var(--button); }
+  .release:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .release .name { font-weight: 600; }
+  .release .size { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+
+  .note {
+    margin: 0;
+    padding: 1.2rem 0.9rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .note a { color: var(--accent); }
 </style>
 </head>
 <body>
   <h1>DOTORI ON</h1>
-  <!-- Always the newest release: the asset name is fixed so this never changes. -->
-  <a href="https://github.com/yhaaan/Dotori_ON/releases/latest/download/DOTORI_ON.zip">다운로드</a>
+
+  <div class="tabs" role="tablist" aria-label="다운로드">
+    <button class="tab" role="tab" id="tab-latest" aria-controls="panel-latest" aria-selected="true">최신</button>
+    <button class="tab" role="tab" id="tab-older" aria-controls="panel-older" aria-selected="false">이전 버전</button>
+  </div>
+
+  <div role="tabpanel" id="panel-latest" aria-labelledby="tab-latest">
+    <!-- Always the newest release: the asset name is fixed so this never changes. -->
+    <a class="download" href="https://github.com/yhaaan/Dotori_ON/releases/latest/download/DOTORI_ON.zip">다운로드</a>
+  </div>
+
+  <div role="tabpanel" id="panel-older" aria-labelledby="tab-older" hidden>
+    <div id="older"><p class="note">불러오는 중…</p></div>
+  </div>
+
+<script>
+(function () {
+  var REPO = 'yhaaan/Dotori_ON';
+  var tabs = [document.getElementById('tab-latest'), document.getElementById('tab-older')];
+  var panels = [document.getElementById('panel-latest'), document.getElementById('panel-older')];
+  var loaded = false;
+
+  function select(index) {
+    tabs.forEach(function (tab, i) { tab.setAttribute('aria-selected', String(i === index)); });
+    panels.forEach(function (panel, i) { panel.hidden = i !== index; });
+    if (index === 1 && !loaded) { loaded = true; loadOlder(); }
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { select(i); });
+    tab.addEventListener('keydown', function (event) {
+      // Left/right move between tabs, which is what a tablist is expected to do.
+      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+      var next = event.key === 'ArrowRight' ? (i + 1) % tabs.length : (i + tabs.length - 1) % tabs.length;
+      select(next);
+      tabs[next].focus();
+    });
+  });
+
+  function megabytes(bytes) { return (bytes / 1048576).toFixed(1) + ' MB'; }
+
+  function fallback(message) {
+    return '<p class="note">' + message +
+      '<br><a href="https://github.com/' + REPO + '/releases">릴리스 목록에서 직접 받기</a></p>';
+  }
+
+  function loadOlder() {
+    var box = document.getElementById('older');
+    // The releases API is the list: nothing here has to be edited when a new
+    // version ships, and nothing can fall out of step with what was published.
+    fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=100')
+      .then(function (response) {
+        if (!response.ok) throw new Error(response.status);
+        return response.json();
+      })
+      .then(function (releases) {
+        var rows = releases
+          .filter(function (release) { return !release.draft; })
+          .map(function (release) {
+            var zip = (release.assets || []).filter(function (asset) {
+              return /\.zip$/i.test(asset.name);
+            })[0];
+            return zip ? { release: release, zip: zip } : null;
+          })
+          .filter(Boolean);
+
+        // The newest one already has the whole other tab to itself.
+        rows.shift();
+
+        if (!rows.length) { box.innerHTML = fallback('이전 버전이 아직 없습니다.'); return; }
+
+        box.innerHTML = rows.map(function (row) {
+          var label = (row.release.name || row.release.tag_name)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;');
+          return '<a class="release" href="' + row.zip.browser_download_url + '">' +
+                 '<span class="name">' + label + '</span>' +
+                 '<span class="size">' + megabytes(row.zip.size) + '</span></a>';
+        }).join('');
+      })
+      .catch(function () {
+        // Usually GitHub's unauthenticated rate limit. The list is one click
+        // away either way, so say so rather than showing an error.
+        box.innerHTML = fallback('목록을 불러오지 못했습니다.');
+      });
+  }
+})();
+</script>
 </body>
 </html>
