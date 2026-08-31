@@ -165,12 +165,14 @@ namespace DOTORION.Tests.EditMode
             AssertReference(settingsData, "_alwaysOnTopValue");
             AssertReference(settingsData, "_muteButton");
             AssertReference(settingsData, "_muteValue");
+            AssertReference(settingsData, "_autoStartButton");
+            AssertReference(settingsData, "_autoStartValue");
             AssertReference(settingsData, "_versionText");
             var settingsRect = main.transform
                 .Find("WindowBackground/SettingsPanel").GetComponent<RectTransform>();
             // Keep in sync with WindowsOverlayWindow.SettingsPanelHeight: the
             // window grows by exactly this much when the settings panel opens.
-            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(160f));
+            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(196f));
             Assert.That(settingsRect.anchoredPosition.y, Is.EqualTo(-220f));
             Assert.That(settingsRect.gameObject.activeSelf, Is.False);
             // The always-on-top switch moved into the panel, so the top bar slot
