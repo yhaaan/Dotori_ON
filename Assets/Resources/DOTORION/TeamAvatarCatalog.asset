@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: TeamAvatarCatalog
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.TeamAvatarCatalog
   _icons:
-  - {fileID: 21300000, guid: 76d424cbb54e18a4e9952b5d23afb89f, type: 3}
   - {fileID: 21300000, guid: fafb9e206c9589446aa30487d1d1fbb7, type: 3}
   - {fileID: 21300000, guid: 0dcbe840186b30848b0cf3f05e6f4c32, type: 3}
   - {fileID: 21300000, guid: bef8da4e3642683458dc46de03c370b4, type: 3}
@@ -21,6 +20,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: a6080c34ad292c8418472d2047cffbca, type: 3}
   - {fileID: 21300000, guid: f05e207525fc9bc4bacd7ef9ec6e155c, type: 3}
   - {fileID: 21300000, guid: 8ac1b8571864d9243aa9e9a3aa914240, type: 3}
+  - {fileID: 21300000, guid: 76d424cbb54e18a4e9952b5d23afb89f, type: 3}
   - {fileID: 21300000, guid: d257d94bec751fe4993499c9a827ad11, type: 3}
   - {fileID: 21300000, guid: f934ef16ca3f17e439bff865fec0af33, type: 3}
   - {fileID: 21300000, guid: 522d3b7b650d73d438869bd0902744b9, type: 3}

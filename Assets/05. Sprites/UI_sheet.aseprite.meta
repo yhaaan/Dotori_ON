@@ -802,7 +802,7 @@ ScriptedImporter:
     uvTransform: {x: 0, y: 0}
   - name: UI_sheet_31
     originalName: 
-    pivot: {x: 0, y: 0}
+    pivot: {x: 0.5, y: 0.5}
     alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -888,7 +888,7 @@ ScriptedImporter:
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
-    border: {x: 0, y: 0, z: 0, w: 0}
+    border: {x: 3, y: 2, z: 2, w: 3}
     customData: 
     rect:
       serializedVersion: 2
