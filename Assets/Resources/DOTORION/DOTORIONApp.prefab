@@ -48,4 +48,5 @@ MonoBehaviour:
   _firstRunNamePrefab: {fileID: 910186508334100652, guid: 14f346e48942508478593b678c89d7e6, type: 3}
   _sounds: {fileID: 11400000, guid: e9596c0c2135c784ab260791839c3cc8, type: 2}
   _avatarCatalog: {fileID: 11400000, guid: 35bc8cbc7fa44614082b035f3541e8e6, type: 2}
+  _updatePromptPrefab: {fileID: 3791415601624418992, guid: 7028ed52d1f81674da3a1e9b336aea96, type: 3}
   _useMockBackend: 0
