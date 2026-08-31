@@ -22,6 +22,13 @@ namespace DOTORION.UI
         [SerializeField] private Button _confirmButton;
         [SerializeField] private Text _feedbackText;
 
+        [Header("Selection tint")]
+        [Tooltip("고른 아바타 칸에 곱해지는 색. 아트가 선택 상태를 직접 표현하면 흰색으로 두세요.")]
+        [SerializeField] private Color _selectedTint = new Color(0.431f, 0.659f, 0.996f, 1f);
+
+        [Tooltip("고르지 않은 칸에 곱해지는 색. 흰색이면 스프라이트가 그려진 그대로 나옵니다.")]
+        [SerializeField] private Color _unselectedTint = Color.white;
+
         private readonly List<Button> _options = new List<Button>();
         private readonly List<string> _optionKeys = new List<string>();
         private TeamAvatarCatalog _catalog;
@@ -143,7 +150,10 @@ namespace DOTORION.UI
                 var background = _options[index].GetComponent<Image>();
                 if (background != null)
                 {
-                    background.color = isSelected ? DOTORIONPalette.Accent : DOTORIONPalette.Button;
+                    // Both come from the Inspector rather than the palette: the
+                    // tile is artwork now, and a colour written here multiplies
+                    // over it on every repaint. White leaves the sprite alone.
+                    background.color = isSelected ? _selectedTint : _unselectedTint;
                 }
             }
         }

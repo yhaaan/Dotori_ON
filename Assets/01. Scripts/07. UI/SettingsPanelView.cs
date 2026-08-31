@@ -83,8 +83,9 @@ namespace DOTORION.UI
         }
 
         /// <summary>
-        /// The row says which way the switch is set in words. The button's own
-        /// surface is artwork, so nothing repaints it.
+        /// The row says which way the switch is set in words. Only the words are
+        /// written: the colour and the font are whatever the prefab was dressed
+        /// in, and repainting them here would undo that on every refresh.
         /// </summary>
         private static void SetSwitch(Text value, bool enabled)
         {
@@ -94,7 +95,6 @@ namespace DOTORION.UI
             }
 
             value.text = enabled ? "켜짐" : "꺼짐";
-            value.color = enabled ? DOTORIONPalette.TextPrimary : DOTORIONPalette.TextSecondary;
         }
     }
 }
