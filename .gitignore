@@ -110,6 +110,9 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
+# Performance Testing package artefacts, rewritten into Resources on every test run
+/[Aa]ssets/[Rr]esources/PerformanceTestRun*.json*
+
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
 
