@@ -160,9 +160,27 @@ finally {
 $zipMb = [math]::Round((Get-Item -LiteralPath $zipPath).Length / 1MB, 1)
 Write-Host "    $assetName ($zipMb MB)"
 
+# 앱이 시작할 때 읽는 매니페스트다. zip 과 같은 자리에서 같은 순간에 만들어지므로
+# 둘이 서로 다른 빌드를 가리킬 수가 없다. 손으로 관리하면 언젠가 반드시 어긋난다.
+$remote = (Invoke-Git remote get-url origin).Trim() -replace '\.git$', ''
+$sha = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+$manifestPath = Join-Path $repoRoot 'Builds\version.json'
+$manifest = [ordered]@{
+    version  = $version
+    download = "$remote/releases/latest/download/$assetName"
+    sha256   = $sha
+    notes    = "$remote/releases/latest"
+}
+[System.IO.File]::WriteAllText(
+    $manifestPath,
+    ($manifest | ConvertTo-Json),
+    [System.Text.UTF8Encoding]::new($false))
+Write-Host "    version.json (sha256 $($sha.Substring(0, 12))...)"
+
 if ($DryRun) {
     Step 'DryRun — 태그와 릴리스는 건너뛴다'
     Write-Host "    $zipPath"
+    Write-Host "    $manifestPath"
     return
 }
 
@@ -173,14 +191,14 @@ Invoke-Git tag -a $tag -m "DOTORI ON $tag" | Out-Null
 Invoke-Git push origin $tag | Out-Null
 
 Step 'GitHub Release 발행'
-$ghArgs = @('release', 'create', $tag, $zipPath, '--title', "DOTORI ON $tag", '--latest')
+$ghArgs = @('release', 'create', $tag, $zipPath, $manifestPath, '--title', "DOTORI ON $tag", '--latest')
 if ($Notes) { $ghArgs += @('--notes', $Notes) } else { $ghArgs += '--generate-notes' }
 & gh @ghArgs
 if ($LASTEXITCODE -ne 0) {
     Fail "gh release create 가 실패했다. 태그 $tag 는 이미 올라갔으니, 원인을 고친 뒤 릴리스만 다시 만들 것."
 }
 
-$remote = (Invoke-Git remote get-url origin).Trim() -replace '\.git$', ''
 Write-Host ''
-Write-Host '완료. 항상 최신을 가리키는 고정 다운로드 URL:' -ForegroundColor Green
+Write-Host '완료. 항상 최신을 가리키는 고정 URL:' -ForegroundColor Green
 Write-Host "  $remote/releases/latest/download/$assetName"
+Write-Host "  $remote/releases/latest/download/version.json"
