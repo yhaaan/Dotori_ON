@@ -49,7 +49,7 @@ Unity 메뉴에서 **DOTORI ON > Build Windows x86_64** 를 실행한다.
 2. 빌드가 마지막 소스 변경보다 오래됐으면 멈춘다 — 버전만 올리고 다시 빌드하지 않은
    채 올리는 사고를 막는다. 의도한 것이면 `-Force` 를 붙인다.
 3. `Builds/Windows/` 에서 배포하면 안 되는 것(`*_DoNotShip`, 지난 zip, `구 빌드`)을
-   빼고 `Builds/DOTORI-ON-win64.zip` 으로 묶는다. 압축 안의 최상단은 `DOTORI ON/`
+   빼고 `Builds/DOTORI_ON.zip` 으로 묶는다. 압축 안의 최상단은 `DOTORI ON/`
    폴더 하나다.
 4. 태그를 밀고 GitHub Release 를 만들면서 zip 을 자산으로 올린다. 릴리스 노트는
    `--generate-notes` 로 커밋 목록에서 자동 생성된다. 직접 쓰려면 `-Notes "..."`.
@@ -60,11 +60,11 @@ zip 내용만 눈으로 확인하고 싶으면 `-DryRun` 을 붙인다. 태그�
 
 ## 자산 파일명은 고정이다
 
-릴리스 자산의 이름은 언제나 `DOTORI-ON-win64.zip` 이다. 이 이름이 고정돼 있어야
+릴리스 자산의 이름은 언제나 `DOTORI_ON.zip` 이다. 이 이름이 고정돼 있어야
 아래 URL 이 **항상 최신 릴리스**를 가리킨다.
 
 ```
-https://github.com/yhaaan/Project-DDD/releases/latest/download/DOTORI-ON-win64.zip
+https://github.com/yhaaan/Project-DDD/releases/latest/download/DOTORI_ON.zip
 ```
 
 다운로드 페이지의 버튼과 앞으로 붙을 자동 업데이트가 둘 다 이 URL 하나를 쓴다.
@@ -78,7 +78,7 @@ https://github.com/yhaaan/Project-DDD/releases/latest/download/DOTORI-ON-win64.z
 원인을 고친 뒤 릴리스만 다시 만든다.
 
 ```
-gh release create v0.8.0 "Builds/DOTORI-ON-win64.zip" --title "DOTORI ON v0.8.0" --generate-notes --latest
+gh release create v0.8.0 "Builds/DOTORI_ON.zip" --title "DOTORI ON v0.8.0" --generate-notes --latest
 ```
 
 태그부터 다시 하려면 원격과 로컬에서 지운다.

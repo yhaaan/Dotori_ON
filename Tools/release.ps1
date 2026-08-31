@@ -37,7 +37,7 @@ $exePath  = Join-Path $buildDir 'DOTORI ON.exe'
 # 자동 업데이트 확인과 다운로드 페이지가 둘 다 이 파일명에 의존한다. 이름이 고정돼
 # 있어야 releases/latest/download/<이름> 이 언제나 최신 릴리스를 가리킨다. 바꾸면
 # 이미 배포된 구버전의 업데이트 경로가 끊기므로 함부로 건드리지 않는다.
-$assetName = 'DOTORI-ON-win64.zip'
+$assetName = 'DOTORI_ON.zip'
 $zipPath   = Join-Path $repoRoot ('Builds\' + $assetName)
 
 function Step([string]$message) { Write-Host "==> $message" -ForegroundColor Cyan }
