@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOTORI ON</title>
+<link rel="icon" href="logo.png">
+<style>
+  /* The app's own palette, so the page and the window it hands over look related. */
+  :root {
+    --window: #101621;
+    --text: #F4F7FB;
+    --button: #273449;
+    --button-hover: #34445D;
+    --accent: #6EA8FE;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 2rem;
+    /* dvh rather than a percentage height: on a phone the address bar slides
+       away and vh would leave the centre off by that much. */
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.75rem;
+    background: var(--window);
+    color: var(--text);
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 0;
+    /* Fills a phone screen and stops growing on a desktop one. */
+    font-size: clamp(2.5rem, 13vw, 6.5rem);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  a {
+    display: inline-block;
+    padding: 0.95rem 2.6rem;
+    border-radius: 999px;
+    background: var(--button);
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 120ms ease;
+  }
+
+  a:hover { background: var(--button-hover); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  a:active { background: var(--button-hover); }
+</style>
+</head>
+<body>
+  <h1>DOTORI ON</h1>
+  <!-- Always the newest release: the asset name is fixed so this never changes. -->
+  <a href="https://github.com/yhaaan/Dotori_ON/releases/latest/download/DOTORI_ON.zip">다운로드</a>
+</body>
+</html>
