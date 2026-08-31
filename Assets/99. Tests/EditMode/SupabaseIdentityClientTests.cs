@@ -197,6 +197,79 @@ namespace DOTORION.Tests.EditMode
             Assert.That(capacity.HasRoom, Is.True);
         }
 
+        [Test]
+        public async Task ClaimingWithAStoredSessionForADeletedAccount_StartsOverAndSignsUp()
+        {
+            // Wiping the server does not invalidate a token that is already out:
+            // it is signed and still in date, so PostgREST takes it and auth.uid()
+            // names a user row that is gone. Only the insert notices.
+            var store = new MemorySessionStore
+            {
+                Saved = new SupabaseAuthSession(
+                    UserId, "stale-access", "stale-refresh", Now.AddHours(1))
+            };
+            var transport = new QueueTransport(
+                Ok("[]"),                 // initialize: no member for this account
+                ForeignKeyViolation(),    // claim: members.id has nothing to point at
+                InvalidCredentials(),     // the derived account is gone too
+                Ok(AuthJson("access-new", "refresh-new", Now.AddHours(1))),
+                Ok(MemberJson("하늘")));  // claim again, on the new account
+            var client = CreateClient(transport, store);
+            await client.InitializeForNameAsync(Name("하늘"), CancellationToken.None);
+
+            var member = await client.ClaimMemberNameAsync("하늘", CancellationToken.None);
+
+            Assert.That(store.DeleteCount, Is.EqualTo(1), "the dead session must be thrown away");
+            Assert.That(member.DisplayName, Is.EqualTo("하늘"));
+            Assert.That(store.Saved.AccessToken, Is.EqualTo("access-new"));
+            Assert.That(transport.Requests[3].Url, Does.EndWith("/auth/v1/signup"));
+            Assert.That(transport.Requests[4].Url, Does.EndWith("/rpc/claim_member_name"));
+        }
+
+        [Test]
+        public async Task ClaimingAfterTheAccountWasRemade_SignsBackInWithoutASecondSignup()
+        {
+            var store = new MemorySessionStore
+            {
+                Saved = new SupabaseAuthSession(
+                    UserId, "stale-access", "stale-refresh", Now.AddHours(1))
+            };
+            var transport = new QueueTransport(
+                Ok("[]"),
+                ForeignKeyViolation(),
+                Ok(AuthJson("access-new", "refresh-new", Now.AddHours(1))),
+                Ok(MemberJson("하늘")));
+            var client = CreateClient(transport, store);
+            await client.InitializeForNameAsync(Name("하늘"), CancellationToken.None);
+
+            var member = await client.ClaimMemberNameAsync("하늘", CancellationToken.None);
+
+            Assert.That(store.DeleteCount, Is.EqualTo(1));
+            Assert.That(member.DisplayName, Is.EqualTo("하늘"));
+            Assert.That(transport.Requests, Has.Count.EqualTo(4), "signup must not be attempted");
+        }
+
+        [Test]
+        public async Task AMissingTeamIsNotMistakenForADeletedAccount()
+        {
+            // claim_member_name raises 23503 itself when the team row is gone.
+            // Starting over would make a second account and still fail, so this
+            // one has to surface as the error it is.
+            var store = new MemorySessionStore
+            {
+                Saved = new SupabaseAuthSession(
+                    UserId, "access", "refresh", Now.AddHours(1))
+            };
+            var transport = new QueueTransport(Ok("[]"), TeamNotFound());
+            var client = CreateClient(transport, store);
+            await client.InitializeForNameAsync(Name("하늘"), CancellationToken.None);
+
+            Assert.That(
+                async () => await client.ClaimMemberNameAsync("하늘", CancellationToken.None),
+                Throws.InstanceOf<SupabaseApiException>());
+            Assert.That(store.DeleteCount, Is.EqualTo(0), "the session must be left alone");
+        }
+
         private static SupabaseIdentityClient CreateClient(
             QueueTransport transport,
             MemorySessionStore store)
@@ -219,6 +292,23 @@ namespace DOTORION.Tests.EditMode
             return new SupabaseHttpResponse(
                 400,
                 "{\"error_code\":\"invalid_credentials\",\"msg\":\"Invalid login credentials\"}");
+        }
+
+        /// <summary>What PostgREST returns when members.id has nothing to point at.</summary>
+        private static SupabaseHttpResponse ForeignKeyViolation()
+        {
+            return new SupabaseHttpResponse(
+                409,
+                "{\"code\":\"23503\",\"message\":\"insert or update on table \\\"members\\\" " +
+                "violates foreign key constraint \\\"members_id_fkey\\\"\"}");
+        }
+
+        /// <summary>The RPC's own 23503, which means something else entirely.</summary>
+        private static SupabaseHttpResponse TeamNotFound()
+        {
+            return new SupabaseHttpResponse(
+                400,
+                "{\"code\":\"23503\",\"message\":\"team_not_found\"}");
         }
 
         private static SupabaseHttpResponse Ok(string body)
