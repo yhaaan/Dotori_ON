@@ -16,7 +16,6 @@ namespace DOTORION.UI
         // thing that now costs nothing.
         private const string RenameHint = "기록은 그대로 따라옵니다.";
 
-        [Header("Optional typography override")]
         [Header("Prefab references")]
         [SerializeField] private InputField _nameInput;
         [SerializeField] private Button _confirmButton;

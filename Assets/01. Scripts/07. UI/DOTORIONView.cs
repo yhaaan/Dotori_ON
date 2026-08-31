@@ -12,7 +12,6 @@ namespace DOTORION.UI
     {
         private const int MemberCount = 4;
 
-        [Header("Optional typography override")]
         [Header("Prefab references")]
         [SerializeField] private TeamMemberCardView[] _cards = new TeamMemberCardView[MemberCount];
         [SerializeField] private Button _checkInButton;

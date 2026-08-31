@@ -20,7 +20,17 @@ namespace DOTORION.UI
         [SerializeField] private Button _confirmButton;
         [SerializeField] private Button _laterButton;
 
+        [Tooltip("오류일 때만 쓰는 글자색. 나머지 상태는 프리팹에 칠해진 색을 그대로 씁니다.")]
+        [SerializeField] private Color _errorColor = new Color(0.914f, 0.443f, 0.443f, 1f);
+
         private bool _initialized;
+
+        /// <summary>
+        /// Whatever colour the status line was painted in the prefab. Read once
+        /// and put back afterwards, so the artwork stays the source of truth and
+        /// only the error state is allowed to depart from it.
+        /// </summary>
+        private Color _statusColor = Color.white;
 
         /// <summary>The person said yes. The app downloads and then quits.</summary>
         public event Action Confirmed;
@@ -38,6 +48,11 @@ namespace DOTORION.UI
             }
 
             _initialized = true;
+            if (_statusText != null)
+            {
+                _statusColor = _statusText.color;
+            }
+
             UiFactory.EnsureEventSystem();
             _confirmButton?.onClick.AddListener(() => Confirmed?.Invoke());
             _laterButton?.onClick.AddListener(() => Dismissed?.Invoke());
@@ -51,7 +66,7 @@ namespace DOTORION.UI
                 _messageText.text = "새로운 버전 " + version + "이 나왔습니다.\n업데이트 할까요?";
             }
 
-            SetStatus(string.Empty, DOTORIONPalette.TextSecondary);
+            SetStatus(string.Empty);
             SetButtonsVisible(true);
             gameObject.SetActive(true);
         }
@@ -70,14 +85,14 @@ namespace DOTORION.UI
         {
             SetButtonsVisible(false);
             var percent = Mathf.Clamp01(fraction) * 100f;
-            SetStatus("내려받는 중… " + Mathf.FloorToInt(percent) + "%", DOTORIONPalette.TextSecondary);
+            SetStatus("내려받는 중… " + Mathf.FloorToInt(percent) + "%");
         }
 
         /// <summary>Shown just before the app closes, so the wait is not silent.</summary>
         public void ShowApplying()
         {
             SetButtonsVisible(false);
-            SetStatus("설치하고 다시 시작합니다…", DOTORIONPalette.TextSecondary);
+            SetStatus("설치하고 다시 시작합니다…");
         }
 
         /// <summary>
@@ -87,13 +102,19 @@ namespace DOTORION.UI
         public void ShowError(string message)
         {
             SetButtonsVisible(true);
-            SetStatus(message, DOTORIONPalette.Danger);
+            SetStatus(message, _errorColor);
         }
 
         private void SetButtonsVisible(bool visible)
         {
             if (_confirmButton != null) _confirmButton.gameObject.SetActive(visible);
             if (_laterButton != null) _laterButton.gameObject.SetActive(visible);
+        }
+
+        /// <summary>The ordinary states leave the prefab's colour alone.</summary>
+        private void SetStatus(string message)
+        {
+            SetStatus(message, _statusColor);
         }
 
         private void SetStatus(string message, Color color)
