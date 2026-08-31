@@ -1,0 +1,107 @@
+# Swaps a downloaded release over this install and starts it again.
+#
+# It runs as its own process because the thing being replaced is the process
+# that started it: a running exe cannot overwrite itself, so the app hands this
+# script its own process id, quits, and this waits for it to be gone.
+#
+# Shipped as a TextAsset (Resources/DOTORION/ApplyUpdate.ps1) and written out to
+# the temp folder at update time. Editing it here is the way to change it.
+
+param(
+    [Parameter(Mandatory = $true)] [int]$ProcessId,
+    [Parameter(Mandatory = $true)] [string]$ZipPath,
+    [Parameter(Mandatory = $true)] [string]$InstallDir,
+    [Parameter(Mandatory = $true)] [string]$ExePath,
+    [Parameter(Mandatory = $true)] [string]$RootName
+)
+
+$ErrorActionPreference = 'Stop'
+$log = Join-Path (Split-Path -Parent $ZipPath) 'apply-update.log'
+
+function Write-Log([string]$message) {
+    $line = "[{0}] {1}" -f (Get-Date -Format 'HH:mm:ss'), $message
+    Add-Content -LiteralPath $log -Value $line -Encoding UTF8
+}
+
+function Restart-App {
+    if (Test-Path -LiteralPath $ExePath) {
+        Write-Log "starting $ExePath"
+        Start-Process -FilePath $ExePath -WorkingDirectory $InstallDir
+    }
+}
+
+try {
+    Write-Log "waiting for process $ProcessId"
+    # The app quits right after starting this. Sixty seconds is far longer than
+    # a clock-out takes; past that something is wrong and touching the files
+    # while it still runs would be worse than leaving the version alone.
+    $waited = 0
+    while ($waited -lt 60) {
+        if (-not (Get-Process -Id $ProcessId -ErrorAction SilentlyContinue)) { break }
+        Start-Sleep -Milliseconds 250
+        $waited += 0.25
+    }
+
+    if (Get-Process -Id $ProcessId -ErrorAction SilentlyContinue) {
+        Write-Log "process $ProcessId is still running after ${waited}s - giving up"
+        exit 1
+    }
+
+    # Unpacked to one side and checked before anything is overwritten, so a zip
+    # that turns out to be short or wrong leaves the install exactly as it was.
+    $staging = Join-Path (Split-Path -Parent $ZipPath) 'staged'
+    if (Test-Path -LiteralPath $staging) { Remove-Item -LiteralPath $staging -Recurse -Force }
+    New-Item -ItemType Directory -Path $staging -Force | Out-Null
+
+    Write-Log "extracting to $staging"
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    [System.IO.Compression.ZipFile]::ExtractToDirectory($ZipPath, $staging)
+
+    $source = Join-Path $staging $RootName
+    $stagedExe = Join-Path $source (Split-Path -Leaf $ExePath)
+    if (-not (Test-Path -LiteralPath $stagedExe)) {
+        Write-Log "no $stagedExe in the archive - leaving the install alone"
+        Restart-App
+        exit 1
+    }
+
+    # Copied rather than swapped in wholesale: the folder may hold things the
+    # release does not carry, and a person who put something beside the exe
+    # should not lose it to an update.
+    Write-Log "copying over $InstallDir"
+    $copied = $false
+    for ($attempt = 1; $attempt -le 5; $attempt++) {
+        try {
+            Copy-Item -Path (Join-Path $source '*') -Destination $InstallDir -Recurse -Force
+            $copied = $true
+            break
+        }
+        catch {
+            # A virus scanner or a lingering handle can hold a file open for a
+            # moment after the process is gone.
+            Write-Log "copy attempt $attempt failed: $($_.Exception.Message)"
+            Start-Sleep -Seconds 2
+        }
+    }
+
+    if (-not $copied) {
+        Write-Log "could not copy the new files - the install is unchanged"
+        Restart-App
+        exit 1
+    }
+
+    Write-Log "update applied"
+    Restart-App
+}
+catch {
+    Write-Log "failed: $($_.Exception.Message)"
+    # Whatever went wrong, the person is sitting in front of a closed app.
+    Restart-App
+    exit 1
+}
+finally {
+    # The zip is the large one; the log stays for anyone asking what happened.
+    Remove-Item -LiteralPath $ZipPath -Force -ErrorAction SilentlyContinue
+    $staging = Join-Path (Split-Path -Parent $ZipPath) 'staged'
+    Remove-Item -LiteralPath $staging -Recurse -Force -ErrorAction SilentlyContinue
+}
