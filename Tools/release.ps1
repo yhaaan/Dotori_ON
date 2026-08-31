@@ -73,15 +73,23 @@ if (-not (Test-Path -LiteralPath $exePath)) {
     Fail "빌드가 없다: $exePath`n    Unity 에서 [DOTORI ON > Build Windows x86_64] 를 먼저 실행할 것."
 }
 
-# 버전만 올리고 다시 빌드하지 않은 채 올리는 사고가 가장 흔하다. exe 가 마지막
-# 소스 변경보다 오래됐으면 멈춘다. Library 는 Unity 가 수시로 건드리므로 보지 않는다.
-$exeTime = (Get-Item -LiteralPath $exePath).LastWriteTime
+# 버전만 올리고 다시 빌드하지 않은 채 올리는 사고가 가장 흔하다. 빌드 시각이 마지막
+# 소스 변경보다 이르면 멈춘다. Library 는 Unity 가 수시로 건드리므로 보지 않는다.
+#
+# 빌드 시각의 근거로 exe 를 쓰면 안 된다. DOTORI ON.exe 와 UnityPlayer.dll 은 Unity
+# 설치 폴더에서 그대로 복사돼 원본의 수정 시각을 유지하므로, 다시 빌드해도 날짜가
+# 예전 그대로다. 매 빌드 새로 쓰이는 것은 DOTORI ON_Data 안의 파일들이다.
+$dataDir = Join-Path $buildDir 'DOTORI ON_Data'
+if (-not (Test-Path -LiteralPath $dataDir)) { Fail "빌드 데이터 폴더가 없다: $dataDir" }
+$buildTime = (Get-ChildItem -LiteralPath $dataDir -File |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1).LastWriteTime
+
 $sourceRoots = @((Join-Path $repoRoot 'Assets'), (Join-Path $repoRoot 'ProjectSettings'))
 $newestSource = Get-ChildItem -LiteralPath $sourceRoots -Recurse -File -ErrorAction SilentlyContinue |
     Sort-Object LastWriteTime -Descending | Select-Object -First 1
-if ($newestSource -and $newestSource.LastWriteTime -gt $exeTime) {
+if ($newestSource -and $newestSource.LastWriteTime -gt $buildTime) {
     $stale = "빌드({0})가 마지막 소스 변경({1}, {2})보다 오래됐다." -f `
-        $exeTime.ToString('yyyy-MM-dd HH:mm'),
+        $buildTime.ToString('yyyy-MM-dd HH:mm'),
         $newestSource.LastWriteTime.ToString('yyyy-MM-dd HH:mm'),
         $newestSource.Name
     if (-not $Force) { Fail "$stale`n    다시 빌드하거나, 의도한 것이면 -Force 를 붙일 것." }
