@@ -27,6 +27,7 @@ namespace DOTORION.Editor
 
         /// <summary>Where the team drops profile icon images.</summary>
         public const string AvatarSpriteFolder = "Assets/04. Avatars";
+        public const string DailyGiftSpritePath = "Assets/05. Sprites/DailyGift.png";
 
         /// <summary>
         /// The avatar picker's own height in the prefab. The window grows upwards
@@ -704,7 +705,7 @@ namespace DOTORION.Editor
             var panelView = panel.gameObject.AddComponent<TeamStatisticsPanelView>();
 
             var heading = UiFactory.CreateText("Heading", panel.transform, font, 14,
-                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary);
             heading.text = "\uD300 \uD1B5\uACC4";
             UiFactory.AnchorTop(heading.rectTransform, 14f, 8f, 150f, 24f);
             var period = UiFactory.CreateText("Period", panel.transform, font, 10,
@@ -714,8 +715,10 @@ namespace DOTORION.Editor
 
             var dailyTab = UiFactory.CreateButton("DailyTab", panel.transform, font, "\uB0B4 \uD1B5\uACC4", null,
                 DOTORIONPalette.Accent);
+            dailyTab.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
             UiFactory.AnchorTop(dailyTab.GetComponent<RectTransform>(), 14f, 39f, 88f, 28f);
             var rankingTab = UiFactory.CreateButton("RankingTab", panel.transform, font, "\uB7AD\uD0B9");
+            rankingTab.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
             UiFactory.AnchorTop(rankingTab.GetComponent<RectTransform>(), 108f, 39f, 88f, 28f);
 
             // Period sits next to the tabs because it applies to both of them.
@@ -727,7 +730,9 @@ namespace DOTORION.Editor
                 periodButtons[index] = UiFactory.CreateButton(
                     periodNames[index], panel.transform, font, periodLabels[index], null,
                     index == 0 ? DOTORIONPalette.Accent : DOTORIONPalette.Button);
-                periodButtons[index].GetComponentInChildren<Text>().fontSize = 11;
+                var periodText = periodButtons[index].GetComponentInChildren<Text>();
+                periodText.fontSize = 11;
+                periodText.fontStyle = FontStyle.Normal;
                 UiFactory.AnchorTop(
                     periodButtons[index].GetComponent<RectTransform>(), 206f + index * 88f, 39f, 84f, 28f);
             }
@@ -757,7 +762,9 @@ namespace DOTORION.Editor
                 metricButtons[index] = UiFactory.CreateButton(
                     metricNames[index], rankingContent.transform, font, metricLabels[index], null,
                     index == 0 ? DOTORIONPalette.Working : DOTORIONPalette.Button);
-                metricButtons[index].GetComponentInChildren<Text>().fontSize = 11;
+                var metricText = metricButtons[index].GetComponentInChildren<Text>();
+                metricText.fontSize = 11;
+                metricText.fontStyle = FontStyle.Normal;
                 UiFactory.AnchorTop(
                     metricButtons[index].GetComponent<RectTransform>(), 10f + index * 115f, 0f, 111f, 24f);
             }
@@ -908,7 +915,7 @@ namespace DOTORION.Editor
             for (var column = 0; column < weekdays.Length; column++)
             {
                 var label = UiFactory.CreateText("Weekday_" + weekdays[column], calendar.transform, font, 9,
-                    TextAnchor.MiddleCenter, DOTORIONPalette.TextSecondary, FontStyle.Bold);
+                    TextAnchor.MiddleCenter, DOTORIONPalette.TextSecondary);
                 label.text = weekdays[column];
                 UiFactory.AnchorTop(
                     label.rectTransform,
@@ -933,6 +940,8 @@ namespace DOTORION.Editor
 
             var serialized = new SerializedObject(calendarView);
             SetArray(serialized, "_cells", cells);
+            Set(serialized, "_dailyGiftUnclaimedSprite", LoadSprite(DailyGiftSpritePath, "DailyGift_0"));
+            Set(serialized, "_dailyGiftClaimedSprite", LoadSprite(DailyGiftSpritePath, "DailyGift_1"));
             serialized.ApplyModifiedPropertiesWithoutUndo();
             calendar.SetActive(false);
             return calendarView;
@@ -945,8 +954,10 @@ namespace DOTORION.Editor
             float left,
             float top)
         {
+            // No palette colour here: the prefab owns the empty-day base colour.
+            // Runtime attendance shading starts from whatever the Image stores.
             var background = UiFactory.CreateImage(
-                "CalendarDay_" + (index + 1), parent, DOTORIONPalette.Card);
+                "CalendarDay_" + (index + 1), parent);
             UiFactory.AnchorTop(
                 background.rectTransform, left, top, CalendarCellWidth, CalendarCellHeight);
             // The squares are the grid's only control: clicking any of them swaps
@@ -960,7 +971,7 @@ namespace DOTORION.Editor
             UiFactory.AnchorTop(day.rectTransform, 4f, 3f, 24f, 13f);
 
             var duration = UiFactory.CreateText("Duration", background.transform, font, 11,
-                TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary);
             duration.text = "00:00";
             // Tall enough for the three stacked lines of the breakdown, and
             // allowed to overflow so a tight fit clips nothing.
@@ -969,9 +980,34 @@ namespace DOTORION.Editor
             duration.verticalOverflow = VerticalWrapMode.Overflow;
             duration.raycastTarget = false;
 
+            var dailyGift = UiFactory.CreateImage("DailyGift", background.transform);
+            dailyGift.raycastTarget = false;
+            dailyGift.preserveAspect = true;
+            dailyGift.gameObject.SetActive(false);
+            var dailyGiftRect = dailyGift.rectTransform;
+            dailyGiftRect.anchorMin = Vector2.one;
+            dailyGiftRect.anchorMax = Vector2.one;
+            dailyGiftRect.pivot = Vector2.one;
+            dailyGiftRect.anchoredPosition = new Vector2(-2f, -2f);
+
             Assign(cell,
-                ("_background", background), ("_dayLabel", day), ("_durationLabel", duration));
+                ("_background", background), ("_dayLabel", day), ("_durationLabel", duration),
+                ("_dailyGiftImage", dailyGift));
             return cell;
+        }
+
+        private static Sprite LoadSprite(string assetPath, string spriteName)
+        {
+            foreach (var asset in AssetDatabase.LoadAllAssetsAtPath(assetPath))
+            {
+                if (asset is Sprite sprite && sprite.name == spriteName)
+                {
+                    return sprite;
+                }
+            }
+
+            throw new InvalidOperationException(
+                "Sprite '" + spriteName + "' was not found at " + assetPath + ".");
         }
 
         /// <summary>
@@ -1134,13 +1170,13 @@ namespace DOTORION.Editor
             UiFactory.AnchorTop(background.rectTransform, 10f, top, 460f, 38f);
             var view = background.gameObject.AddComponent<TeamPeriodStatRowView>();
             var date = UiFactory.CreateText("Date", background.transform, font, 9,
-                TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary);
             UiFactory.AnchorTop(date.rectTransform, 6f, 0f, 70f, 38f);
             var work = UiFactory.CreateText("Work", background.transform, font, 9,
-                TextAnchor.MiddleLeft, DOTORIONPalette.Working, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.Working);
             UiFactory.AnchorTop(work.rectTransform, 80f, 1f, 72f, 17f);
             var attendance = UiFactory.CreateText("Attendance", background.transform, font, 9,
-                TextAnchor.MiddleLeft, DOTORIONPalette.Accent, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.Accent);
             UiFactory.AnchorTop(attendance.rectTransform, 274f, 1f, 91f, 17f);
             var other = UiFactory.CreateText("Other", background.transform, font, 9,
                 TextAnchor.MiddleLeft, DOTORIONPalette.TextSecondary);
@@ -1161,10 +1197,10 @@ namespace DOTORION.Editor
             UiFactory.AnchorTop(background.rectTransform, 10f, top, 460f, 50f);
             var view = background.gameObject.AddComponent<TeamRankingRowView>();
             var rank = UiFactory.CreateText("Rank", background.transform, font, 18,
-                TextAnchor.MiddleCenter, DOTORIONPalette.Accent, FontStyle.Bold);
+                TextAnchor.MiddleCenter, DOTORIONPalette.Accent);
             UiFactory.AnchorTop(rank.rectTransform, 8f, 0f, 32f, 50f);
             var name = UiFactory.CreateText("Name", background.transform, font, 12,
-                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary);
             UiFactory.AnchorTop(name.rectTransform, 46f, 3f, 104f, 22f);
             // Under the name, where a second line about the person fits without
             // crowding the numbers the ranking is actually sorted by.
@@ -1173,7 +1209,7 @@ namespace DOTORION.Editor
             UiFactory.AnchorTop(points.rectTransform, 46f, 24f, 104f, 18f);
             points.text = "0P";
             var work = UiFactory.CreateText("Work", background.transform, font, 10,
-                TextAnchor.MiddleLeft, DOTORIONPalette.Working, FontStyle.Bold);
+                TextAnchor.MiddleLeft, DOTORIONPalette.Working);
             UiFactory.AnchorTop(work.rectTransform, 158f, 3f, 96f, 20f);
             var attendance = UiFactory.CreateText("Attendance", background.transform, font, 10,
                 TextAnchor.MiddleLeft, DOTORIONPalette.Accent);

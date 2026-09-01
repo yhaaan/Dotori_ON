@@ -47,6 +47,21 @@ namespace DOTORION.Tests.EditMode
             return ((Text)new SerializedObject(cell).FindProperty("_durationLabel").objectReferenceValue).text;
         }
 
+        private static int DurationFontSize(TeamCalendarDayView cell)
+        {
+            return ((Text)new SerializedObject(cell).FindProperty("_durationLabel").objectReferenceValue).fontSize;
+        }
+
+        private static Image Background(TeamCalendarDayView cell)
+        {
+            return (Image)new SerializedObject(cell).FindProperty("_background").objectReferenceValue;
+        }
+
+        private static Image DailyGiftImage(TeamCalendarDayView cell)
+        {
+            return (Image)new SerializedObject(cell).FindProperty("_dailyGiftImage").objectReferenceValue;
+        }
+
         private static MemberPeriodStat Day(int dayOfMonth, int workSeconds)
         {
             var date = new DateTime(2026, 8, dayOfMonth);
@@ -128,6 +143,82 @@ namespace DOTORION.Tests.EditMode
         }
 
         [Test]
+        public void EmptyDay_PreservesTheBackgroundColorAuthoredOnThePrefab()
+        {
+            var canvas = Canvas();
+            try
+            {
+                var cell = Cells(canvas)[0];
+                var background = Background(cell);
+                var authored = new Color(0.17f, 0.29f, 0.41f, 0.73f);
+                background.color = authored;
+
+                cell.Bind(1, null, 0, false, false);
+                Assert.That(background.color, Is.EqualTo(authored));
+
+                var date = new DateTime(2026, 8, 1);
+                cell.Bind(
+                    1,
+                    new MemberPeriodStat(date, date, 3600, 3600, 0, 0),
+                    3600,
+                    false,
+                    false);
+                Assert.That(background.color, Is.Not.EqualTo(authored));
+
+                // Removing the attendance restores the prefab-authored colour,
+                // not the palette colour previously hard-coded by Bind.
+                cell.Bind(1, null, 0, false, false);
+                Assert.That(background.color, Is.EqualTo(authored));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(canvas);
+            }
+        }
+
+        [Test]
+        public void DailyGift_ShowsClaimedAndUnclaimedSpritesButHidesFutureDates()
+        {
+            var canvas = Canvas();
+            try
+            {
+                var calendar = canvas.GetComponentInChildren<TeamCalendarView>(true);
+                var month = new DateTime(TeamDay.Today.Year, TeamDay.Today.Month, 1).AddMonths(-1);
+                var claimedDate = month;
+                calendar.Bind(
+                    StatisticsRange.Resolve(StatisticsPeriod.ThisMonth, month.AddDays(10)),
+                    new[] { new MemberPeriodStat(claimedDate, claimedDate, 0, 0, 0, 0, 1) });
+
+                var cells = Cells(canvas);
+                var offset = ((int)month.DayOfWeek + 6) % TeamCalendarView.DaysPerWeek;
+                var claimed = DailyGiftImage(cells[offset]);
+                var unclaimed = DailyGiftImage(cells[offset + 1]);
+                Assert.That(claimed, Is.Not.Null);
+                Assert.That(claimed.gameObject.activeSelf, Is.True);
+                Assert.That(claimed.sprite.name, Is.EqualTo("DailyGift_1"));
+                Assert.That(claimed.rectTransform.sizeDelta.x, Is.EqualTo(15f));
+                Assert.That(claimed.rectTransform.sizeDelta.y, Is.EqualTo(17f));
+                Assert.That(claimed.rectTransform.anchorMin, Is.EqualTo(Vector2.one));
+                Assert.That(claimed.rectTransform.pivot, Is.EqualTo(Vector2.one));
+                Assert.That(unclaimed.gameObject.activeSelf, Is.True);
+                Assert.That(unclaimed.sprite.name, Is.EqualTo("DailyGift_0"));
+
+                var futureMonth = new DateTime(TeamDay.Today.Year, TeamDay.Today.Month, 1).AddMonths(1);
+                calendar.Bind(
+                    StatisticsRange.Resolve(StatisticsPeriod.ThisMonth, futureMonth),
+                    Array.Empty<MemberPeriodStat>());
+                var futureOffset = ((int)futureMonth.DayOfWeek + 6) % TeamCalendarView.DaysPerWeek;
+                var future = DailyGiftImage(Cells(canvas)[futureOffset]);
+                Assert.That(future, Is.Not.Null);
+                Assert.That(future.gameObject.activeSelf, Is.False);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(canvas);
+            }
+        }
+
+        [Test]
         public void ABucketWiderThanADay_DrawsNothingRatherThanGuessing()
         {
             var canvas = Canvas();
@@ -167,6 +258,7 @@ namespace DOTORION.Tests.EditMode
                 // The 3rd is a Monday: offset five plus two squares. The square
                 // opens on the total, which is the whole open-to-close span.
                 Assert.That(DurationLabel(cells[7]), Is.EqualTo("09:00"));
+                var totalFontSize = DurationFontSize(cells[7]);
 
                 cells[7].OnPointerClick(new PointerEventData(null)
                 {
@@ -180,6 +272,7 @@ namespace DOTORION.Tests.EditMode
                 Assert.That(breakdown, Does.Contain("01:10"));
                 Assert.That(breakdown, Does.Contain("00:50"));
                 Assert.That(breakdown, Does.Not.Contain("09:00"));
+                Assert.That(DurationFontSize(cells[7]), Is.EqualTo(totalFontSize));
 
                 // Any square toggles, so the same one puts it back.
                 cells[7].OnPointerClick(new PointerEventData(null)

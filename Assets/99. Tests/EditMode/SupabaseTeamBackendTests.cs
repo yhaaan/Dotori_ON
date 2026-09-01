@@ -199,10 +199,10 @@ namespace DOTORION.Tests.EditMode
             var transport = new QueueTransport(Ok(
                 "[{\"bucket_start\":\"2026-08-25\",\"bucket_end\":\"2026-08-25\","
                 + "\"attendance_seconds\":0,"
-                + "\"work_seconds\":0,\"break_seconds\":0,\"meal_seconds\":0},"
+                + "\"work_seconds\":0,\"break_seconds\":0,\"meal_seconds\":0,\"daily_check_in_days\":0},"
                 + "{\"bucket_start\":\"2026-08-27\",\"bucket_end\":\"2026-08-27\","
                 + "\"attendance_seconds\":3097,"
-                + "\"work_seconds\":482,\"break_seconds\":1628,\"meal_seconds\":987}]"));
+                + "\"work_seconds\":482,\"break_seconds\":1628,\"meal_seconds\":987,\"daily_check_in_days\":1}]"));
             var backend = CreateBackend(transport);
 
             var stats = await backend.GetPeriodStatsAsync(
@@ -213,12 +213,14 @@ namespace DOTORION.Tests.EditMode
             Assert.That(stats.Count, Is.EqualTo(2));
             Assert.That(stats[0].BucketStart, Is.EqualTo(new DateTime(2026, 8, 25)));
             Assert.That(stats[0].HasActivity, Is.False);
+            Assert.That(stats[0].HasDailyCheckIn, Is.False);
 
             var busy = stats[1];
             Assert.That(busy.BucketStart, Is.EqualTo(new DateTime(2026, 8, 27)));
             Assert.That(busy.BucketEnd, Is.EqualTo(new DateTime(2026, 8, 27)));
             Assert.That(busy.AttendanceSeconds, Is.EqualTo(3097));
             Assert.That(busy.WorkSeconds, Is.EqualTo(482));
+            Assert.That(busy.HasDailyCheckIn, Is.True);
             Assert.That(
                 busy.WorkSeconds + busy.BreakSeconds + busy.MealSeconds,
                 Is.EqualTo(busy.AttendanceSeconds),

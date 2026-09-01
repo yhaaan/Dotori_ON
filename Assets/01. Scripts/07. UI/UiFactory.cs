@@ -15,11 +15,16 @@ namespace DOTORION.UI
             return instance;
         }
 
-        public static Image CreateImage(string name, Transform parent, Color color)
+        public static Image CreateImage(string name, Transform parent)
         {
             var instance = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             instance.transform.SetParent(parent, false);
-            var image = instance.GetComponent<Image>();
+            return instance.GetComponent<Image>();
+        }
+
+        public static Image CreateImage(string name, Transform parent, Color color)
+        {
+            var image = CreateImage(name, parent);
             image.color = color;
             return image;
         }

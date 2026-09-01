@@ -100,7 +100,8 @@ namespace DOTORION.Core
             int attendanceSeconds,
             int workSeconds,
             int breakSeconds,
-            int mealSeconds)
+            int mealSeconds,
+            int dailyCheckInDays = 0)
         {
             BucketStart = bucketStart.Date;
             BucketEnd = bucketEnd.Date < BucketStart ? BucketStart : bucketEnd.Date;
@@ -108,6 +109,7 @@ namespace DOTORION.Core
             WorkSeconds = Math.Max(0, workSeconds);
             BreakSeconds = Math.Max(0, breakSeconds);
             MealSeconds = Math.Max(0, mealSeconds);
+            DailyCheckInDays = Math.Max(0, dailyCheckInDays);
         }
 
         public DateTime BucketStart { get; }
@@ -122,6 +124,10 @@ namespace DOTORION.Core
         public int BreakSeconds { get; }
 
         public int MealSeconds { get; }
+
+        public int DailyCheckInDays { get; }
+
+        public bool HasDailyCheckIn => DailyCheckInDays > 0;
 
         public bool HasActivity => AttendanceSeconds > 0;
 

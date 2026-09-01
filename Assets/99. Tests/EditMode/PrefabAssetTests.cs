@@ -36,6 +36,23 @@ namespace DOTORION.Tests.EditMode
         }
 
         [Test]
+        public void StatisticsPanel_UsesOnlyNormalFontStyle()
+        {
+            var main = AssetDatabase.LoadAssetAtPath<DOTORIONView>(
+                "Assets/02. Prefabs/DOTORIONCanvas.prefab");
+            var panel = main.transform.Find("WindowBackground/StatisticsPanel");
+
+            Assert.That(panel, Is.Not.Null);
+            foreach (var text in panel.GetComponentsInChildren<Text>(true))
+            {
+                Assert.That(
+                    text.fontStyle,
+                    Is.EqualTo(FontStyle.Normal),
+                    text.gameObject.name);
+            }
+        }
+
+        [Test]
         public void EditableUiPrefabs_HaveCompleteSerializedReferences()
         {
             var card = AssetDatabase.LoadAssetAtPath<TeamMemberCardView>(
@@ -147,6 +164,8 @@ namespace DOTORION.Tests.EditMode
             Assert.That(
                 new SerializedObject(calendar).FindProperty("_cells").arraySize,
                 Is.EqualTo(42));
+            AssertReference(new SerializedObject(calendar), "_dailyGiftUnclaimedSprite");
+            AssertReference(new SerializedObject(calendar), "_dailyGiftClaimedSprite");
             foreach (var cell in main.GetComponentsInChildren<TeamCalendarDayView>(true))
             {
                 var cellData = new SerializedObject(cell);

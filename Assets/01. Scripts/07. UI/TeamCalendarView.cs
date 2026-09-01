@@ -24,6 +24,8 @@ namespace DOTORION.UI
 
         [Header("Prefab references")]
         [SerializeField] private TeamCalendarDayView[] _cells = new TeamCalendarDayView[CellCount];
+        [SerializeField] private Sprite _dailyGiftUnclaimedSprite;
+        [SerializeField] private Sprite _dailyGiftClaimedSprite;
         private StatisticsRange _range;
         private IReadOnlyList<MemberPeriodStat> _stats;
         private bool _showBreakdown;
@@ -107,7 +109,21 @@ namespace DOTORION.UI
 
                 byDay.TryGetValue(dayOfMonth, out var stat);
                 var date = firstOfMonth.AddDays(dayOfMonth - 1);
-                cell.Bind(dayOfMonth, stat, maximumSeconds, date == today, _showBreakdown);
+                Sprite dailyGiftSprite = null;
+                if (date <= today)
+                {
+                    dailyGiftSprite = stat != null && stat.HasDailyCheckIn
+                        ? _dailyGiftClaimedSprite
+                        : _dailyGiftUnclaimedSprite;
+                }
+
+                cell.Bind(
+                    dayOfMonth,
+                    stat,
+                    maximumSeconds,
+                    date == today,
+                    _showBreakdown,
+                    dailyGiftSprite);
             }
         }
 

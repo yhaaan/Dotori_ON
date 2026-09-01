@@ -314,7 +314,8 @@ namespace DOTORION.Supabase
                     item.attendance_seconds,
                     item.work_seconds,
                     item.break_seconds,
-                    item.meal_seconds));
+                    item.meal_seconds,
+                    item.daily_check_in_days));
             }
 
             return new ReadOnlyCollection<MemberPeriodStat>(results);
@@ -1040,6 +1041,7 @@ namespace DOTORION.Supabase
             public int work_seconds;
             public int break_seconds;
             public int meal_seconds;
+            public int daily_check_in_days;
         }
 
         [Serializable]

@@ -26,6 +26,10 @@ namespace DOTORION.UI
         [SerializeField] private Image _background;
         [SerializeField] private Text _dayLabel;
         [SerializeField] private Text _durationLabel;
+        [SerializeField] private Image _dailyGiftImage;
+
+        private Color _authoredBackgroundColor;
+        private bool _backgroundColorCaptured;
 
         /// <summary>Raised on any square, because the breakdown is a whole-grid mode.</summary>
         public event Action Clicked;
@@ -42,16 +46,32 @@ namespace DOTORION.UI
             MemberPeriodStat stat,
             int maximumSeconds,
             bool isToday,
-            bool showBreakdown)
+            bool showBreakdown,
+            Sprite dailyGiftSprite = null)
         {
             gameObject.SetActive(true);
             var attendance = stat?.AttendanceSeconds ?? 0;
             var fill = maximumSeconds <= 0 ? 0f : MaximumFill * attendance / maximumSeconds;
             var onBrightFill = fill > DarkTextAbove;
 
+            ApplyDailyGift(dailyGiftSprite);
+
             if (_background != null)
             {
-                _background.color = Color.Lerp(DOTORIONPalette.Card, DOTORIONPalette.Working, fill);
+                // Start from the colour authored on the prefab. The runtime used
+                // to force Palette.Card even on an empty day, which silently
+                // replaced any base colour chosen in the Inspector. Only the
+                // attendance fill is a runtime colour decision now.
+                if (!_backgroundColorCaptured)
+                {
+                    _authoredBackgroundColor = _background.color;
+                    _backgroundColorCaptured = true;
+                }
+
+                _background.color = Color.Lerp(
+                    _authoredBackgroundColor,
+                    DOTORIONPalette.Working,
+                    fill);
             }
 
             if (_dayLabel != null)
@@ -62,10 +82,43 @@ namespace DOTORION.UI
                 _dayLabel.color = isToday
                     ? DOTORIONPalette.Accent
                     : (onBrightFill ? DOTORIONPalette.Window : DOTORIONPalette.TextSecondary);
-                _dayLabel.fontStyle = isToday ? FontStyle.Bold : FontStyle.Normal;
             }
 
             BindDuration(stat, attendance, showBreakdown, onBrightFill);
+        }
+
+        private void ApplyDailyGift(Sprite sprite)
+        {
+            if (_dailyGiftImage == null)
+            {
+                var gift = new GameObject(
+                    "DailyGift",
+                    typeof(RectTransform),
+                    typeof(CanvasRenderer),
+                    typeof(Image));
+                gift.transform.SetParent(transform, false);
+                _dailyGiftImage = gift.GetComponent<Image>();
+            }
+
+            if (sprite == null)
+            {
+                _dailyGiftImage.gameObject.SetActive(false);
+                return;
+            }
+
+            _dailyGiftImage.sprite = sprite;
+            _dailyGiftImage.color = Color.white;
+            _dailyGiftImage.preserveAspect = true;
+            _dailyGiftImage.raycastTarget = false;
+            _dailyGiftImage.SetNativeSize();
+
+            var rect = _dailyGiftImage.rectTransform;
+            rect.anchorMin = Vector2.one;
+            rect.anchorMax = Vector2.one;
+            rect.pivot = Vector2.one;
+            rect.anchoredPosition = new Vector2(-2f, -2f);
+            rect.SetAsLastSibling();
+            _dailyGiftImage.gameObject.SetActive(true);
         }
 
         private void BindDuration(
@@ -100,7 +153,7 @@ namespace DOTORION.UI
             // Three numbers do not fit three labels in a square this size, so the
             // colours carry the meaning instead. They are the same three the
             // ranking metrics use, and the legend under the grid names them.
-            _durationLabel.fontSize = BreakdownFontSize;
+            _durationLabel.fontSize = TotalFontSize;
             _durationLabel.color = DOTORIONPalette.TextPrimary;
             _durationLabel.text = string.Join(
                 "\n",
@@ -110,7 +163,6 @@ namespace DOTORION.UI
         }
 
         private const int TotalFontSize = 11;
-        private const int BreakdownFontSize = 8;
 
         private static string Tinted(int seconds, Color color)
         {
