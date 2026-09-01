@@ -73,7 +73,11 @@ namespace DOTORION.Editor
                 return false;
             }
 
-            PlayerSettings.companyName = "DotoriDoguldan";
+            // Windows builds the per-user paths out of this: PlayerPrefs land in
+            // HKCU\Software\<company>\<product>, and Application.persistentDataPath
+            // is AppData\LocalLow\<company>\<product>. Changing it moves both, so
+            // an install that ran under the old name looks like a first run.
+            PlayerSettings.companyName = "Dotori Doguldan";
             PlayerSettings.productName = "DOTORI ON";
             PlayerSettings.defaultScreenWidth = 480;
             PlayerSettings.defaultScreenHeight = 220;
