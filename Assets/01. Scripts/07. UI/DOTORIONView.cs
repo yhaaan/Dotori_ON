@@ -63,6 +63,7 @@ namespace DOTORION.UI
         private CanvasScaler.ScaleMode _fullScaleMode;
         private Vector2 _fullReferenceResolution;
         private float _fullScaleFactor;
+        private float _uiScale = 1f;
         private bool _initialized;
 
         public event Action CheckInRequested;
@@ -80,6 +81,8 @@ namespace DOTORION.UI
 
         /// <summary>Keeps the app in the Windows notification area instead of the taskbar.</summary>
         public event Action HideFromTaskbarToggleRequested;
+
+        public event Action UiScaleChangeRequested;
 
         public event Action MinimizeRequested;
         public event Action ExitRequested;
@@ -215,6 +218,7 @@ namespace DOTORION.UI
                 _settingsPanel.AutoStartToggleRequested += () => AutoStartToggleRequested?.Invoke();
                 _settingsPanel.HideFromTaskbarToggleRequested +=
                     () => HideFromTaskbarToggleRequested?.Invoke();
+                _settingsPanel.UiScaleChangeRequested += () => UiScaleChangeRequested?.Invoke();
                 _settingsPanel.gameObject.SetActive(false);
             }
 
@@ -274,7 +278,7 @@ namespace DOTORION.UI
             if (visible)
             {
                 _canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-                _canvasScaler.scaleFactor = 1f;
+                _canvasScaler.scaleFactor = _uiScale;
                 return;
             }
 
@@ -556,6 +560,18 @@ namespace DOTORION.UI
         public void SetHiddenFromTaskbar(bool hidden)
         {
             _settingsPanel?.SetHiddenFromTaskbar(hidden);
+        }
+
+        public void SetUiScalePercent(int percent)
+        {
+            _uiScale = Mathf.Clamp(percent / 100f, 1f, 2f);
+            _settingsPanel?.SetUiScalePercent(Mathf.RoundToInt(_uiScale * 100f));
+            if (IsMiniModeVisible && _canvasScaler != null)
+            {
+                _canvasScaler.scaleFactor = _uiScale;
+            }
+
+            RefreshTextRenderingSoon();
         }
 
         /// <summary>Opens under the compact layout, the way the statistics panel does.</summary>

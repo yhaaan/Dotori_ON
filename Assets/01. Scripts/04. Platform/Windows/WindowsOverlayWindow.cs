@@ -27,6 +27,8 @@ namespace DOTORION.Platform.Windows
         /// </summary>
         public bool IsMiniMode { get; private set; }
 
+        public float UiScale { get; private set; } = 1f;
+
         public bool IsInitialized { get; private set; }
 
         /// <summary>
@@ -116,7 +118,7 @@ namespace DOTORION.Platform.Windows
         /// taken off the bottom, and it mirrors the panel's own height in the
         /// prefab; PrefabAssetTests pins the pair.
         /// </summary>
-        public const int SettingsPanelHeight = 232;
+        public const int SettingsPanelHeight = 268;
 
         public const int MiniWindowWidth = 75;
 
@@ -323,14 +325,16 @@ namespace DOTORION.Platform.Windows
                 return;
             }
 
-            var contentWidth = IsMiniMode ? MiniWindowWidth : OverlayWindowWidth;
-            var contentHeight = IsMiniMode
+            var baseContentWidth = IsMiniMode ? MiniWindowWidth : OverlayWindowWidth;
+            var baseContentHeight = IsMiniMode
                 ? MiniWindowHeight
                 : CompactWindowHeight +
                   (_statisticsExpanded ? StatisticsPanelHeight : 0) +
                   (_avatarPickerExpanded ? AvatarPickerPanelHeight : 0) +
                   (_dashboardExpanded ? DashboardPanelHeight : 0) +
                   (_settingsExpanded ? SettingsPanelHeight : 0);
+            var contentWidth = ScalePixels(baseContentWidth);
+            var contentHeight = ScalePixels(baseContentHeight);
             var widthDelta = contentWidth - client.Width;
             var heightDelta = contentHeight - client.Height;
             if (widthDelta == 0 && heightDelta == 0)
@@ -370,6 +374,11 @@ namespace DOTORION.Platform.Windows
                 width,
                 height,
                 WindowsNativeMethods.SwpNoZOrder | WindowsNativeMethods.SwpNoActivate);
+        }
+
+        private int ScalePixels(int pixels)
+        {
+            return Math.Max(1, Mathf.RoundToInt(pixels * UiScale));
         }
 
         /// <summary>
@@ -492,6 +501,20 @@ namespace DOTORION.Platform.Windows
             return TryInitialize();
 #else
             return false;
+#endif
+        }
+
+        public void SetUiScale(float scale)
+        {
+            var normalized = scale >= 1.75f ? 2f : (scale >= 1.25f ? 1.5f : 1f);
+            if (Mathf.Approximately(UiScale, normalized))
+            {
+                return;
+            }
+
+            UiScale = normalized;
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            ApplyContentSize();
 #endif
         }
 
@@ -974,8 +997,8 @@ namespace DOTORION.Platform.Windows
                 var limits = (WindowsNativeMethods.MinMaxInfo)Marshal.PtrToStructure(
                     longParameter,
                     typeof(WindowsNativeMethods.MinMaxInfo));
-                limits.ptMinTrackSize.X = Math.Min(limits.ptMinTrackSize.X, MiniWindowWidth);
-                limits.ptMinTrackSize.Y = Math.Min(limits.ptMinTrackSize.Y, MiniWindowHeight);
+                limits.ptMinTrackSize.X = Math.Min(limits.ptMinTrackSize.X, ScalePixels(MiniWindowWidth));
+                limits.ptMinTrackSize.Y = Math.Min(limits.ptMinTrackSize.Y, ScalePixels(MiniWindowHeight));
                 Marshal.StructureToPtr(limits, longParameter, false);
                 return result;
             }

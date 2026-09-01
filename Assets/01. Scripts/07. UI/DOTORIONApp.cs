@@ -75,6 +75,8 @@ namespace DOTORION.UI
         /// </summary>
         private const string HideFromTaskbarPreferenceKey = "DOTORION.HideFromTaskbar";
 
+        private const string UiScalePreferenceKey = "DOTORION.UiScalePercent";
+
         [Header("Prefab references")]
         [SerializeField] private DOTORIONView _mainViewPrefab;
         [SerializeField] private FirstRunNameView _firstRunNamePrefab;
@@ -136,6 +138,7 @@ namespace DOTORION.UI
         private bool _renameInProgress;
         private bool _dashboardBusy;
         private bool _mutationInProgress;
+        private int _uiScalePercent = 100;
         private int _statisticsRequestId;
         private StatisticsPeriod _statisticsPeriod = StatisticsPeriod.LastSevenDays;
         private bool _quitting;
@@ -186,6 +189,9 @@ namespace DOTORION.UI
             _window.SuspendingRequested += HandleSuspendingRequested;
             _window.SetHiddenFromTaskbar(
                 PlayerPrefs.GetInt(HideFromTaskbarPreferenceKey, 0) == 1);
+            _uiScalePercent = NormalizeUiScalePercent(
+                PlayerPrefs.GetInt(UiScalePreferenceKey, 100));
+            _window.SetUiScale(_uiScalePercent / 100f);
             _window.Configure();
             _window.SetAlwaysOnTop(true);
             _tonePlayer = gameObject.AddComponent<NotificationTonePlayer>();
@@ -683,6 +689,7 @@ namespace DOTORION.UI
             _view.MuteToggleRequested += HandleMuteToggleRequested;
             _view.AutoStartToggleRequested += HandleAutoStartToggleRequested;
             _view.HideFromTaskbarToggleRequested += HandleHideFromTaskbarToggleRequested;
+            _view.UiScaleChangeRequested += HandleUiScaleChangeRequested;
             _view.MinimizeRequested += HandleMinimizeRequested;
             _view.ExitRequested += HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
@@ -708,6 +715,7 @@ namespace DOTORION.UI
             _view.SetMuted(_tonePlayer.IsMuted);
             _view.SetAutoStart(WindowsStartupRegistration.IsEnabled());
             _view.SetHiddenFromTaskbar(_window.IsHiddenFromTaskbar);
+            _view.SetUiScalePercent(_uiScalePercent);
             _firstRunNameView.Hide();
             CheckForUpdate();
             _view.SetDailyCheckIn(null, _backend is ITeamCheckIn);
@@ -787,6 +795,7 @@ namespace DOTORION.UI
             _view.MuteToggleRequested -= HandleMuteToggleRequested;
             _view.AutoStartToggleRequested -= HandleAutoStartToggleRequested;
             _view.HideFromTaskbarToggleRequested -= HandleHideFromTaskbarToggleRequested;
+            _view.UiScaleChangeRequested -= HandleUiScaleChangeRequested;
             _view.MinimizeRequested -= HandleMinimizeRequested;
             _view.ExitRequested -= HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested -= HandleSwitchAccountRequested;
@@ -1137,6 +1146,28 @@ namespace DOTORION.UI
             _view.ShowFeedback(hidden
                 ? "작업표시줄에서 숨기고 트레이에 표시합니다."
                 : "작업표시줄에 다시 표시합니다.");
+        }
+
+        private void HandleUiScaleChangeRequested()
+        {
+            if (_view == null || _window == null)
+            {
+                return;
+            }
+
+            _uiScalePercent = _uiScalePercent >= 200 ? 100 : _uiScalePercent + 50;
+            _window.SetUiScale(_uiScalePercent / 100f);
+            _view.SetUiScalePercent(_uiScalePercent);
+            PlayerPrefs.SetInt(UiScalePreferenceKey, _uiScalePercent);
+            PlayerPrefs.Save();
+            _view.ShowFeedback("UI 크기를 " + _uiScalePercent + "%로 변경했습니다.");
+        }
+
+        private static int NormalizeUiScalePercent(int percent)
+        {
+            if (percent >= 175) return 200;
+            if (percent >= 125) return 150;
+            return 100;
         }
 
         /// <summary>

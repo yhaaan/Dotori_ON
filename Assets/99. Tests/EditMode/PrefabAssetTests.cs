@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using DOTORION.UI;
+using DOTORION.Platform.Windows;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,11 +29,62 @@ namespace DOTORION.Tests.EditMode
 
             var settingsRect = main.transform
                 .Find("WindowBackground/SettingsPanel").GetComponent<RectTransform>();
-            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(232f));
+            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(268f));
             Assert.That(
                 main.transform.Find(
                     "WindowBackground/SettingsPanel/HideFromTaskbarToggle"),
                 Is.Not.Null);
+        }
+
+        [Test]
+        public void SettingsPanel_CreatesUiScaleRowAndReportsChanges()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/02. Prefabs/DOTORIONCanvas.prefab");
+            var instance = Object.Instantiate(prefab);
+            try
+            {
+                var panel = instance.GetComponentInChildren<SettingsPanelView>(true);
+                var requested = 0;
+                panel.UiScaleChangeRequested += () => requested++;
+                panel.Initialize();
+                panel.SetUiScalePercent(150);
+
+                var toggle = panel.transform.Find("UiScaleToggle");
+                Assert.That(toggle, Is.Not.Null);
+                Assert.That(toggle.GetComponentInChildren<Text>().text, Is.EqualTo("150%"));
+                Assert.That(toggle.GetComponent<RectTransform>().anchoredPosition.y, Is.EqualTo(-188f));
+                Assert.That(panel.GetComponent<RectTransform>().sizeDelta.y, Is.EqualTo(268f));
+                Assert.That(panel.transform.Find("VersionLabel").GetComponent<RectTransform>()
+                    .anchoredPosition.y, Is.EqualTo(-224f));
+
+                toggle.GetComponent<Button>().onClick.Invoke();
+                Assert.That(requested, Is.EqualTo(1));
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
+        }
+
+        [Test]
+        public void WindowUiScale_SnapsToSupportedFiftyPercentSteps()
+        {
+            var instance = new GameObject("Window scale test");
+            try
+            {
+                var window = instance.AddComponent<WindowsOverlayWindow>();
+                window.SetUiScale(1.49f);
+                Assert.That(window.UiScale, Is.EqualTo(1.5f));
+                window.SetUiScale(1.99f);
+                Assert.That(window.UiScale, Is.EqualTo(2f));
+                window.SetUiScale(0.5f);
+                Assert.That(window.UiScale, Is.EqualTo(1f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
         }
 
         [Test]
@@ -229,7 +281,7 @@ namespace DOTORION.Tests.EditMode
                 .Find("WindowBackground/SettingsPanel").GetComponent<RectTransform>();
             // Keep in sync with WindowsOverlayWindow.SettingsPanelHeight: the
             // window grows by exactly this much when the settings panel opens.
-            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(232f));
+            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(268f));
             Assert.That(settingsRect.anchoredPosition.y, Is.EqualTo(-220f));
             Assert.That(settingsRect.gameObject.activeSelf, Is.False);
             // The always-on-top switch moved into the panel, so the top bar slot

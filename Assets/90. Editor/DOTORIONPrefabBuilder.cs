@@ -62,9 +62,9 @@ namespace DOTORION.Editor
         /// The settings panel's own height in the prefab. The window grows
         /// downwards by exactly this much, so it has to match
         /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>; PrefabAssetTests pins
-        /// the pair. The heading and five rows fit in it.
+        /// the pair. The heading and six rows fit in it.
         /// </summary>
-        public const float SettingsPanelHeight = 232f;
+        public const float SettingsPanelHeight = 268f;
 
         /// <summary>Shared with the migration so the two rows read identically.</summary>
         public const string AutoStartRowLabel = "자동 시작";
@@ -75,6 +75,10 @@ namespace DOTORION.Editor
         public const string HideFromTaskbarRowLabel = "작업표시줄";
 
         public const string HideFromTaskbarRowHint = "켜면 시스템 트레이에만 표시합니다.";
+
+        public const string UiScaleRowLabel = "UI 크기";
+
+        public const string UiScaleRowHint = "4K 모니터에서 전체 화면을 확대합니다.";
 
         /// <summary>Settings panel geometry, in pixels from the top of the panel.</summary>
         private const float SettingsRowTop = 44f;
@@ -833,8 +837,12 @@ namespace DOTORION.Editor
             var hideFromTaskbar = SettingsSwitchRow(panel.transform, font, "HideFromTaskbar",
                 HideFromTaskbarRowLabel, HideFromTaskbarRowHint,
                 SettingsRowTop + (SettingsRowStep * 3f));
+            var uiScale = SettingsSwitchRow(panel.transform, font, "UiScale",
+                UiScaleRowLabel, UiScaleRowHint,
+                SettingsRowTop + (SettingsRowStep * 4f));
+            uiScale.GetComponentInChildren<Text>().text = "100%";
 
-            var versionTop = SettingsRowTop + (SettingsRowStep * 4f);
+            var versionTop = SettingsRowTop + (SettingsRowStep * 5f);
             SettingsRowLabel(panel.transform, font, "VersionLabel", "버전", versionTop);
             var version = UiFactory.CreateText("VersionValue", panel.transform, font, 11,
                 TextAnchor.MiddleRight, DOTORIONPalette.TextSecondary);
@@ -850,6 +858,8 @@ namespace DOTORION.Editor
             Set(serialized, "_autoStartValue", autoStart.GetComponentInChildren<Text>());
             Set(serialized, "_hideFromTaskbarButton", hideFromTaskbar);
             Set(serialized, "_hideFromTaskbarValue", hideFromTaskbar.GetComponentInChildren<Text>());
+            Set(serialized, "_uiScaleButton", uiScale);
+            Set(serialized, "_uiScaleValue", uiScale.GetComponentInChildren<Text>());
             Set(serialized, "_versionText", version);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             panel.gameObject.SetActive(false);

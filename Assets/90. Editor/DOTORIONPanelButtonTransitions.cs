@@ -30,6 +30,7 @@ namespace DOTORION.Editor
             "WindowBackground/SettingsPanel/MuteToggle",
             "WindowBackground/SettingsPanel/AutoStartToggle",
             "WindowBackground/SettingsPanel/HideFromTaskbarToggle",
+            "WindowBackground/SettingsPanel/UiScaleToggle",
             // Every avatar tile is cloned from this at runtime, so setting the
             // template is what sets all of them.
             "AvatarPickerPanel/Viewport/Content/OptionTemplate",
