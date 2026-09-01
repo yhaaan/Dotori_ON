@@ -78,6 +78,9 @@ namespace DOTORION.UI
         /// <summary>Starts the app with Windows, or stops it doing so.</summary>
         public event Action AutoStartToggleRequested;
 
+        /// <summary>Keeps the app in the Windows notification area instead of the taskbar.</summary>
+        public event Action HideFromTaskbarToggleRequested;
+
         public event Action MinimizeRequested;
         public event Action ExitRequested;
 
@@ -210,6 +213,8 @@ namespace DOTORION.UI
                 _settingsPanel.AlwaysOnTopToggleRequested += () => AlwaysOnTopToggleRequested?.Invoke();
                 _settingsPanel.MuteToggleRequested += () => MuteToggleRequested?.Invoke();
                 _settingsPanel.AutoStartToggleRequested += () => AutoStartToggleRequested?.Invoke();
+                _settingsPanel.HideFromTaskbarToggleRequested +=
+                    () => HideFromTaskbarToggleRequested?.Invoke();
                 _settingsPanel.gameObject.SetActive(false);
             }
 
@@ -546,6 +551,11 @@ namespace DOTORION.UI
         public void SetAutoStart(bool enabled)
         {
             _settingsPanel?.SetAutoStart(enabled);
+        }
+
+        public void SetHiddenFromTaskbar(bool hidden)
+        {
+            _settingsPanel?.SetHiddenFromTaskbar(hidden);
         }
 
         /// <summary>Opens under the compact layout, the way the statistics panel does.</summary>

@@ -18,6 +18,8 @@ namespace DOTORION.Platform.Windows
     {
         public bool IsAlwaysOnTop { get; private set; } = true;
 
+        public bool IsHiddenFromTaskbar { get; private set; }
+
         /// <summary>
         /// The window is showing the name-and-status only mini overlay. Declared
         /// outside the Windows-only block because the Unity side reads it on
@@ -114,7 +116,7 @@ namespace DOTORION.Platform.Windows
         /// taken off the bottom, and it mirrors the panel's own height in the
         /// prefab; PrefabAssetTests pins the pair.
         /// </summary>
-        public const int SettingsPanelHeight = 196;
+        public const int SettingsPanelHeight = 232;
 
         public const int MiniWindowWidth = 75;
 
@@ -152,6 +154,8 @@ namespace DOTORION.Platform.Windows
         private bool _growsUpward;
         private int _windowStateDirty;
         private float _nextWindowAudit;
+        private bool _trayIconAdded;
+        private uint _taskbarCreatedMessage;
 #endif
 
         /// <summary>Grows the window so the developer dashboard fits under the overlay.</summary>
@@ -476,6 +480,7 @@ namespace DOTORION.Platform.Windows
             }
 
             ApplyWindowOpacity();
+            ApplyTaskbarVisibility();
             ApplyContentSize();
         }
 #endif
@@ -513,6 +518,22 @@ namespace DOTORION.Platform.Windows
         public void ToggleAlwaysOnTop()
         {
             SetAlwaysOnTop(!IsAlwaysOnTop);
+        }
+
+        /// <summary>
+        /// Removes the window's taskbar button and represents it with a Windows
+        /// notification-area icon instead. The shell decides whether that icon
+        /// sits directly on the bar or inside its hidden-icons overflow.
+        /// </summary>
+        public void SetHiddenFromTaskbar(bool hidden)
+        {
+            IsHiddenFromTaskbar = hidden;
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            if (EnsureWindowHandle())
+            {
+                ApplyTaskbarVisibility();
+            }
+#endif
         }
 
         public void BeginWindowDrag()
@@ -644,6 +665,8 @@ namespace DOTORION.Platform.Windows
             ApplyContentSize();
             HookWindowProcedure();
             SetAlwaysOnTop(IsAlwaysOnTop);
+            _taskbarCreatedMessage = WindowsNativeMethods.RegisterWindowMessageW("TaskbarCreated");
+            ApplyTaskbarVisibility();
 
             IsInitialized = true;
             return true;
@@ -726,6 +749,134 @@ namespace DOTORION.Platform.Windows
                 WindowsNativeMethods.SwpNoZOrder |
                 WindowsNativeMethods.SwpNoActivate |
                 WindowsNativeMethods.SwpFrameChanged);
+        }
+
+        private void ApplyTaskbarVisibility()
+        {
+            if (_windowHandle == IntPtr.Zero)
+            {
+                return;
+            }
+
+            var exStyle = WindowsNativeMethods.GetWindowLongPointer(
+                    _windowHandle,
+                    WindowsNativeMethods.GwlExStyle)
+                .ToInt64();
+            var desired = IsHiddenFromTaskbar
+                ? (exStyle | WindowsNativeMethods.WsExToolWindow) &
+                  ~WindowsNativeMethods.WsExAppWindow
+                : (exStyle | WindowsNativeMethods.WsExAppWindow) &
+                  ~WindowsNativeMethods.WsExToolWindow;
+
+            if (desired != exStyle)
+            {
+                // The shell creates and removes taskbar buttons when a top-level
+                // window crosses hidden/visible. Changing the bits while it stays
+                // visible can leave a stale button behind until Explorer restarts.
+                WindowsNativeMethods.ShowWindow(
+                    _windowHandle,
+                    WindowsNativeMethods.SwHide);
+                WindowsNativeMethods.SetWindowLongPointer(
+                    _windowHandle,
+                    WindowsNativeMethods.GwlExStyle,
+                    new IntPtr(desired));
+                WindowsNativeMethods.SetWindowPos(
+                    _windowHandle,
+                    IntPtr.Zero,
+                    0,
+                    0,
+                    0,
+                    0,
+                    WindowsNativeMethods.SwpNoMove |
+                    WindowsNativeMethods.SwpNoSize |
+                    WindowsNativeMethods.SwpNoZOrder |
+                    WindowsNativeMethods.SwpNoActivate |
+                    WindowsNativeMethods.SwpFrameChanged);
+                WindowsNativeMethods.ShowWindow(
+                    _windowHandle,
+                    WindowsNativeMethods.SwShowNoActivate);
+            }
+
+            if (IsHiddenFromTaskbar)
+            {
+                AddTrayIcon();
+            }
+            else
+            {
+                RemoveTrayIcon();
+            }
+        }
+
+        private void AddTrayIcon()
+        {
+            if (_trayIconAdded || _windowHandle == IntPtr.Zero)
+            {
+                return;
+            }
+
+            var icon = WindowsNativeMethods.SendMessage(
+                _windowHandle,
+                WindowsNativeMethods.WmGetIcon,
+                new IntPtr(WindowsNativeMethods.IconSmall2),
+                IntPtr.Zero);
+            if (icon == IntPtr.Zero)
+            {
+                icon = WindowsNativeMethods.SendMessage(
+                    _windowHandle,
+                    WindowsNativeMethods.WmGetIcon,
+                    new IntPtr(WindowsNativeMethods.IconSmall),
+                    IntPtr.Zero);
+            }
+            if (icon == IntPtr.Zero)
+            {
+                icon = WindowsNativeMethods.LoadIconW(
+                    IntPtr.Zero,
+                    new IntPtr(WindowsNativeMethods.IdiApplication));
+            }
+
+            var data = CreateTrayIconData(icon);
+            _trayIconAdded = WindowsNativeMethods.ShellNotifyIconW(
+                WindowsNativeMethods.NimAdd,
+                ref data);
+        }
+
+        private void RemoveTrayIcon()
+        {
+            if (!_trayIconAdded || _windowHandle == IntPtr.Zero)
+            {
+                return;
+            }
+
+            var data = CreateTrayIconData(IntPtr.Zero);
+            WindowsNativeMethods.ShellNotifyIconW(
+                WindowsNativeMethods.NimDelete,
+                ref data);
+            _trayIconAdded = false;
+        }
+
+        private WindowsNativeMethods.NotifyIconData CreateTrayIconData(IntPtr icon)
+        {
+            return new WindowsNativeMethods.NotifyIconData
+            {
+                cbSize = (uint)Marshal.SizeOf(
+                    typeof(WindowsNativeMethods.NotifyIconData)),
+                hWnd = _windowHandle,
+                uID = WindowsNativeMethods.TrayIconId,
+                uFlags = WindowsNativeMethods.NifMessage |
+                         WindowsNativeMethods.NifIcon |
+                         WindowsNativeMethods.NifTip,
+                uCallbackMessage = WindowsNativeMethods.WmTrayIcon,
+                hIcon = icon,
+                szTip = "DOTORI ON"
+            };
+        }
+
+        private void RestoreFromTray()
+        {
+            WindowsNativeMethods.ShowWindow(
+                _windowHandle,
+                WindowsNativeMethods.SwRestore);
+            WindowsNativeMethods.SetForegroundWindow(_windowHandle);
         }
 
         private void HookWindowProcedure()
@@ -830,11 +981,34 @@ namespace DOTORION.Platform.Windows
             }
             else if (message == WindowsNativeMethods.WmClose && !_allowNativeClose)
             {
-                // This used to hide the window to the tray. With no tray icon that
-                // would strand a running process nothing can restore, and
-                // forceSingleInstance would then block every later launch, so a
-                // close now goes down the normal clock-out-and-exit path.
+                // Closing still means clock out and exit. The notification icon
+                // only restores a deliberately minimized taskbar-hidden window;
+                // treating Close as Hide would leave the session running when the
+                // person explicitly asked to leave.
                 Interlocked.Exchange(ref _exitPending, 1);
+                return IntPtr.Zero;
+            }
+            else if (message == WindowsNativeMethods.WmTrayIcon)
+            {
+                var mouseMessage = unchecked((uint)longParameter.ToInt64());
+                if (mouseMessage == WindowsNativeMethods.WmLButtonUp ||
+                    mouseMessage == WindowsNativeMethods.WmLButtonDoubleClick)
+                {
+                    RestoreFromTray();
+                }
+
+                return IntPtr.Zero;
+            }
+            else if (_taskbarCreatedMessage != 0 && message == _taskbarCreatedMessage)
+            {
+                // Explorer owns notification icons. It discards them when it
+                // restarts, so re-register ours when the replacement shell asks.
+                _trayIconAdded = false;
+                if (IsHiddenFromTaskbar)
+                {
+                    AddTrayIcon();
+                }
+
                 return IntPtr.Zero;
             }
 
@@ -859,6 +1033,7 @@ namespace DOTORION.Platform.Windows
 
         private void CleanupNativeResources()
         {
+            RemoveTrayIcon();
             if (_windowHandle != IntPtr.Zero &&
                 _previousWindowProcedure != IntPtr.Zero &&
                 WindowsNativeMethods.IsWindow(_windowHandle))

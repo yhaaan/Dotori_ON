@@ -18,11 +18,16 @@ namespace DOTORION.Platform.Windows
         internal const long WsVisible = 0x10000000L;
 
         internal const long WsExLayered = 0x00080000L;
+        internal const long WsExToolWindow = 0x00000080L;
+        internal const long WsExAppWindow = 0x00040000L;
 
         /// <summary>Tells SetLayeredWindowAttributes to read the alpha argument.</summary>
         internal const uint LwaAlpha = 0x00000002;
 
         internal const uint SwMinimize = 6;
+        internal const uint SwHide = 0;
+        internal const uint SwShowNoActivate = 4;
+        internal const uint SwRestore = 9;
 
         internal const uint SwpNoSize = 0x0001;
         internal const uint SwpNoMove = 0x0002;
@@ -39,6 +44,21 @@ namespace DOTORION.Platform.Windows
         internal const uint WmDpiChanged = 0x02E0;
         internal const uint WmGetMinMaxInfo = 0x0024;
         internal const uint WmPowerBroadcast = 0x0218;
+        internal const uint WmGetIcon = 0x007F;
+        internal const uint WmLButtonUp = 0x0202;
+        internal const uint WmLButtonDoubleClick = 0x0203;
+        internal const uint WmTrayIcon = 0x8001;
+
+        internal const int IconSmall = 0;
+        internal const int IconSmall2 = 2;
+        internal const int IdiApplication = 32512;
+
+        internal const uint TrayIconId = 1;
+        internal const uint NimAdd = 0x00000000;
+        internal const uint NimDelete = 0x00000002;
+        internal const uint NifMessage = 0x00000001;
+        internal const uint NifIcon = 0x00000002;
+        internal const uint NifTip = 0x00000004;
 
         /// <summary>The machine is suspending. There is no way to delay it.</summary>
         internal const int PbtApmSuspend = 0x0004;
@@ -71,6 +91,29 @@ namespace DOTORION.Platform.Windows
             internal uint dwFlags;
             internal uint uCount;
             internal uint dwTimeout;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        internal struct NotifyIconData
+        {
+            internal uint cbSize;
+            internal IntPtr hWnd;
+            internal uint uID;
+            internal uint uFlags;
+            internal uint uCallbackMessage;
+            internal IntPtr hIcon;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            internal string szTip;
+            internal uint dwState;
+            internal uint dwStateMask;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+            internal string szInfo;
+            internal uint uTimeoutOrVersion;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+            internal string szInfoTitle;
+            internal uint dwInfoFlags;
+            internal Guid guidItem;
+            internal IntPtr hBalloonIcon;
         }
 
         /// <summary>
@@ -177,6 +220,24 @@ namespace DOTORION.Platform.Windows
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool FlashWindowEx(ref FlashWindowInfo info);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        internal static extern uint RegisterWindowMessageW(string message);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetForegroundWindow(IntPtr windowHandle);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        internal static extern IntPtr LoadIconW(IntPtr instance, IntPtr iconName);
+
+        [DllImport(
+            "shell32.dll",
+            CharSet = CharSet.Unicode,
+            EntryPoint = "Shell_NotifyIconW",
+            ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ShellNotifyIconW(uint message, ref NotifyIconData data);
 
         [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
         private static extern IntPtr GetWindowLongPtr64(IntPtr windowHandle, int index);

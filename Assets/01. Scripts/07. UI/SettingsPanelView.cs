@@ -18,6 +18,8 @@ namespace DOTORION.UI
         [SerializeField] private Text _muteValue;
         [SerializeField] private Button _autoStartButton;
         [SerializeField] private Text _autoStartValue;
+        [SerializeField] private Button _hideFromTaskbarButton;
+        [SerializeField] private Text _hideFromTaskbarValue;
         [SerializeField] private Text _versionText;
 
         private bool _initialized;
@@ -27,6 +29,8 @@ namespace DOTORION.UI
         public event Action MuteToggleRequested;
 
         public event Action AutoStartToggleRequested;
+
+        public event Action HideFromTaskbarToggleRequested;
 
         public void Initialize()
         {
@@ -39,6 +43,7 @@ namespace DOTORION.UI
             _alwaysOnTopButton?.onClick.AddListener(() => AlwaysOnTopToggleRequested?.Invoke());
             _muteButton?.onClick.AddListener(() => MuteToggleRequested?.Invoke());
             _autoStartButton?.onClick.AddListener(() => AutoStartToggleRequested?.Invoke());
+            _hideFromTaskbarButton?.onClick.AddListener(() => HideFromTaskbarToggleRequested?.Invoke());
         }
 
         public void SetAlwaysOnTop(bool enabled)
@@ -67,6 +72,15 @@ namespace DOTORION.UI
             SetSwitch(_autoStartValue, enabled);
         }
 
+        /// <summary>
+        /// Whether the main window stays out of the taskbar and is represented
+        /// by its notification-area icon instead.
+        /// </summary>
+        public void SetHiddenFromTaskbar(bool hidden)
+        {
+            SetSwitch(_hideFromTaskbarValue, hidden);
+        }
+
         public void SetVersion(string version)
         {
             if (_versionText != null)
@@ -80,6 +94,7 @@ namespace DOTORION.UI
             if (_alwaysOnTopButton != null) _alwaysOnTopButton.interactable = !busy;
             if (_muteButton != null) _muteButton.interactable = !busy;
             if (_autoStartButton != null) _autoStartButton.interactable = !busy;
+            if (_hideFromTaskbarButton != null) _hideFromTaskbarButton.interactable = !busy;
         }
 
         /// <summary>

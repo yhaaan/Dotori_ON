@@ -61,15 +61,19 @@ namespace DOTORION.Editor
         /// The settings panel's own height in the prefab. The window grows
         /// downwards by exactly this much, so it has to match
         /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>; PrefabAssetTests pins
-        /// the pair. The heading and four rows fit in it.
+        /// the pair. The heading and five rows fit in it.
         /// </summary>
-        public const float SettingsPanelHeight = 196f;
+        public const float SettingsPanelHeight = 232f;
 
         /// <summary>Shared with the migration so the two rows read identically.</summary>
         public const string AutoStartRowLabel = "자동 시작";
 
         /// <summary>Shared with the migration so the two rows read identically.</summary>
         public const string AutoStartRowHint = "윈도우를 켤 때 같이 실행합니다.";
+
+        public const string HideFromTaskbarRowLabel = "작업표시줄";
+
+        public const string HideFromTaskbarRowHint = "켜면 시스템 트레이에만 표시합니다.";
 
         /// <summary>Settings panel geometry, in pixels from the top of the panel.</summary>
         private const float SettingsRowTop = 44f;
@@ -819,8 +823,11 @@ namespace DOTORION.Editor
             var autoStart = SettingsSwitchRow(panel.transform, font, "AutoStart",
                 AutoStartRowLabel, AutoStartRowHint,
                 SettingsRowTop + (SettingsRowStep * 2f));
+            var hideFromTaskbar = SettingsSwitchRow(panel.transform, font, "HideFromTaskbar",
+                HideFromTaskbarRowLabel, HideFromTaskbarRowHint,
+                SettingsRowTop + (SettingsRowStep * 3f));
 
-            var versionTop = SettingsRowTop + (SettingsRowStep * 3f);
+            var versionTop = SettingsRowTop + (SettingsRowStep * 4f);
             SettingsRowLabel(panel.transform, font, "VersionLabel", "버전", versionTop);
             var version = UiFactory.CreateText("VersionValue", panel.transform, font, 11,
                 TextAnchor.MiddleRight, DOTORIONPalette.TextSecondary);
@@ -834,6 +841,8 @@ namespace DOTORION.Editor
             Set(serialized, "_muteValue", mute.GetComponentInChildren<Text>());
             Set(serialized, "_autoStartButton", autoStart);
             Set(serialized, "_autoStartValue", autoStart.GetComponentInChildren<Text>());
+            Set(serialized, "_hideFromTaskbarButton", hideFromTaskbar);
+            Set(serialized, "_hideFromTaskbarValue", hideFromTaskbar.GetComponentInChildren<Text>());
             Set(serialized, "_versionText", version);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             panel.gameObject.SetActive(false);

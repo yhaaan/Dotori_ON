@@ -12,6 +12,30 @@ namespace DOTORION.Tests.EditMode
     public sealed class PrefabAssetTests
     {
         [Test]
+        public void SettingsPanel_HasTaskbarVisibilitySwitch()
+        {
+            var main = AssetDatabase.LoadAssetAtPath<DOTORIONView>(
+                "Assets/02. Prefabs/DOTORIONCanvas.prefab");
+            Assert.That(main, Is.Not.Null);
+
+            var mainData = new SerializedObject(main);
+            var settings = mainData.FindProperty("_settingsPanel").objectReferenceValue;
+            Assert.That(settings, Is.Not.Null);
+
+            var settingsData = new SerializedObject(settings);
+            AssertReference(settingsData, "_hideFromTaskbarButton");
+            AssertReference(settingsData, "_hideFromTaskbarValue");
+
+            var settingsRect = main.transform
+                .Find("WindowBackground/SettingsPanel").GetComponent<RectTransform>();
+            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(232f));
+            Assert.That(
+                main.transform.Find(
+                    "WindowBackground/SettingsPanel/HideFromTaskbarToggle"),
+                Is.Not.Null);
+        }
+
+        [Test]
         public void EditableUiPrefabs_HaveCompleteSerializedReferences()
         {
             var card = AssetDatabase.LoadAssetAtPath<TeamMemberCardView>(
@@ -179,12 +203,14 @@ namespace DOTORION.Tests.EditMode
             AssertReference(settingsData, "_muteValue");
             AssertReference(settingsData, "_autoStartButton");
             AssertReference(settingsData, "_autoStartValue");
+            AssertReference(settingsData, "_hideFromTaskbarButton");
+            AssertReference(settingsData, "_hideFromTaskbarValue");
             AssertReference(settingsData, "_versionText");
             var settingsRect = main.transform
                 .Find("WindowBackground/SettingsPanel").GetComponent<RectTransform>();
             // Keep in sync with WindowsOverlayWindow.SettingsPanelHeight: the
             // window grows by exactly this much when the settings panel opens.
-            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(196f));
+            Assert.That(settingsRect.sizeDelta.y, Is.EqualTo(232f));
             Assert.That(settingsRect.anchoredPosition.y, Is.EqualTo(-220f));
             Assert.That(settingsRect.gameObject.activeSelf, Is.False);
             // The always-on-top switch moved into the panel, so the top bar slot

@@ -69,6 +69,12 @@ namespace DOTORION.UI
         /// </summary>
         private const string MutePreferenceKey = "DOTORION.Muted";
 
+        /// <summary>
+        /// Whether Windows represents the running app only in its notification
+        /// area rather than with a taskbar button as well.
+        /// </summary>
+        private const string HideFromTaskbarPreferenceKey = "DOTORION.HideFromTaskbar";
+
         [Header("Prefab references")]
         [SerializeField] private DOTORIONView _mainViewPrefab;
         [SerializeField] private FirstRunNameView _firstRunNamePrefab;
@@ -178,6 +184,8 @@ namespace DOTORION.UI
             _window.ClockOutAndExitRequested += HandleClockOutAndExitRequested;
             _window.SessionEndingRequested += HandleSessionEndingRequested;
             _window.SuspendingRequested += HandleSuspendingRequested;
+            _window.SetHiddenFromTaskbar(
+                PlayerPrefs.GetInt(HideFromTaskbarPreferenceKey, 0) == 1);
             _window.Configure();
             _window.SetAlwaysOnTop(true);
             _tonePlayer = gameObject.AddComponent<NotificationTonePlayer>();
@@ -674,6 +682,7 @@ namespace DOTORION.UI
             _view.AlwaysOnTopToggleRequested += HandleAlwaysOnTopToggleRequested;
             _view.MuteToggleRequested += HandleMuteToggleRequested;
             _view.AutoStartToggleRequested += HandleAutoStartToggleRequested;
+            _view.HideFromTaskbarToggleRequested += HandleHideFromTaskbarToggleRequested;
             _view.MinimizeRequested += HandleMinimizeRequested;
             _view.ExitRequested += HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
@@ -698,6 +707,7 @@ namespace DOTORION.UI
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _view.SetMuted(_tonePlayer.IsMuted);
             _view.SetAutoStart(WindowsStartupRegistration.IsEnabled());
+            _view.SetHiddenFromTaskbar(_window.IsHiddenFromTaskbar);
             _firstRunNameView.Hide();
             CheckForUpdate();
             _view.SetDailyCheckIn(null, _backend is ITeamCheckIn);
@@ -776,6 +786,7 @@ namespace DOTORION.UI
             _view.AlwaysOnTopToggleRequested -= HandleAlwaysOnTopToggleRequested;
             _view.MuteToggleRequested -= HandleMuteToggleRequested;
             _view.AutoStartToggleRequested -= HandleAutoStartToggleRequested;
+            _view.HideFromTaskbarToggleRequested -= HandleHideFromTaskbarToggleRequested;
             _view.MinimizeRequested -= HandleMinimizeRequested;
             _view.ExitRequested -= HandleClockOutAndExitRequested;
             _view.SwitchAccountRequested -= HandleSwitchAccountRequested;
@@ -1109,6 +1120,23 @@ namespace DOTORION.UI
             _view.ShowFeedback(enable
                 ? "윈도우를 켤 때 같이 실행합니다."
                 : "윈도우를 켤 때 실행하지 않습니다.");
+        }
+
+        private void HandleHideFromTaskbarToggleRequested()
+        {
+            if (_view == null || _window == null)
+            {
+                return;
+            }
+
+            var hidden = !_window.IsHiddenFromTaskbar;
+            _window.SetHiddenFromTaskbar(hidden);
+            PlayerPrefs.SetInt(HideFromTaskbarPreferenceKey, hidden ? 1 : 0);
+            PlayerPrefs.Save();
+            _view.SetHiddenFromTaskbar(hidden);
+            _view.ShowFeedback(hidden
+                ? "작업표시줄에서 숨기고 트레이에 표시합니다."
+                : "작업표시줄에 다시 표시합니다.");
         }
 
         /// <summary>
