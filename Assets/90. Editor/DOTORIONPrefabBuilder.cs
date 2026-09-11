@@ -24,6 +24,7 @@ namespace DOTORION.Editor
         public const string AppPath = ResourceFolder + "/DOTORIONApp.prefab";
         public const string SoundsPath = ResourceFolder + "/DOTORIONSounds.asset";
         public const string AvatarCatalogPath = ResourceFolder + "/TeamAvatarCatalog.asset";
+        public const string ThemePath = ResourceFolder + "/DarkTheme.asset";
 
         /// <summary>Where the team drops profile icon images.</summary>
         public const string AvatarSpriteFolder = "Assets/04. Avatars";
@@ -183,6 +184,7 @@ namespace DOTORION.Editor
         /// </summary>
         public static void RebuildCardAndMainView()
         {
+            SeedPaletteFromThemeAsset();
             BuildMainView(BuildCard());
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -191,6 +193,7 @@ namespace DOTORION.Editor
 
         public static void RebuildMainViewFromCommandLine()
         {
+            SeedPaletteFromThemeAsset();
             var cardPrefab = AssetDatabase.LoadAssetAtPath<TeamMemberCardView>(CardPath);
             if (cardPrefab == null) throw new InvalidOperationException("Missing member card prefab.");
             var mainPrefab = BuildMainView(cardPrefab);
@@ -205,11 +208,24 @@ namespace DOTORION.Editor
                    File.Exists(UpdatePromptPath);
         }
 
+        /// <summary>
+        /// Points the palette at the theme asset before anything is built.
+        ///
+        /// The builder bakes colours into the prefabs it writes, and without this
+        /// it would bake the built-in defaults - so a colour tuned in the asset
+        /// would be quietly undone by the next rebuild.
+        /// </summary>
+        private static void SeedPaletteFromThemeAsset()
+        {
+            DOTORIONPalette.Use(EnsureThemeAsset());
+        }
+
         private static void BuildAll()
         {
             EnsureFolder("Assets", "02. Prefabs");
             EnsureFolder("Assets", "Resources");
             EnsureFolder("Assets/Resources", "DOTORION");
+            SeedPaletteFromThemeAsset();
 
             var cardPrefab = BuildCard();
             var mainPrefab = BuildMainView(cardPrefab);
@@ -1412,7 +1428,8 @@ namespace DOTORION.Editor
                     ("_firstRunNamePrefab", namePrefab),
                     ("_updatePromptPrefab", BuildUpdatePrompt()),
                     ("_sounds", EnsureSoundsAsset()),
-                    ("_avatarCatalog", EnsureAvatarCatalogAsset()));
+                    ("_avatarCatalog", EnsureAvatarCatalogAsset()),
+                    ("_theme", EnsureThemeAsset()));
                 PrefabUtility.SaveAsPrefabAsset(root, AppPath);
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
@@ -1440,6 +1457,33 @@ namespace DOTORION.Editor
             AssetDatabase.SaveAssets();
             Selection.activeObject = created;
             Debug.Log("Created " + SoundsPath + ". Drop the team's audio clips into it.");
+            return created;
+        }
+
+        /// <summary>
+        /// Creates the shipped colour scheme the first time and never touches it
+        /// again, for the same reason as the sound asset: once someone has tuned
+        /// a colour in it, a prefab rebuild must not put the defaults back.
+        ///
+        /// A new asset starts out holding exactly the built-in scheme, because
+        /// the values are <see cref="DOTORIONTheme"/>'s field defaults, so
+        /// creating it changes nothing about how the overlay looks.
+        /// </summary>
+        [MenuItem("DOTORI ON/Create Missing Theme Asset")]
+        public static DOTORIONTheme EnsureThemeAsset()
+        {
+            EnsureFolder("Assets", "Resources");
+            EnsureFolder("Assets/Resources", "DOTORION");
+            var existing = AssetDatabase.LoadAssetAtPath<DOTORIONTheme>(ThemePath);
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            var created = ScriptableObject.CreateInstance<DOTORIONTheme>();
+            AssetDatabase.CreateAsset(created, ThemePath);
+            AssetDatabase.SaveAssets();
+            Debug.Log("Created " + ThemePath + " holding the built-in scheme.");
             return created;
         }
 

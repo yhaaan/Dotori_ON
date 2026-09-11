@@ -1,0 +1,185 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e246123cf5a045369fd6da2e09cf4d46, type: 3}
+  m_Name: PinkSkinTheme
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONTheme
+  Catalog: {fileID: 11400000, guid: 9b3c7589070c34c4185e75d5b1503912, type: 2}
+  Overrides: []
+  Palette:
+  - Role: 1
+    Color: {r: 1, g: 1, b: 1, a: 1}
+  - Role: 2
+    Color: {r: 1, g: 0.7058824, b: 0.9098039, a: 1}
+  - Role: 3
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+  - Role: 4
+    Color: {r: 0.95686275, g: 0.9137255, b: 0.9411765, a: 1}
+  - Role: 5
+    Color: {r: 1, g: 0.8235294, b: 0.9372549, a: 1}
+  - Role: 6
+    Color: {r: 0.32156864, g: 0.2, b: 0.27058825, a: 1}
+  - Role: 7
+    Color: {r: 0.5803922, g: 0.41568628, b: 0.50980395, a: 1}
+  - Role: 8
+    Color: {r: 0.23921569, g: 0.14901961, b: 0.20392157, a: 1}
+  - Role: 9
+    Color: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+  - Role: 10
+    Color: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+  - Role: 11
+    Color: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+  - Role: 12
+    Color: {r: 0.6039216, g: 0.50980395, b: 0.57254905, a: 1}
+  - Role: 13
+    Color: {r: 0.84313726, g: 0.2784314, b: 0.64705884, a: 1}
+  - Role: 14
+    Color: {r: 0.8509804, g: 0.29411766, b: 0.4117647, a: 1}
+  - Role: 15
+    Color: {r: 1, g: 0.8352941, b: 0.93333334, a: 1}
+  - Role: 16
+    Color: {r: 1, g: 0.91764706, b: 0.96862745, a: 1}
+  - Role: 17
+    Color: {r: 0.9098039, g: 0.69411767, b: 0.827451, a: 1}
+  - Role: 18
+    Color: {r: 0.78431374, g: 0.7137255, b: 0.75686276, a: 1}
+  - Role: 19
+    Color: {r: 0.22352941, g: 0.14117648, b: 0.19607843, a: 1}
+  Sprites:
+  - Original: {fileID: -8419651496348907305, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -1777966043405932319, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 4582663716359257325, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -8415945526217194208, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 5707102211868492483, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 2859222883088879270, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -4503749733886677722, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -1616408058800990306, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -4391501961712971644, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 1741591815566662014, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -1674784212163885319, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -8630861436041696028, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 6859514048307153119, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 3487366233330876202, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 5868935815051780122, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 3321489087806748028, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -4691332597965536479, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 5014618338298107313, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: -6473538129092287803, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -7825537597138692394, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -2724489779920945529, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -7166427718681567842, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -6707576332687999409, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -641451950451097126, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -329239408103798631, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 1226514783349017066, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 5268507463803269582, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -4612708015907388746, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 8314006318702593624, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 1180498786566666303, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 8721910874991129212, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 2591055189333715602, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -5489898661777849415, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 1103102057886046831, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: 3090599043359701789, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -4513941087442181217, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: 5125501786560805490, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 5980238708680237786, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: -5047758018075128281, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -4349561098201642467, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: -6406511612858118475, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -8866280933517168533, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: 973337207956349392, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -2988303403709575457, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 4001450261858032001, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 7197303199970733970, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 8431811068468054566, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 6097544283407324162, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: -6135000843686057389, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 1669514009657394954, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 7878486845139481159, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 4231604460900596376, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 6289730640402028891, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 401432440309343989, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 6749165501518866314, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 4519815581646662874, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 3242001664305257821, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 1837906214075418983, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -2286418101969548366, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 3795754996357042651, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -3999486071687864156, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -5057360755312255528, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: 2074912020723768805, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 5767205212905042345, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: -8177735682962812375, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -3834472492506350169, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  - Original: {fileID: 3027740827192121718, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -2441788263206256313, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: 3890587298456596411, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 6459797940978980779, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -7306399181758636113, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: 5825911318558844023, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -7204280238293849361, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -1488659775954860219, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 0
+  - Original: {fileID: -4054244002820568883, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+    Replacement: {fileID: -173007109889618456, guid: 7983e6cef4b3b504f9973c3d72e83ea8, type: 3}
+    PreserveTint: 1
+  _window: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
+  _topBar: {r: 0.09019608, g: 0.12156863, b: 0.1764706, a: 1}
+  _card: {r: 0.10980392, g: 0.14901961, b: 0.20784314, a: 1}
+  _cardOffline: {r: 0.09411765, g: 0.12156863, b: 0.16470589, a: 1}
+  _controlBar: {r: 0.07058824, g: 0.101960786, b: 0.14901961, a: 1}
+  _textPrimary: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _textSecondary: {r: 0.6627451, g: 0.70980394, b: 0.7764706, a: 1}
+  _working: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+  _break: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+  _meal: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+  _offline: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
+  _accent: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  _danger: {r: 0.9137255, g: 0.44313726, b: 0.44313726, a: 1}
+  _button: {r: 0.15294118, g: 0.20392157, b: 0.28627452, a: 1}
+  _buttonHover: {r: 0.20392157, g: 0.26666668, b: 0.3647059, a: 1}

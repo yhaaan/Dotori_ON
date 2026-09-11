@@ -87,6 +87,9 @@ namespace DOTORION.UI
         [Tooltip("프로필 아이콘 목록 에셋. 비워 두면 아이콘 대신 이름 첫 글자만 보입니다.")]
         [SerializeField] private TeamAvatarCatalog _avatarCatalog;
 
+        [Tooltip("색상 테마 에셋. 비워 두면 빌드에 들어 있는 기본 어두운 테마를 씁니다.")]
+        [SerializeField] private DOTORIONTheme _theme;
+
         [Tooltip("새 버전을 알리는 모달 프리팹. 비워 두면 업데이트 확인을 하지 않습니다.")]
         [SerializeField] private UpdatePromptView _updatePromptPrefab;
         [Header("Development")]
@@ -178,6 +181,11 @@ namespace DOTORION.UI
             Application.runInBackground = true;
             Application.targetFrameRate = 30;
             QualitySettings.vSyncCount = 0;
+
+            // Before the first view exists: everything the overlay draws reads
+            // its colours through the palette, so the theme has to be in place
+            // ahead of anything that paints itself.
+            DOTORIONPalette.Use(_theme);
 
             _lifetime = new CancellationTokenSource();
             _identityStore = new LocalIdentityProfileStore();

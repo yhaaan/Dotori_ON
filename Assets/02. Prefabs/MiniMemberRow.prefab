@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 976362238832363368}
   - component: {fileID: 4867180992292729078}
   - component: {fileID: 6891251416795919933}
+  - component: {fileID: 6213369498016759095}
   m_Layer: 0
   m_Name: Name
   m_TagString: Untagged
@@ -79,6 +80,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\uAE40\uD584\uCD08"
+--- !u!114 &6213369498016759095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2845342671237509252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 4225c697750346c89f582463fd9c78b7
+      Label: "MiniMemberRow/Pill/Name \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0, g: 0, b: 0, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 1
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 6891251416795919933}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &5781997557104530766
 GameObject:
   m_ObjectHideFlags: 0
@@ -89,6 +117,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8954638227708495665}
   - component: {fileID: 31617742952968014}
+  - component: {fileID: 6249383669016208900}
   m_Layer: 0
   m_Name: MiniMemberRow
   m_TagString: Untagged
@@ -140,6 +169,145 @@ MonoBehaviour:
   _nameOfflineColor: {r: 0.2, g: 0.23137255, b: 0.28235295, a: 1}
   _dotIdleColor: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   _dotNoteColor: {r: 0.87058824, g: 0.13725491, b: 0.13725491, a: 1}
+--- !u!114 &6249383669016208900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5781997557104530766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 6b6a7f952d984df39860e53302fdbd23
+      Label: "MiniMemberRow/ \xB7 MiniMemberRowView/_workingColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 31617742952968014}
+    Member: _workingColor
+    OriginalTransition: 0
+  - Slot:
+      Id: c26bb6151ff44154b8a68ad1a8521f6f
+      Label: "MiniMemberRow/ \xB7 MiniMemberRowView/_breakColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 31617742952968014}
+    Member: _breakColor
+    OriginalTransition: 0
+  - Slot:
+      Id: f2b57fd5ef984d62a24f85495dff6459
+      Label: "MiniMemberRow/ \xB7 MiniMemberRowView/_mealColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 31617742952968014}
+    Member: _mealColor
+    OriginalTransition: 0
+  - Slot:
+      Id: a78ede007e974cfeb41a723bbe0b1f3a
+      Label: "MiniMemberRow/ \xB7 MiniMemberRowView/_onlineColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 31617742952968014}
+    Member: _onlineColor
+    OriginalTransition: 0
+  - Slot:
+      Id: f16214e93cfe45db88f8ada87c184bd2
+      Label: "MiniMemberRow/ \xB7 MiniMemberRowView/_offlineColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 31617742952968014}
+    Member: _offlineColor
+    OriginalTransition: 0
+  - Slot:
+      Id: 49d20fb6458a43dba4038c2693f92085
+      Label: "MiniMemberRow/ \xB7 MiniMemberRowView/_nameOnlineColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 31617742952968014}
+    Member: _nameOnlineColor
+    OriginalTransition: 0
+  - Slot:
+      Id: c5125bcbe99b484a8b510a01cce3d7a5
+      Label: "MiniMemberRow/ \xB7 MiniMemberRowView/_nameOfflineColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.2, g: 0.23137255, b: 0.28235295, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 31617742952968014}
+    Member: _nameOfflineColor
+    OriginalTransition: 0
+  - Slot:
+      Id: be29823685ab4d9fa89894190126be81
+      Label: "MiniMemberRow/ \xB7 MiniMemberRowView/_dotIdleColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 31617742952968014}
+    Member: _dotIdleColor
+    OriginalTransition: 0
+  - Slot:
+      Id: caf256761dd647a9bae0e84b3992173b
+      Label: "MiniMemberRow/ \xB7 MiniMemberRowView/_dotNoteColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.87058824, g: 0.13725491, b: 0.13725491, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 31617742952968014}
+    Member: _dotNoteColor
+    OriginalTransition: 0
 --- !u!1 &7640377409392159986
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,6 +319,7 @@ GameObject:
   - component: {fileID: 3958699634713120362}
   - component: {fileID: 5890697198373476765}
   - component: {fileID: 8301818411821564878}
+  - component: {fileID: 3006397588301130552}
   m_Layer: 0
   m_Name: Pill
   m_TagString: Untagged
@@ -217,6 +386,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3006397588301130552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7640377409392159986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: bbf6b6aac6314350bde1f83f78fd7597
+      Label: "MiniMemberRow/Pill \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+      Sprite: {fileID: 8431811068468054566, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 1
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 8301818411821564878}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &8994476471706590916
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,6 +424,7 @@ GameObject:
   - component: {fileID: 6924822733894837288}
   - component: {fileID: 4072386068153918567}
   - component: {fileID: 6587189805460726235}
+  - component: {fileID: 1500785625729117835}
   m_Layer: 0
   m_Name: Dot
   m_TagString: Untagged
@@ -292,3 +489,30 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1500785625729117835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8994476471706590916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 7baca2c72865486bacacae75395d6bf8
+      Label: "MiniMemberRow/Pill/Dot \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: -3999486071687864156, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 1
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 6587189805460726235}
+    Member: Appearance
+    OriginalTransition: 0

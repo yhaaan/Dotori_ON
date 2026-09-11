@@ -69,7 +69,7 @@ namespace DOTORION.UI
                 }
 
                 _background.color = Color.Lerp(
-                    _authoredBackgroundColor,
+                    DOTORIONThemeBinding.BaseColor(_background, _authoredBackgroundColor),
                     DOTORIONPalette.Working,
                     fill);
             }

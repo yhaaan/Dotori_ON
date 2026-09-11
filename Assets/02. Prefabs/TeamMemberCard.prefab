@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2893002186668800207}
   - component: {fileID: 4708493722818820407}
   - component: {fileID: 534459047929955214}
+  - component: {fileID: 5986458268419155242}
   m_Layer: 0
   m_Name: Nudge
   m_TagString: Untagged
@@ -120,6 +121,159 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5986458268419155242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 899431086176943591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 1007b79ef22c4a13af5f5542a7baf442
+      Label: "TeamMemberCard/Nudge \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 0.5882353, g: 0.69411767, b: 0.92156863, a: 1}
+      Sprite: {fileID: -8177735682962812375, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 4708493722818820407}
+    Member: Appearance
+    OriginalTransition: 0
+  - Slot:
+      Id: ef92c60129f14c8fbb2d5cd3d4f777f1
+      Label: "TeamMemberCard/Nudge \xB7 Button/normalColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 534459047929955214}
+    Member: normalColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 6f62f93794eb4517a8ea3b638bb8b834
+      Label: "TeamMemberCard/Nudge \xB7 Button/highlightedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 534459047929955214}
+    Member: highlightedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: e24dcf3a94fe4e3386f1db6de8c7aff7
+      Label: "TeamMemberCard/Nudge \xB7 Button/pressedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 534459047929955214}
+    Member: pressedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 69644f759fcc4274968429887aa0a86e
+      Label: "TeamMemberCard/Nudge \xB7 Button/selectedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 534459047929955214}
+    Member: selectedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: c5742f6a81a345f6b1e531426cc17715
+      Label: "TeamMemberCard/Nudge \xB7 Button/disabledColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 534459047929955214}
+    Member: disabledColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 5a6507572e114aa7bf109ee9afda943e
+      Label: "TeamMemberCard/Nudge \xB7 Button/highlightedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 534459047929955214}
+    Member: highlightedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: d3e11fd89ad54114805a882563c062c9
+      Label: "TeamMemberCard/Nudge \xB7 Button/pressedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 534459047929955214}
+    Member: pressedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: 9666a63ca68744649ee8cce550b7f73e
+      Label: "TeamMemberCard/Nudge \xB7 Button/selectedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 534459047929955214}
+    Member: selectedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: 55be523bf49140a49aceeacd5a7edc51
+      Label: "TeamMemberCard/Nudge \xB7 Button/disabledSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 534459047929955214}
+    Member: disabledSprite
+    OriginalTransition: 1
 --- !u!1 &1381211825336936592
 GameObject:
   m_ObjectHideFlags: 0
@@ -133,6 +287,7 @@ GameObject:
   - component: {fileID: 1046949441046839606}
   - component: {fileID: 8233701377816133985}
   - component: {fileID: 4702564742637820184}
+  - component: {fileID: 2179581687055728691}
   m_Layer: 0
   m_Name: TeamMemberCard
   m_TagString: Untagged
@@ -254,6 +409,131 @@ MonoBehaviour:
   _offlineColor: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
   _onlineCardColor: {r: 0.84705883, g: 0.8901961, b: 0.9764706, a: 1}
   _offlineCardColor: {r: 0.74509805, g: 0.8039216, b: 0.92156863, a: 1}
+--- !u!114 &2179581687055728691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381211825336936592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: a23df29b34b34efea1bcd80c994f7aa7
+      Label: "TeamMemberCard/ \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 0.84705883, g: 0.8901961, b: 0.9764706, a: 1}
+      Sprite: {fileID: -4691332597965536479, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 1
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 1046949441046839606}
+    Member: Appearance
+    OriginalTransition: 0
+  - Slot:
+      Id: 713ac9676d5f4d9da000f4248f669cd2
+      Label: "TeamMemberCard/ \xB7 TeamMemberCardView/_workingColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4702564742637820184}
+    Member: _workingColor
+    OriginalTransition: 0
+  - Slot:
+      Id: 72e35bdcd7d243349f984314daa58154
+      Label: "TeamMemberCard/ \xB7 TeamMemberCardView/_breakColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4702564742637820184}
+    Member: _breakColor
+    OriginalTransition: 0
+  - Slot:
+      Id: 1b9af7aed8b6498496bbe1d35a4a6f3c
+      Label: "TeamMemberCard/ \xB7 TeamMemberCardView/_mealColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4702564742637820184}
+    Member: _mealColor
+    OriginalTransition: 0
+  - Slot:
+      Id: 3431d573dea4499cb237a7d7ab687a90
+      Label: "TeamMemberCard/ \xB7 TeamMemberCardView/_onlineColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4702564742637820184}
+    Member: _onlineColor
+    OriginalTransition: 0
+  - Slot:
+      Id: 620bb8a6445d489e9a84c605a4739284
+      Label: "TeamMemberCard/ \xB7 TeamMemberCardView/_offlineColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4702564742637820184}
+    Member: _offlineColor
+    OriginalTransition: 0
+  - Slot:
+      Id: 0087b74f8e774b78bb87cbe4a6befbcb
+      Label: "TeamMemberCard/ \xB7 TeamMemberCardView/_onlineCardColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.84705883, g: 0.8901961, b: 0.9764706, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4702564742637820184}
+    Member: _onlineCardColor
+    OriginalTransition: 0
+  - Slot:
+      Id: 6ace93d9fcca47729a639020f3b199d9
+      Label: "TeamMemberCard/ \xB7 TeamMemberCardView/_offlineCardColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.74509805, g: 0.8039216, b: 0.92156863, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4702564742637820184}
+    Member: _offlineCardColor
+    OriginalTransition: 0
 --- !u!1 &1408609108049136822
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,6 +545,7 @@ GameObject:
   - component: {fileID: 531914029097722401}
   - component: {fileID: 3711643958166225401}
   - component: {fileID: 4698884127424254874}
+  - component: {fileID: 8247818769187869608}
   m_Layer: 0
   m_Name: Status
   m_TagString: Untagged
@@ -333,6 +614,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\uC791\uC5C5\uC911"
+--- !u!114 &8247818769187869608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408609108049136822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 0c3a7e7a4ea441f9a228823d2ed21786
+      Label: "TeamMemberCard/Status \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 1
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4698884127424254874}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &2777476482394452864
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,6 +652,7 @@ GameObject:
   - component: {fileID: 5144464861078787746}
   - component: {fileID: 2757359355322826626}
   - component: {fileID: 2153959801103405982}
+  - component: {fileID: 1031598710638213456}
   m_Layer: 0
   m_Name: Icon
   m_TagString: Untagged
@@ -408,6 +717,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1031598710638213456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2777476482394452864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 806c29c4cdb4488db03fde5f5dd0dd19
+      Label: "TeamMemberCard/Avatar/Icon \xB7 Image/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 1
+      RuntimeSprite: 1
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 2153959801103405982}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &3969356049127392063
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,6 +756,7 @@ GameObject:
   - component: {fileID: 112043441136592223}
   - component: {fileID: 8144691680713689457}
   - component: {fileID: 1961062046088422119}
+  - component: {fileID: 3973339285406892362}
   m_Layer: 0
   m_Name: Name
   m_TagString: Untagged
@@ -500,6 +837,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b63a941a0726f32469f4941d0c39978f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DoubleClickHandle
+--- !u!114 &3973339285406892362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3969356049127392063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 9d6dec97f0a74a75a18bdb2911889db6
+      Label: "TeamMemberCard/Name \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0, g: 0, b: 0, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 8144691680713689457}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &4018438312440899786
 GameObject:
   m_ObjectHideFlags: 0
@@ -511,6 +875,7 @@ GameObject:
   - component: {fileID: 1415531625212730678}
   - component: {fileID: 8976090518201993188}
   - component: {fileID: 7884130180487099734}
+  - component: {fileID: 3351917015929584215}
   m_Layer: 0
   m_Name: ElapsedTimer
   m_TagString: Untagged
@@ -579,6 +944,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 00:42:18
+--- !u!114 &3351917015929584215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4018438312440899786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 4e2d37ac9f914755a219b065595440ca
+      Label: "TeamMemberCard/ElapsedTimer \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.49019608, g: 0.54901963, b: 0.6784314, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 7884130180487099734}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &7345013184024154221
 GameObject:
   m_ObjectHideFlags: 0
@@ -591,6 +983,7 @@ GameObject:
   - component: {fileID: 164783575093265557}
   - component: {fileID: 3423625583136907719}
   - component: {fileID: 5491388843447569132}
+  - component: {fileID: 3324842206622059888}
   m_Layer: 0
   m_Name: Avatar
   m_TagString: Untagged
@@ -701,6 +1094,159 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3324842206622059888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7345013184024154221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 5c999520fae942638f644a72f85bdaa6
+      Label: "TeamMemberCard/Avatar \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+      Sprite: {fileID: -5489898661777849415, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 1
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 3423625583136907719}
+    Member: Appearance
+    OriginalTransition: 0
+  - Slot:
+      Id: 531610bace104bfeb213dbe8f1e3041a
+      Label: "TeamMemberCard/Avatar \xB7 Button/normalColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5491388843447569132}
+    Member: normalColor
+    OriginalTransition: 0
+  - Slot:
+      Id: 4cbda88a5c7d4a80bd7a4e5b1ae3eda4
+      Label: "TeamMemberCard/Avatar \xB7 Button/highlightedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5491388843447569132}
+    Member: highlightedColor
+    OriginalTransition: 0
+  - Slot:
+      Id: 3dcd4bff82604f1281b996ebbf791a1b
+      Label: "TeamMemberCard/Avatar \xB7 Button/pressedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5491388843447569132}
+    Member: pressedColor
+    OriginalTransition: 0
+  - Slot:
+      Id: e9f1512b743841b3baaed72e052f893b
+      Label: "TeamMemberCard/Avatar \xB7 Button/selectedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5491388843447569132}
+    Member: selectedColor
+    OriginalTransition: 0
+  - Slot:
+      Id: ddd02b5a5a5b47db8f1733cc12381a18
+      Label: "TeamMemberCard/Avatar \xB7 Button/disabledColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5491388843447569132}
+    Member: disabledColor
+    OriginalTransition: 0
+  - Slot:
+      Id: aa8d72119342412a9e03a9a60c5237f2
+      Label: "TeamMemberCard/Avatar \xB7 Button/highlightedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 5491388843447569132}
+    Member: highlightedSprite
+    OriginalTransition: 0
+  - Slot:
+      Id: 02fc42e82cd745f1a02f18e468bf4911
+      Label: "TeamMemberCard/Avatar \xB7 Button/pressedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 5491388843447569132}
+    Member: pressedSprite
+    OriginalTransition: 0
+  - Slot:
+      Id: bf923b9519f749c3a2184e17e3694671
+      Label: "TeamMemberCard/Avatar \xB7 Button/selectedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 5491388843447569132}
+    Member: selectedSprite
+    OriginalTransition: 0
+  - Slot:
+      Id: ad54beec879343e0993bc68e953062b5
+      Label: "TeamMemberCard/Avatar \xB7 Button/disabledSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 5491388843447569132}
+    Member: disabledSprite
+    OriginalTransition: 0
 --- !u!1 &8052057840317539071
 GameObject:
   m_ObjectHideFlags: 0
@@ -712,6 +1258,7 @@ GameObject:
   - component: {fileID: 394615009461973939}
   - component: {fileID: 4332192008317191563}
   - component: {fileID: 8113636587113533943}
+  - component: {fileID: 5030020006661925327}
   m_Layer: 0
   m_Name: Initial
   m_TagString: Untagged
@@ -780,6 +1327,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\uAE40"
+--- !u!114 &5030020006661925327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8052057840317539071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 74d5ada43842447a8f07af484e220c10
+      Label: "TeamMemberCard/Avatar/Initial \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 8113636587113533943}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &8628544571829866069
 GameObject:
   m_ObjectHideFlags: 0
@@ -791,6 +1365,7 @@ GameObject:
   - component: {fileID: 1945650153429123768}
   - component: {fileID: 1050392660038426862}
   - component: {fileID: 4136923742309522862}
+  - component: {fileID: 1512208144534246191}
   m_Layer: 0
   m_Name: Detail
   m_TagString: Untagged
@@ -859,3 +1434,30 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\uCD9C\uADFC 09:00"
+--- !u!114 &1512208144534246191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8628544571829866069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 6f3658834b2441219f93f754b531385d
+      Label: "TeamMemberCard/Detail \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.49019608, g: 0.54901963, b: 0.6784314, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4136923742309522862}
+    Member: Appearance
+    OriginalTransition: 0

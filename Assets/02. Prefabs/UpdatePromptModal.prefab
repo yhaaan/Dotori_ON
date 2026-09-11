@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7596078239076416071}
   - component: {fileID: 4823815627099384727}
   - component: {fileID: 8029272591328542729}
+  - component: {fileID: 7446885878067184861}
   m_Layer: 0
   m_Name: Status
   m_TagString: Untagged
@@ -79,6 +80,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 
+--- !u!114 &7446885878067184861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1147687971570738501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: f74db3ea995e431a9c323876aafce776
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Status \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0, g: 0, b: 0, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 1
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 8029272591328542729}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &2841082498982542843
 GameObject:
   m_ObjectHideFlags: 0
@@ -90,6 +118,7 @@ GameObject:
   - component: {fileID: 3722821372082910623}
   - component: {fileID: 1078231813159719711}
   - component: {fileID: 8345970334567973668}
+  - component: {fileID: 6337670174387295940}
   m_Layer: 0
   m_Name: ModalBackdrop
   m_TagString: Untagged
@@ -155,6 +184,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6337670174387295940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2841082498982542843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: ee7dea24b1b3438b8af0631c93c29f27
+      Label: "UpdatePromptModal/ModalBackdrop \xB7 Image/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 0}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 8345970334567973668}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &3157274400725008155
 GameObject:
   m_ObjectHideFlags: 0
@@ -166,6 +222,7 @@ GameObject:
   - component: {fileID: 6426826524639600127}
   - component: {fileID: 5687263183026668634}
   - component: {fileID: 6088809745649332001}
+  - component: {fileID: 4698218874582181509}
   m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
@@ -234,6 +291,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: DOTORI ON
+--- !u!114 &4698218874582181509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3157274400725008155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 0f07209ecb764e5eaf7e3f68e1c93fed
+      Label: "UpdatePromptModal/WindowDragArea/Title \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 6088809745649332001}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &3563239328626117986
 GameObject:
   m_ObjectHideFlags: 0
@@ -245,6 +329,7 @@ GameObject:
   - component: {fileID: 7952781269664848647}
   - component: {fileID: 8233022597681159257}
   - component: {fileID: 2590672570117723491}
+  - component: {fileID: 3624613542450262486}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -313,6 +398,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\uB098\uC911\uC5D0"
+--- !u!114 &3624613542450262486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3563239328626117986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: a5fb7714239b4c889e9d6d754b9a9f2e
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later/Label \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.35686275, g: 0.5568628, b: 0.99607843, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 2590672570117723491}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &4189570785339206289
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,6 +436,7 @@ GameObject:
   - component: {fileID: 8300947933958945871}
   - component: {fileID: 9105574609047566693}
   - component: {fileID: 8425985281590331118}
+  - component: {fileID: 8070955895501878290}
   m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
@@ -394,6 +507,33 @@ MonoBehaviour:
   m_Text: 'DOTORI ON
 
 '
+--- !u!114 &8070955895501878290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4189570785339206289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 3eb05d531b26498880381f66aba81f2a
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Title \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.35686275, g: 0.5568628, b: 0.99607843, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 8425985281590331118}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &5237102715956401071
 GameObject:
   m_ObjectHideFlags: 0
@@ -407,6 +547,7 @@ GameObject:
   - component: {fileID: 7756649554578417120}
   - component: {fileID: 6256178407630373189}
   - component: {fileID: 3791415601624418992}
+  - component: {fileID: 5232609017589305383}
   m_Layer: 0
   m_Name: UpdatePromptModal
   m_TagString: Untagged
@@ -515,6 +656,33 @@ MonoBehaviour:
   _confirmButton: {fileID: 778131540295754824}
   _laterButton: {fileID: 1505144355528399786}
   _errorColor: {r: 0.914, g: 0.443, b: 0.443, a: 1}
+--- !u!114 &5232609017589305383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5237102715956401071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 727f1e726b88407fa083987986de2b4f
+      Label: "UpdatePromptModal/ \xB7 UpdatePromptView/_errorColor"
+      Target: 1
+      Mode: 1
+      Color: {r: 0.914, g: 0.443, b: 0.443, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 3791415601624418992}
+    Member: _errorColor
+    OriginalTransition: 0
 --- !u!1 &5567396091597764371
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,6 +695,7 @@ GameObject:
   - component: {fileID: 8399769250552505743}
   - component: {fileID: 3877990501058337262}
   - component: {fileID: 778131540295754824}
+  - component: {fileID: 2362276428816455931}
   m_Layer: 0
   m_Name: Confirm
   m_TagString: Untagged
@@ -636,6 +805,159 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2362276428816455931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5567396091597764371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: bdbacba263ab4fd6832eb51248114a16
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Sprite: {fileID: -7306399181758636113, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 3877990501058337262}
+    Member: Appearance
+    OriginalTransition: 0
+  - Slot:
+      Id: 2356e28023ba4859925836fc419cbbbc
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Button/normalColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 778131540295754824}
+    Member: normalColor
+    OriginalTransition: 2
+  - Slot:
+      Id: 5e9f39b7d2d740f08bedc1480da88d21
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Button/highlightedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.20392157, g: 0.26666668, b: 0.3647059, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 778131540295754824}
+    Member: highlightedColor
+    OriginalTransition: 2
+  - Slot:
+      Id: f8e5ec4f0971463d8069688244f75d49
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Button/pressedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.72, g: 0.78, b: 0.88, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 778131540295754824}
+    Member: pressedColor
+    OriginalTransition: 2
+  - Slot:
+      Id: fd6a48e03c3344f593e3038d8cbe943b
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Button/selectedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 778131540295754824}
+    Member: selectedColor
+    OriginalTransition: 2
+  - Slot:
+      Id: 30d48ab1e9174b6c978309b68149bb97
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Button/disabledColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.48, g: 0.52, b: 0.58, a: 0.55}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 778131540295754824}
+    Member: disabledColor
+    OriginalTransition: 2
+  - Slot:
+      Id: 3fb33aa007a74febadebc2fdfbe33351
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Button/highlightedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 778131540295754824}
+    Member: highlightedSprite
+    OriginalTransition: 2
+  - Slot:
+      Id: 4a1492615c36448b82992ed6f64d299f
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Button/pressedSprite"
+      Target: 4
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: -7204280238293849361, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 778131540295754824}
+    Member: pressedSprite
+    OriginalTransition: 2
+  - Slot:
+      Id: d4aa520aa66b4f77a3f294a2e1e12b6e
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Button/selectedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 778131540295754824}
+    Member: selectedSprite
+    OriginalTransition: 2
+  - Slot:
+      Id: 4c8c8772071d4c098aeef8e0435470ec
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm \xB7 Button/disabledSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 778131540295754824}
+    Member: disabledSprite
+    OriginalTransition: 2
 --- !u!1 &5854256843979767435
 GameObject:
   m_ObjectHideFlags: 0
@@ -648,6 +970,7 @@ GameObject:
   - component: {fileID: 5023494218846032699}
   - component: {fileID: 7453814074837518606}
   - component: {fileID: 5043657099204078311}
+  - component: {fileID: 6977743787946201944}
   m_Layer: 0
   m_Name: WindowDragArea
   m_TagString: Untagged
@@ -725,6 +1048,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f125fa4aefba9644a83a074e1a059162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.WindowDragHandle
+--- !u!114 &6977743787946201944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5854256843979767435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 4e2e6ba14a3d4d759ecab70303d21a9f
+      Label: "UpdatePromptModal/WindowDragArea \xB7 Image/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 0.001}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 7453814074837518606}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &5918510969663473390
 GameObject:
   m_ObjectHideFlags: 0
@@ -736,6 +1086,7 @@ GameObject:
   - component: {fileID: 8035139529429427299}
   - component: {fileID: 4072113337527111753}
   - component: {fileID: 1436883288156381085}
+  - component: {fileID: 3274432607991964094}
   m_Layer: 0
   m_Name: UpdatePanel
   m_TagString: Untagged
@@ -805,6 +1156,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3274432607991964094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5918510969663473390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 2b94ad0ed6ce46d6b6f4af13fb6a17f8
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 3027740827192121718, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 1436883288156381085}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &6005929888081033488
 GameObject:
   m_ObjectHideFlags: 0
@@ -816,6 +1194,7 @@ GameObject:
   - component: {fileID: 4630645760055917395}
   - component: {fileID: 4739655093277139491}
   - component: {fileID: 5395355116352473928}
+  - component: {fileID: 2888983748202341124}
   m_Layer: 0
   m_Name: Message
   m_TagString: Untagged
@@ -885,6 +1264,33 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: "\uC0C8\uB85C\uC6B4 \uBC84\uC804\uC774 \uB098\uC654\uC2B5\uB2C8\uB2E4.\n\uC5C5\uB370\uC774\uD2B8
     \uD560\uAE4C\uC694?"
+--- !u!114 &2888983748202341124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6005929888081033488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 8863b361ab004b608f0ca4f1e13c8187
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Message \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.49019608, g: 0.54901963, b: 0.6784314, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5395355116352473928}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &7037441219477213938
 GameObject:
   m_ObjectHideFlags: 0
@@ -896,6 +1302,7 @@ GameObject:
   - component: {fileID: 2869058800200939537}
   - component: {fileID: 1200431021172780866}
   - component: {fileID: 8224261244594938786}
+  - component: {fileID: 5378089607565558309}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -964,6 +1371,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\uB124"
+--- !u!114 &5378089607565558309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7037441219477213938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 10583d0ade52429183f4e8cd5d6333f7
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Confirm/Label \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 8224261244594938786}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &9089657087586677903
 GameObject:
   m_ObjectHideFlags: 0
@@ -976,6 +1410,7 @@ GameObject:
   - component: {fileID: 7247382114771045619}
   - component: {fileID: 1889175299388073074}
   - component: {fileID: 1505144355528399786}
+  - component: {fileID: 1616280103962270150}
   m_Layer: 0
   m_Name: Later
   m_TagString: Untagged
@@ -1085,3 +1520,156 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1616280103962270150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9089657087586677903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 636d0ca4e59b439f86ece90200c7024c
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: -7306399181758636113, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 1889175299388073074}
+    Member: Appearance
+    OriginalTransition: 0
+  - Slot:
+      Id: 9c55b52df0d44c7f801e9e33edfdf41b
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Button/normalColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 1505144355528399786}
+    Member: normalColor
+    OriginalTransition: 2
+  - Slot:
+      Id: c3bf9937f1d9476a811fa07022b42caa
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Button/highlightedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.20392157, g: 0.26666668, b: 0.3647059, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 1505144355528399786}
+    Member: highlightedColor
+    OriginalTransition: 2
+  - Slot:
+      Id: fd9863d8da6b4155b391653d95c206be
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Button/pressedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.72, g: 0.78, b: 0.88, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 1505144355528399786}
+    Member: pressedColor
+    OriginalTransition: 2
+  - Slot:
+      Id: ad7e42c12e4342f2982b7bcd4c3b6fe6
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Button/selectedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 1505144355528399786}
+    Member: selectedColor
+    OriginalTransition: 2
+  - Slot:
+      Id: ab33d03234094bdfac4168b34ce2fcf0
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Button/disabledColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.48, g: 0.52, b: 0.58, a: 0.55}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 1505144355528399786}
+    Member: disabledColor
+    OriginalTransition: 2
+  - Slot:
+      Id: 4e9dffad171648c58c46a1035b531d50
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Button/highlightedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 1505144355528399786}
+    Member: highlightedSprite
+    OriginalTransition: 2
+  - Slot:
+      Id: 0cb7106981494a66b7b3b26f815dacb5
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Button/pressedSprite"
+      Target: 4
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: -7204280238293849361, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 1505144355528399786}
+    Member: pressedSprite
+    OriginalTransition: 2
+  - Slot:
+      Id: 30974a8e413d4752854f5528993a444f
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Button/selectedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 1505144355528399786}
+    Member: selectedSprite
+    OriginalTransition: 2
+  - Slot:
+      Id: 0f1cf580cd114fbc8e1c88ca9b561587
+      Label: "UpdatePromptModal/ModalBackdrop/UpdatePanel/Later \xB7 Button/disabledSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 1505144355528399786}
+    Member: disabledSprite
+    OriginalTransition: 2

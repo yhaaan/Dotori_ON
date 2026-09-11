@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2865818660882375847}
   - component: {fileID: 4983681563651557746}
   - component: {fileID: 4009200397072294283}
+  - component: {fileID: 5128186864509892634}
   m_Layer: 0
   m_Name: ModalBackdrop
   m_TagString: Untagged
@@ -76,6 +77,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5128186864509892634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154783344178693153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 6b9c7777351c489eb8dbe5421ce9f7bd
+      Label: "FirstRunNameModal/ModalBackdrop \xB7 Image/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.025, g: 0.035, b: 0.055, a: 0.88}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 4009200397072294283}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &851782730735621160
 GameObject:
   m_ObjectHideFlags: 0
@@ -88,6 +116,7 @@ GameObject:
   - component: {fileID: 6061574980967774891}
   - component: {fileID: 8444096509951362102}
   - component: {fileID: 5775211558288259869}
+  - component: {fileID: 1028870486797457348}
   m_Layer: 0
   m_Name: Confirm
   m_TagString: Untagged
@@ -196,6 +225,159 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1028870486797457348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 851782730735621160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 8b4fff5174b147da9313c086e7821619
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 3890587298456596411, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 8444096509951362102}
+    Member: Appearance
+    OriginalTransition: 0
+  - Slot:
+      Id: b61e91408c714245a1caa7650179629f
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Button/normalColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5775211558288259869}
+    Member: normalColor
+    OriginalTransition: 1
+  - Slot:
+      Id: a404768da7fa487fb2d18dc0d687a079
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Button/highlightedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5775211558288259869}
+    Member: highlightedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 4606c381db6548c9a8110807ff55a60c
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Button/pressedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5775211558288259869}
+    Member: pressedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 446e53a66b164ef287af7d8e48806813
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Button/selectedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5775211558288259869}
+    Member: selectedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: d0fea7f286ea4be58e6fe8bee595156a
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Button/disabledColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 5775211558288259869}
+    Member: disabledColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 2e383b2cfc5844c59cc851df411fc9c0
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Button/highlightedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 5775211558288259869}
+    Member: highlightedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: 43d72692d50844d29f86cb66e036af0d
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Button/pressedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 5775211558288259869}
+    Member: pressedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: cc084c742af9458a92f5d70f56a4cad3
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Button/selectedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 5775211558288259869}
+    Member: selectedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: 6fdd99e1b59f4fbcb3262f8059fc0659
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Confirm \xB7 Button/disabledSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 5775211558288259869}
+    Member: disabledSprite
+    OriginalTransition: 1
 --- !u!1 &1151946313236959280
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,6 +389,7 @@ GameObject:
   - component: {fileID: 448806763770150826}
   - component: {fileID: 4940553602087573793}
   - component: {fileID: 8899604601668611406}
+  - component: {fileID: 890693323505560684}
   m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
@@ -275,6 +458,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: DOTORI ON
+--- !u!114 &890693323505560684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1151946313236959280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: b8e9c5f99dbc4510a65d2c5365ec9629
+      Label: "FirstRunNameModal/WindowDragArea/Title \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 8899604601668611406}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &3305581775097188533
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,6 +497,7 @@ GameObject:
   - component: {fileID: 1801127336828809623}
   - component: {fileID: 5266147567918573206}
   - component: {fileID: 4584056985396656231}
+  - component: {fileID: 1963424018380146562}
   m_Layer: 0
   m_Name: Exit
   m_TagString: Untagged
@@ -395,6 +606,159 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1963424018380146562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3305581775097188533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: bc9fd766d8b64ae28770cf4ddec20a9c
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 5868935815051780122, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 5266147567918573206}
+    Member: Appearance
+    OriginalTransition: 0
+  - Slot:
+      Id: 797a7dfa33924406b41c9f3ff3808744
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Button/normalColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4584056985396656231}
+    Member: normalColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 4a1fbcc38c984446902c48fb1975a3ab
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Button/highlightedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4584056985396656231}
+    Member: highlightedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 14c8b495a27f4f3b8a85a84b86e722f8
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Button/pressedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4584056985396656231}
+    Member: pressedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 0b51db132c2a4c0780f4c7e5d292d4c9
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Button/selectedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4584056985396656231}
+    Member: selectedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 4fa758f7b65a482382f5835d421adaa1
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Button/disabledColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 4584056985396656231}
+    Member: disabledColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 629c9c9283844836b238c654bead30fb
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Button/highlightedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 4584056985396656231}
+    Member: highlightedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: 4f57da693d8b4002a6478c707382196a
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Button/pressedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 4584056985396656231}
+    Member: pressedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: bf4ec6ddf85743f295aeb424144666c2
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Button/selectedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 4584056985396656231}
+    Member: selectedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: 93a997220ed94da495d761280d172e88
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Exit \xB7 Button/disabledSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 4584056985396656231}
+    Member: disabledSprite
+    OriginalTransition: 1
 --- !u!1 &3493907314260300985
 GameObject:
   m_ObjectHideFlags: 0
@@ -406,6 +770,7 @@ GameObject:
   - component: {fileID: 6015959670313857849}
   - component: {fileID: 7699400367439996969}
   - component: {fileID: 8707197132722958960}
+  - component: {fileID: 1273696478958770451}
   m_Layer: 0
   m_Name: Description
   m_TagString: Untagged
@@ -474,6 +839,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\uD300\uC5D0\uC11C \uC0AC\uC6A9\uD560 \uC774\uB984\uC744 \uC54C\uB824\uC8FC\uC138\uC694"
+--- !u!114 &1273696478958770451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3493907314260300985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: bb24649485d841d9b576550be2de6e29
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Description \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.49019608, g: 0.54901963, b: 0.6784314, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 8707197132722958960}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &3762030428704086757
 GameObject:
   m_ObjectHideFlags: 0
@@ -485,6 +877,7 @@ GameObject:
   - component: {fileID: 4066295312194073474}
   - component: {fileID: 5500605723476160926}
   - component: {fileID: 6805993531998134945}
+  - component: {fileID: 3916002042930454661}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -553,6 +946,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 
+--- !u!114 &3916002042930454661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3762030428704086757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 21b30423cf9847f8b7d4ba19d24bdce8
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput/Text \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.49019608, g: 0.54901963, b: 0.6784314, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 6805993531998134945}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &4397417167917422508
 GameObject:
   m_ObjectHideFlags: 0
@@ -565,6 +985,7 @@ GameObject:
   - component: {fileID: 602258224106996089}
   - component: {fileID: 2390257251920983098}
   - component: {fileID: 2537420692020467962}
+  - component: {fileID: 1185293043053547551}
   m_Layer: 0
   m_Name: WindowDragArea
   m_TagString: Untagged
@@ -642,6 +1063,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f125fa4aefba9644a83a074e1a059162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.WindowDragHandle
+--- !u!114 &1185293043053547551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4397417167917422508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 0c405f2a59204bbe94cc6810afdd0217
+      Label: "FirstRunNameModal/WindowDragArea \xB7 Image/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 0.001}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 2390257251920983098}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &4534624695618037088
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,6 +1101,7 @@ GameObject:
   - component: {fileID: 6867622337833081987}
   - component: {fileID: 431250219497866224}
   - component: {fileID: 328661226594064306}
+  - component: {fileID: 6570095267428890784}
   m_Layer: 0
   m_Name: Placeholder
   m_TagString: Untagged
@@ -721,6 +1170,34 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\uC608: \uAE40\uD584\uCD08"
+--- !u!114 &6570095267428890784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4534624695618037088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 6ed90cb60d124bd29ca4e3e97b319239
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput/Placeholder \xB7
+        Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.49019608, g: 0.54901963, b: 0.6784314, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 328661226594064306}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &6904086243522031438
 GameObject:
   m_ObjectHideFlags: 0
@@ -732,6 +1209,7 @@ GameObject:
   - component: {fileID: 7223702488954537078}
   - component: {fileID: 5718829837201914645}
   - component: {fileID: 7533533183421139927}
+  - component: {fileID: 2568499795803469810}
   m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
@@ -802,6 +1280,33 @@ MonoBehaviour:
   m_Text: 'DOTORI ON
 
 '
+--- !u!114 &2568499795803469810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6904086243522031438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 368d9ae5579b4de69ec9362e10f8a54e
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Title \xB7 Text/Appearance"
+      Target: 0
+      Mode: 1
+      Color: {r: 0.35686275, g: 0.5568628, b: 0.99607843, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 7533533183421139927}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &7514367424458371214
 GameObject:
   m_ObjectHideFlags: 0
@@ -813,6 +1318,7 @@ GameObject:
   - component: {fileID: 4944620467173452178}
   - component: {fileID: 6140114471984743548}
   - component: {fileID: 3197242955210173671}
+  - component: {fileID: 7148179294569959735}
   m_Layer: 0
   m_Name: Profile
   m_TagString: Untagged
@@ -877,6 +1383,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7148179294569959735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7514367424458371214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 2bbf4b7117204e1885760ab9ccec9453
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/Profile \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: -4054244002820568883, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 3197242955210173671}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &7818993818564488159
 GameObject:
   m_ObjectHideFlags: 0
@@ -996,8 +1529,7 @@ MonoBehaviour:
   _nameInput: {fileID: 3280763271362757311}
   _confirmButton: {fileID: 5775211558288259869}
   _cancelButton: {fileID: 4584056985396656231}
-  _confirmLabel: {fileID: 8707197132722958960}
-  _feedbackText: {fileID: 8707197132722958960}
+  _messageText: {fileID: 8707197132722958960}
 --- !u!1 &8152593345466924761
 GameObject:
   m_ObjectHideFlags: 0
@@ -1010,6 +1542,7 @@ GameObject:
   - component: {fileID: 7123820528147365298}
   - component: {fileID: 4419589273170655245}
   - component: {fileID: 3280763271362757311}
+  - component: {fileID: 8985363361024570966}
   m_Layer: 0
   m_Name: NameInput
   m_TagString: Untagged
@@ -1144,6 +1677,159 @@ MonoBehaviour:
   m_CaretWidth: 1
   m_ReadOnly: 0
   m_ShouldActivateOnSelect: 1
+--- !u!114 &8985363361024570966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8152593345466924761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 35da3561092842b8a6587edd7d0d4769
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: -6406511612858118475, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 4419589273170655245}
+    Member: Appearance
+    OriginalTransition: 0
+  - Slot:
+      Id: bb2063044be64606890054bf6ad4e2ec
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 InputField/normalColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 3280763271362757311}
+    Member: normalColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 6cb23ae78c7f4383b771075ede0f9a7b
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 InputField/highlightedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 3280763271362757311}
+    Member: highlightedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 48af9039f7e443229bea4f473b83d16a
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 InputField/pressedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 3280763271362757311}
+    Member: pressedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: b2dfa638217b4d9796b74bffd83b081e
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 InputField/selectedColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 3280763271362757311}
+    Member: selectedColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 154b0cfc96084c50a702f2f272bae62d
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 InputField/disabledColor"
+      Target: 3
+      Mode: 1
+      Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 0
+      ColorRole: 0
+    Target: {fileID: 3280763271362757311}
+    Member: disabledColor
+    OriginalTransition: 1
+  - Slot:
+      Id: 9cd5d4d82be44d19bcd450dfd2e0479f
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 InputField/highlightedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 3280763271362757311}
+    Member: highlightedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: a688db9d800845b09418abbb22db185f
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 InputField/pressedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 3280763271362757311}
+    Member: pressedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: e35e333c00ff452e8be0915cc74e6301
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 InputField/selectedSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 3280763271362757311}
+    Member: selectedSprite
+    OriginalTransition: 1
+  - Slot:
+      Id: 68639971903940cba762784749303742
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel/NameInput \xB7 InputField/disabledSprite"
+      Target: 4
+      Mode: 1
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 0}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 3280763271362757311}
+    Member: disabledSprite
+    OriginalTransition: 1
 --- !u!1 &8486663708146216638
 GameObject:
   m_ObjectHideFlags: 0
@@ -1155,6 +1841,7 @@ GameObject:
   - component: {fileID: 1125168837784738393}
   - component: {fileID: 8684331222905455692}
   - component: {fileID: 3592760142438200672}
+  - component: {fileID: 2295239749440988415}
   m_Layer: 0
   m_Name: NamePanel
   m_TagString: Untagged
@@ -1225,3 +1912,30 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2295239749440988415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8486663708146216638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 6edfec2331144f258bf63d69c32dc98d
+      Label: "FirstRunNameModal/ModalBackdrop/NamePanel \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 3027740827192121718, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 3592760142438200672}
+    Member: Appearance
+    OriginalTransition: 0

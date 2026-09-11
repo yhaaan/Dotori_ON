@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e246123cf5a045369fd6da2e09cf4d46, type: 3}
+  m_Name: DarkTheme
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONTheme
+  Catalog: {fileID: 11400000, guid: 9b3c7589070c34c4185e75d5b1503912, type: 2}
+  Overrides: []
+  _window: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
+  _topBar: {r: 0.09019608, g: 0.12156863, b: 0.1764706, a: 1}
+  _card: {r: 0.10980392, g: 0.14901961, b: 0.20784314, a: 1}
+  _cardOffline: {r: 0.09411765, g: 0.12156863, b: 0.16470589, a: 1}
+  _controlBar: {r: 0.07058824, g: 0.101960786, b: 0.14901961, a: 1}
+  _textPrimary: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
+  _textSecondary: {r: 0.6627451, g: 0.70980394, b: 0.7764706, a: 1}
+  _working: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+  _break: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+  _meal: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+  _offline: {r: 0.4, g: 0.4509804, b: 0.5254902, a: 1}
+  _accent: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  _danger: {r: 0.9137255, g: 0.44313726, b: 0.44313726, a: 1}
+  _button: {r: 0.15294118, g: 0.20392157, b: 0.28627452, a: 1}
+  _buttonHover: {r: 0.20392157, g: 0.26666668, b: 0.3647059, a: 1}
