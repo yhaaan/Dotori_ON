@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOTORI ON 출석</title>
+<link rel="icon" href="logo.png">
+<style>
+  /* Same palette as index.html and the app. */
+  :root {
+    --window: #101621;
+    --card: #1C2635;
+    --text: #F4F7FB;
+    --muted: #A9B5C6;
+    --button: #273449;
+    --button-hover: #34445D;
+    --accent: #6EA8FE;
+    --danger: #FF8A8A;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 1.5rem 1rem;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.75rem;
+    background: var(--window);
+    color: var(--text);
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.2rem, 11vw, 4rem);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .card {
+    width: min(24rem, 100%);
+    background: var(--card);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  [hidden] { display: none !important; }
+
+  input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--button-hover);
+    border-radius: 0.6rem;
+    background: var(--window);
+    color: var(--text);
+    /* 16px or more keeps iOS from zooming into the field. */
+    font: inherit;
+    font-size: 1.05rem;
+    text-align: center;
+  }
+
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+
+  button {
+    padding: 0.95rem 1rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--button);
+    color: var(--text);
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 120ms ease;
+  }
+
+  button:hover:not(:disabled), button:active:not(:disabled) { background: var(--button-hover); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  button:disabled { cursor: default; opacity: 0.55; }
+
+  button.primary { background: var(--accent); color: #0B1220; }
+  button.primary:hover:not(:disabled), button.primary:active:not(:disabled) { background: #8DBBFF; }
+
+  button.link {
+    padding: 0.3rem;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  button.link:hover:not(:disabled) { background: transparent; color: var(--text); }
+
+  .who { margin: 0; font-size: 1.2rem; font-weight: 700; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .stat {
+    background: var(--window);
+    border-radius: 0.6rem;
+    padding: 0.9rem 0.5rem;
+  }
+
+  .stat .value { font-size: 1.6rem; font-weight: 800; }
+  .stat .label { margin-top: 0.2rem; color: var(--muted); font-size: 0.85rem; }
+
+  .message { margin: 0; min-height: 1.4em; color: var(--muted); font-size: 0.95rem; }
+  .message.error { color: var(--danger); }
+  .message.success { color: var(--accent); }
+
+  .footer a { color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+  <h1>DOTORI ON</h1>
+
+  <form class="card" id="login">
+    <input id="name" type="text" placeholder="이름" autocomplete="username"
+           autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="40" required>
+    <button class="primary" type="submit" id="login-button">로그인</button>
+    <p class="message" id="login-message" role="status"></p>
+  </form>
+
+  <section class="card" id="panel" hidden>
+    <p class="who" id="who"></p>
+    <div class="stats">
+      <div class="stat"><div class="value" id="points">-</div><div class="label">누적 포인트</div></div>
+      <div class="stat"><div class="value" id="streak">-</div><div class="label">연속 출석</div></div>
+    </div>
+    <button class="primary" type="button" id="claim">출석하기</button>
+    <p class="message" id="panel-message" role="status"></p>
+    <button class="link" type="button" id="logout">다른 이름으로 로그인</button>
+  </section>
+
+  <p class="footer"><a href="./">앱 다운로드</a></p>
+
+<script>
+(function () {
+  // Same values the app ships with (SupabaseProjectConfig.cs). The key is the
+  // publishable one and is meant to be public.
+  var PROJECT_URL = 'https://pperuinfufndfathcosf.supabase.co';
+  var PUBLISHABLE_KEY = 'sb_publishable_XXTLgr_HJhoIAUt2_X_FgA_DOVeuLa9';
+
+  // Must match DerivedTeamCredentials.cs exactly, or every login fails.
+  var EMAIL_DOMAIN = 'dotorion.invalid';
+  var PASSWORD_NAMESPACE = 'DOTORION.v1';
+
+  var NAME_STORAGE_KEY = 'dotorion.checkin.name';
+
+  var loginForm = document.getElementById('login');
+  var nameInput = document.getElementById('name');
+  var loginButton = document.getElementById('login-button');
+  var loginMessage = document.getElementById('login-message');
+  var panel = document.getElementById('panel');
+  var who = document.getElementById('who');
+  var points = document.getElementById('points');
+  var streak = document.getElementById('streak');
+  var claimButton = document.getElementById('claim');
+  var panelMessage = document.getElementById('panel-message');
+  var logoutButton = document.getElementById('logout');
+
+  var accessToken = null;
+
+  // Mirrors DisplayNamePolicy.Validate: NFKC, collapse and trim whitespace,
+  // then lowercase and NFKC again for the unique key.
+  function uniqueNameKey(raw) {
+    var display = raw.normalize('NFKC').replace(/\s+/gu, ' ').trim();
+    return {
+      display: display,
+      key: display.toLowerCase().normalize('NFKC')
+    };
+  }
+
+  function sha256Hex(value) {
+    var bytes = new TextEncoder().encode(value.normalize('NFKC'));
+    return crypto.subtle.digest('SHA-256', bytes).then(function (hash) {
+      return Array.prototype.map.call(new Uint8Array(hash), function (b) {
+        return ('0' + b.toString(16)).slice(-2);
+      }).join('');
+    });
+  }
+
+  function credentialsFor(key) {
+    return Promise.all([
+      sha256Hex(key),
+      sha256Hex(PASSWORD_NAMESPACE + '|' + key)
+    ]).then(function (digests) {
+      return {
+        email: 'm' + digests[0].substring(0, 32) + '@' + EMAIL_DOMAIN,
+        password: digests[1]
+      };
+    });
+  }
+
+  function request(path, body, token) {
+    var headers = { 'apikey': PUBLISHABLE_KEY, 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = 'Bearer ' + token; }
+    return fetch(PROJECT_URL + path, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body || {})
+    }).then(function (response) {
+      return response.text().then(function (text) {
+        var data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
+        if (!response.ok) {
+          var error = new Error((data && (data.error_code || data.code || data.message)) || 'http_' + response.status);
+          error.status = response.status;
+          error.code = data && (data.error_code || data.message);
+          throw error;
+        }
+        return data;
+      });
+    });
+  }
+
+  function rpc(name) {
+    return request('/rest/v1/rpc/' + name, {}, accessToken).then(function (rows) {
+      return Array.isArray(rows) ? rows[0] : rows;
+    });
+  }
+
+  function describeError(error) {
+    if (error.code === 'invalid_credentials') {
+      return '등록되지 않은 이름이에요. 앱에서 먼저 가입해 주세요.';
+    }
+    if (error.code === 'member_identity_mismatch') {
+      return '팀에서 비활성화된 멤버예요.';
+    }
+    if (error.status === 429) {
+      return '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.';
+    }
+    if (error.status === 401 || error.code === 'authentication_required') {
+      return '로그인이 만료됐어요. 다시 로그인해 주세요.';
+    }
+    if (error instanceof TypeError) {
+      return '서버에 연결할 수 없어요. 인터넷 연결을 확인해 주세요.';
+    }
+    return '문제가 생겼어요. (' + error.message + ')';
+  }
+
+  function setMessage(element, text, kind) {
+    element.textContent = text || '';
+    element.className = 'message' + (kind ? ' ' + kind : '');
+  }
+
+  function render(state) {
+    points.textContent = state.total_points + 'P';
+    streak.textContent = state.streak_days + '일';
+    claimButton.disabled = !!state.claimed;
+    claimButton.textContent = state.claimed ? '오늘 출석 완료' : '출석하기';
+  }
+
+  function saveName(name) {
+    try { localStorage.setItem(NAME_STORAGE_KEY, name); } catch (e) { }
+  }
+
+  function loadName() {
+    try { return localStorage.getItem(NAME_STORAGE_KEY); } catch (e) { return null; }
+  }
+
+  function forgetName() {
+    try { localStorage.removeItem(NAME_STORAGE_KEY); } catch (e) { }
+  }
+
+  function showLogin(message) {
+    accessToken = null;
+    panel.hidden = true;
+    loginForm.hidden = false;
+    loginButton.disabled = false;
+    loginButton.textContent = '로그인';
+    setMessage(loginMessage, message, message ? 'error' : null);
+  }
+
+  function signIn(rawName) {
+    var name = uniqueNameKey(rawName);
+    if (!name.key) {
+      showLogin('이름을 입력해 주세요.');
+      return;
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = '로그인 중…';
+    setMessage(loginMessage, '');
+
+    credentialsFor(name.key)
+      .then(function (credentials) {
+        return request('/auth/v1/token?grant_type=password', credentials);
+      })
+      .then(function (session) {
+        accessToken = session.access_token;
+        return rpc('daily_check_in_status');
+      })
+      .then(function (state) {
+        saveName(name.display);
+        who.textContent = name.display;
+        render(state);
+        setMessage(panelMessage, state.claimed ? '오늘은 이미 출석했어요.' : '');
+        loginForm.hidden = true;
+        panel.hidden = false;
+      })
+      .catch(function (error) {
+        showLogin(describeError(error));
+      });
+  }
+
+  loginForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    signIn(nameInput.value);
+  });
+
+  claimButton.addEventListener('click', function () {
+    claimButton.disabled = true;
+    setMessage(panelMessage, '출석하는 중…');
+
+    rpc('claim_daily_check_in')
+      .then(function (state) {
+        render(state);
+        // Same wording as DOTORIONApp.HandleDailyCheckInRequested.
+        if (state.awarded > 0) {
+          setMessage(panelMessage, '출석했습니다. +' + state.awarded + 'P', 'success');
+        } else {
+          setMessage(panelMessage, '오늘은 이미 출석했습니다.');
+        }
+      })
+      .catch(function (error) {
+        if (error.status === 401) {
+          showLogin(describeError(error));
+          return;
+        }
+        claimButton.disabled = false;
+        setMessage(panelMessage, describeError(error), 'error');
+      });
+  });
+
+  logoutButton.addEventListener('click', function () {
+    forgetName();
+    nameInput.value = '';
+    showLogin('');
+    nameInput.focus();
+  });
+
+  if (!window.crypto || !crypto.subtle) {
+    showLogin('이 브라우저에서는 사용할 수 없어요. (HTTPS 필요)');
+    loginButton.disabled = true;
+    return;
+  }
+
+  var saved = loadName();
+  if (saved) {
+    nameInput.value = saved;
+    signIn(saved);
+  }
+})();
+</script>
+</body>
+</html>

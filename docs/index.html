@@ -131,6 +131,9 @@
   }
 
   .note a { color: var(--accent); }
+
+  .checkin-link { color: var(--muted); font-size: 0.9rem; }
+  .checkin-link:hover { color: var(--text); }
 </style>
 </head>
 <body>
@@ -149,6 +152,9 @@
   <div role="tabpanel" id="panel-older" aria-labelledby="tab-older" hidden>
     <div id="older"><p class="note">불러오는 중…</p></div>
   </div>
+
+  <!-- For days away from the PC: claims the daily gift from a phone. -->
+  <a class="checkin-link" href="checkin.html">모바일 출석체크</a>
 
 <script>
 (function () {
