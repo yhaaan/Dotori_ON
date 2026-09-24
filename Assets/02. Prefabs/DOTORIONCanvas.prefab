@@ -3486,13 +3486,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6328611625548622392}
+  m_Father: {fileID: 3931302496259250907}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -91, y: -4}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 76, y: 17}
   m_SizeDelta: {x: 25, y: 24}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 0, y: 0}
 --- !u!222 &6610762661044504711
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3590,7 +3590,8 @@ MonoBehaviour:
   Entries:
   - Slot:
       Id: 57fab51a88d347cb8bafd4fb7dabb248
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Image/Appearance"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Image/Appearance"
       Target: 0
       Mode: 0
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3604,7 +3605,8 @@ MonoBehaviour:
     OriginalTransition: 0
   - Slot:
       Id: 0d7218ac66dc43cf8282c84172bbee98
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/normalColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Button/normalColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3618,7 +3620,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 0a37215ecf304984bbc73265fcecbdbd
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/highlightedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Button/highlightedColor"
       Target: 3
       Mode: 1
       Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
@@ -3632,7 +3635,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 67575cf67d1f41b3abf656592f68c9ce
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/pressedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Button/pressedColor"
       Target: 3
       Mode: 1
       Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -3646,7 +3650,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: bb69569b892d46d3910abc0a98312fcd
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/selectedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Button/selectedColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3660,7 +3665,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 13105d258b814955ad80b7122131a91c
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/disabledColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Button/disabledColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3674,7 +3680,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 9a6f1341e0ca40b9bb4bcf701fb0354c
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/highlightedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Button/highlightedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3688,7 +3695,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 1196f9b3795b4f97b9dfa36cd53317bb
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/pressedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Button/pressedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3702,7 +3710,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 65e1c26d7a394fc79e6d1ed6e509a870
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/selectedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Button/selectedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3716,7 +3725,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 5e18dcf926cd4d70bb937b138652a00d
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/disabledSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break
+        \xB7 Button/disabledSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -5608,14 +5618,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5316444711733610530}
-  - {fileID: 3822710036883253558}
-  - {fileID: 8505984500284826989}
-  - {fileID: 3157063893871759343}
-  - {fileID: 1903598120723351878}
   - {fileID: 2260714033921575884}
   - {fileID: 3058894477374996707}
   - {fileID: 6160656765890850160}
   - {fileID: 8594960366640184317}
+  - {fileID: 7214339252247270747}
   m_Father: {fileID: 7410318593376365862}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -9292,13 +9299,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6328611625548622392}
+  m_Father: {fileID: 3931302496259250907}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -68, y: -4}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 12, y: 17}
   m_SizeDelta: {x: 25, y: 24}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 0, y: 0}
 --- !u!222 &1726453505129159010
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9396,7 +9403,8 @@ MonoBehaviour:
   Entries:
   - Slot:
       Id: 59174f2af9b44d8fa7f859f9a5f5bbaa
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Image/Appearance"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Image/Appearance"
       Target: 0
       Mode: 0
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -9410,7 +9418,8 @@ MonoBehaviour:
     OriginalTransition: 0
   - Slot:
       Id: 735daf16b0af457d9f63c4f6e9cda544
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/normalColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Button/normalColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -9424,7 +9433,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 8c97a874ec09496a94416bed5331e181
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/highlightedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Button/highlightedColor"
       Target: 3
       Mode: 1
       Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
@@ -9438,7 +9448,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 2aaf94753bfc45f5bcb63f568810a9e1
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/pressedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Button/pressedColor"
       Target: 3
       Mode: 1
       Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -9452,7 +9463,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 628305c7abd44dc1b8f7b24fc7c18a3b
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/selectedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Button/selectedColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -9466,7 +9478,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 1d7bef712b3e4400a0475f3dcf3dd4d8
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/disabledColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Button/disabledColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -9480,7 +9493,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 5ffcb94e358d49978ffa74899f463046
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/highlightedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Button/highlightedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -9494,7 +9508,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 19c184a33f1a44e39b592bd0358981c2
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/pressedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Button/pressedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -9508,7 +9523,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: c1597fb09aa94571b29d79a65508d4b9
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/selectedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Button/selectedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -9522,7 +9538,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: f72375a86f134e14b784e515a8d7f3a9
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/disabledSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal
+        \xB7 Button/disabledSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14009,13 +14026,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6328611625548622392}
+  m_Father: {fileID: 3931302496259250907}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -114, y: -4}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 44, y: 32}
   m_SizeDelta: {x: 25, y: 24}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 0, y: 0}
 --- !u!222 &8939273641662874483
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -14113,7 +14130,8 @@ MonoBehaviour:
   Entries:
   - Slot:
       Id: 07af797e5d3d4a9c93b1b08feff1fe43
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Image/Appearance"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Image/Appearance"
       Target: 0
       Mode: 0
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14127,7 +14145,8 @@ MonoBehaviour:
     OriginalTransition: 0
   - Slot:
       Id: 0f230782623c4ffc977a195c4648840d
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/normalColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Button/normalColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14141,7 +14160,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: d7c5bc11eb314a96b88131b648bbb4b6
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/highlightedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Button/highlightedColor"
       Target: 3
       Mode: 1
       Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
@@ -14155,7 +14175,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 77ce9772fbef46999f2b1e44d0c25e40
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/pressedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Button/pressedColor"
       Target: 3
       Mode: 1
       Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -14169,7 +14190,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 35cf34b81b7047789b703c2e47a32b29
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/selectedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Button/selectedColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14183,7 +14205,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 20bade46a6304dd5a9dbdcc5b732c234
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/disabledColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Button/disabledColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14197,7 +14220,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: f9a05442e48a4c9597b9ec1d8fcc8d11
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/highlightedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Button/highlightedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14211,7 +14235,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: fe5d0093de20495b93936b351f23013f
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/pressedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Button/pressedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14225,7 +14250,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 8f91c9b38a4f4ada9a7b5e4a3ffca48a
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/selectedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Button/selectedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14239,7 +14265,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 0f177f4adc904b77b5286da64e9339de
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/disabledSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working
+        \xB7 Button/disabledSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -14767,6 +14794,110 @@ MonoBehaviour:
     Target: {fileID: 5734182083134145969}
     Member: disabledSprite
     OriginalTransition: 1
+--- !u!1 &3129993380513612029
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6224321912414683138}
+  - component: {fileID: 7861292632785564620}
+  - component: {fileID: 8384397708392321867}
+  - component: {fileID: 5791903129017651037}
+  m_Layer: 0
+  m_Name: Handle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &6224321912414683138
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3129993380513612029}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3931302496259250907}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 51, y: 62}
+  m_SizeDelta: {x: 12, y: 8}
+  m_Pivot: {x: 0, y: 0}
+--- !u!222 &7861292632785564620
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3129993380513612029}
+  m_CullTransparentMesh: 1
+--- !u!114 &8384397708392321867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3129993380513612029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -6473538129092287803, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5791903129017651037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3129993380513612029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 2d7c507b35eb4d8aaad3b18426f11cd3
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Handle
+        \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: -6473538129092287803, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 8384397708392321867}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &3172030042578675635
 GameObject:
   m_ObjectHideFlags: 0
@@ -19307,6 +19438,7 @@ MonoBehaviour:
   _dailyCheckInPointsLabel: {fileID: 4818157336460562903}
   _statusNoteInput: {fileID: 1873065509840273366}
   _offlineBackground: {fileID: 4125413752346400431}
+  _activityDock: {fileID: 1381830056578166591}
   _dailyCheckInAvailableSprite: {fileID: -329239408103798631, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
   _dailyCheckInClaimedSprite: {fileID: -6707576332687999409, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
   _feedbackText: {fileID: 3031693403873836149}
@@ -22481,6 +22613,75 @@ MonoBehaviour:
     Target: {fileID: 928828971794956737}
     Member: Appearance
     OriginalTransition: 0
+--- !u!1 &4498371584055437701
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7214339252247270747}
+  - component: {fileID: 8574943634921099751}
+  - component: {fileID: 1381830056578166591}
+  m_Layer: 0
+  m_Name: ActivityDock
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7214339252247270747
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4498371584055437701}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5388363985003520063}
+  - {fileID: 3931302496259250907}
+  m_Father: {fileID: 6328611625548622392}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 114, y: 70}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &8574943634921099751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4498371584055437701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
+--- !u!114 &1381830056578166591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4498371584055437701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3ea2bdf57e144d78faac9113913f2f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.ActivityDockView
+  _tray: {fileID: 3931302496259250907}
+  _hiddenDepth: 59
+  _slideSeconds: 0.18
+  _closeDelaySeconds: 0.35
 --- !u!1 &4518651128726300021
 GameObject:
   m_ObjectHideFlags: 0
@@ -33998,6 +34199,110 @@ MonoBehaviour:
     Target: {fileID: 5317475948015613884}
     Member: Appearance
     OriginalTransition: 0
+--- !u!1 &6518374410355355175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7164692626477251483}
+  - component: {fileID: 5782584413793233551}
+  - component: {fileID: 350451473146279316}
+  - component: {fileID: 4745633296286244382}
+  m_Layer: 0
+  m_Name: Arch
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7164692626477251483
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6518374410355355175}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3931302496259250907}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 113, y: 59}
+  m_Pivot: {x: 0, y: 0}
+--- !u!222 &5782584413793233551
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6518374410355355175}
+  m_CullTransparentMesh: 1
+--- !u!114 &350451473146279316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6518374410355355175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 8721910874991129212, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4745633296286244382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6518374410355355175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cb924fef84317468959fd08381ba6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONThemeBinding
+  Entries:
+  - Slot:
+      Id: 06391129883b49faa75a841a356b9df9
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Arch
+        \xB7 Image/Appearance"
+      Target: 0
+      Mode: 0
+      Color: {r: 1, g: 1, b: 1, a: 1}
+      Sprite: {fileID: 8721910874991129212, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      RuntimeColor: 0
+      RuntimeSprite: 0
+      AllowsSprite: 1
+      ColorRole: 0
+    Target: {fileID: 350451473146279316}
+    Member: Appearance
+    OriginalTransition: 0
 --- !u!1 &6557401640849563069
 GameObject:
   m_ObjectHideFlags: 0
@@ -37675,6 +37980,47 @@ MonoBehaviour:
     Target: {fileID: 4146934558176822679}
     Member: Appearance
     OriginalTransition: 0
+--- !u!1 &7304396336514646620
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3931302496259250907}
+  m_Layer: 0
+  m_Name: Tray
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &3931302496259250907
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7304396336514646620}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7164692626477251483}
+  - {fileID: 6224321912414683138}
+  - {fileID: 8505984500284826989}
+  - {fileID: 3157063893871759343}
+  - {fileID: 1903598120723351878}
+  - {fileID: 3822710036883253558}
+  m_Father: {fileID: 7214339252247270747}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 114, y: 70}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!1 &7313713589598381090
 GameObject:
   m_ObjectHideFlags: 0
@@ -41238,6 +41584,81 @@ MonoBehaviour:
     Target: {fileID: 12397686327340523}
     Member: Appearance
     OriginalTransition: 0
+--- !u!1 &7727044698981398869
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5388363985003520063}
+  - component: {fileID: 283981060410584274}
+  - component: {fileID: 3817641879499471540}
+  m_Layer: 0
+  m_Name: HoverZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5388363985003520063
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7727044698981398869}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7214339252247270747}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 64, y: 28}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!222 &283981060410584274
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7727044698981398869}
+  m_CullTransparentMesh: 1
+--- !u!114 &3817641879499471540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7727044698981398869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &7742026181599590776
 GameObject:
   m_ObjectHideFlags: 0
@@ -47699,13 +48120,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6328611625548622392}
+  m_Father: {fileID: 3931302496259250907}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -12.5, y: -4}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 44, y: 4}
   m_SizeDelta: {x: 25, y: 24}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 0, y: 0}
 --- !u!222 &6330126443314655229
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -47803,7 +48224,8 @@ MonoBehaviour:
   Entries:
   - Slot:
       Id: 50d39c0e51054ae79300a8d16852fa2a
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Image/Appearance"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Image/Appearance"
       Target: 0
       Mode: 0
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -47817,7 +48239,8 @@ MonoBehaviour:
     OriginalTransition: 0
   - Slot:
       Id: b6ba0871d5af46a5ba4056ece3fbf88c
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/normalColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Button/normalColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -47831,7 +48254,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 251439740e36451b9befd60b5dd433f9
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/highlightedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Button/highlightedColor"
       Target: 3
       Mode: 1
       Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
@@ -47845,7 +48269,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: ec981b44042247199f0d3ebb603e4275
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/pressedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Button/pressedColor"
       Target: 3
       Mode: 1
       Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -47859,7 +48284,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 17ca10b4c2f8423cb768c5ec77a358ea
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/selectedColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Button/selectedColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -47873,7 +48299,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: a3ea891a556f42d7be1379905d4e9541
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/disabledColor"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Button/disabledColor"
       Target: 3
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -47887,7 +48314,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 261e3e8248694df19283fecd99549dce
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/highlightedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Button/highlightedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -47901,7 +48329,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: f99142e2e29b4d02937906cb602e2a7c
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/pressedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Button/pressedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -47915,7 +48344,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 9ac75ccf968447489c5979f5465987af
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/selectedSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Button/selectedSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}
@@ -47929,7 +48359,8 @@ MonoBehaviour:
     OriginalTransition: 1
   - Slot:
       Id: 9d0bb577d82c407490abb30f88e9954c
-      Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/disabledSprite"
+      Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut
+        \xB7 Button/disabledSprite"
       Target: 4
       Mode: 1
       Color: {r: 1, g: 1, b: 1, a: 1}

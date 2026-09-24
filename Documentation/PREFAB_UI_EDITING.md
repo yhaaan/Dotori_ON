@@ -123,6 +123,32 @@ ColorTint는 **곱하기**라 흰색보다 밝게는 못 만듭니다. hover에�
 
 시스템 트레이로 숨기는 `숨김` 버튼은 제거했습니다. 트레이 아이콘이 Windows 11의 오버플로 영역에 가려지면 창을 되찾을 방법이 없고, `forceSingleInstance` 때문에 재실행까지 막혀 작업 관리자로 프로세스를 죽여야 했습니다. 최소화는 항상 작업 표시줄에 남으므로 같은 용도를 안전하게 대신합니다.
 
+## 퇴근·상태 아치
+
+`퇴근`·`작업중`·`쉬는중`·`식사중`은 하단 가운데의 아치(`LocalControls/ActivityDock`)에 얹혀 있습니다. 평소에는 창 아래 끝에 돔 손잡이만 보이고, 그 근처에 마우스를 올리거나 손잡이를 클릭하면 아치가 올라옵니다. 출근 중에만 보입니다.
+
+```
+ActivityDock   RectMask2D + ActivityDockView — 이 rect 밖은 그려지지도 눌리지도 않음
+├ HoverZone    투명 Image — 접혀 있을 때 "근처"로 치는 범위
+└ Tray         올라오고 내려가는 묶음
+  ├ Arch       UI_sheet_15
+  ├ Handle     UI_sheet_9 (돔)
+  ├ Working · Break · Meal
+  └ CheckOut   아치 안쪽 빈 곳
+```
+
+**프리팹에는 펼친 모습으로 저장합니다.** `Tray`를 둔 위치가 곧 펼친 위치이고, 실행하면 `_hiddenDepth`(59px)만큼 내려가 접힌 채로 시작합니다. 59는 아치 높이와 같아서 아치 윗변이 창 아래 끝에 딱 걸리고 그 위 3px 틈에 돔만 남습니다. 아치를 키우거나 돔 위치를 바꾸면 이 값도 같이 맞춥니다.
+
+| 바꾸고 싶은 것 | 어디 |
+| --- | --- |
+| 버튼·아치·돔 위치 | `Tray` 아래 각 오브젝트의 rect |
+| "근처"의 범위 | `HoverZone`의 크기. 단 `ActivityDock` rect 밖으로 나가면 마스크에 잘려 반응하지 않습니다 |
+| 속도·닫힘 지연 | `ActivityDockView`의 `_slideSeconds`(0.18초)·`_closeDelaySeconds`(0.35초) |
+
+**`ActivityDock`의 RectMask2D를 지우면 안 됩니다.** 접힌 아치는 창 아래 220px 너머에 있는데, 거기는 통계·설정 패널이 열리는 자리라 마스크가 없으면 패널 위에 아치가 그려지고 클릭까지 가로챕니다.
+
+**호버는 창이 마우스 입력을 받을 때만 동작합니다.** 창이 포커스를 잃은 동안에는 Input System의 기본 background behavior가 마우스를 멈춰 둘 수 있어서, 손잡이 근처를 클릭해도 열리게 해 두었습니다.
+
 ## 상태 메모 입력칸
 
 하단 컨트롤 바 오른쪽의 `StatusNoteInput`(`DOTORIONView._statusNoteInput`)은 지금 뭘 하는지 24자까지 적는 칸입니다. 출근 중일 때만 보이고, Enter를 누르거나 포커스를 잃으면 저장됩니다. 서버가 퇴근 시 자동으로 비웁니다.

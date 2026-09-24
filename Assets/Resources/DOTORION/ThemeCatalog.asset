@@ -2214,7 +2214,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 50d39c0e51054ae79300a8d16852fa2a
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Image/Appearance"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Image/Appearance"
     Target: 0
     Mode: 0
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2224,7 +2224,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: b6ba0871d5af46a5ba4056ece3fbf88c
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/normalColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Button/normalColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2234,7 +2234,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 251439740e36451b9befd60b5dd433f9
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/highlightedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Button/highlightedColor"
     Target: 3
     Mode: 1
     Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
@@ -2244,7 +2244,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: ec981b44042247199f0d3ebb603e4275
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/pressedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Button/pressedColor"
     Target: 3
     Mode: 1
     Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -2254,7 +2254,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 17ca10b4c2f8423cb768c5ec77a358ea
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/selectedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Button/selectedColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2264,7 +2264,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: a3ea891a556f42d7be1379905d4e9541
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/disabledColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Button/disabledColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2274,7 +2274,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 261e3e8248694df19283fecd99549dce
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/highlightedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Button/highlightedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2284,7 +2284,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: f99142e2e29b4d02937906cb602e2a7c
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/pressedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Button/pressedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2294,7 +2294,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 9ac75ccf968447489c5979f5465987af
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/selectedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Button/selectedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2304,7 +2304,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 9d0bb577d82c407490abb30f88e9954c
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/CheckOut \xB7 Button/disabledSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/CheckOut \xB7 Button/disabledSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2314,7 +2314,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 07af797e5d3d4a9c93b1b08feff1fe43
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Image/Appearance"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Image/Appearance"
     Target: 0
     Mode: 0
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2324,7 +2324,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 0f230782623c4ffc977a195c4648840d
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/normalColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Button/normalColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2334,7 +2334,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: d7c5bc11eb314a96b88131b648bbb4b6
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/highlightedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Button/highlightedColor"
     Target: 3
     Mode: 1
     Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
@@ -2344,7 +2344,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 77ce9772fbef46999f2b1e44d0c25e40
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/pressedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Button/pressedColor"
     Target: 3
     Mode: 1
     Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -2354,7 +2354,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 35cf34b81b7047789b703c2e47a32b29
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/selectedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Button/selectedColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2364,7 +2364,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 20bade46a6304dd5a9dbdcc5b732c234
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/disabledColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Button/disabledColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2374,7 +2374,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: f9a05442e48a4c9597b9ec1d8fcc8d11
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/highlightedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Button/highlightedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2384,7 +2384,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: fe5d0093de20495b93936b351f23013f
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/pressedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Button/pressedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2394,7 +2394,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 8f91c9b38a4f4ada9a7b5e4a3ffca48a
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/selectedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Button/selectedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2404,7 +2404,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 0f177f4adc904b77b5286da64e9339de
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Working \xB7 Button/disabledSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Working \xB7 Button/disabledSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2414,7 +2414,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 57fab51a88d347cb8bafd4fb7dabb248
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Image/Appearance"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Image/Appearance"
     Target: 0
     Mode: 0
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2424,7 +2424,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 0d7218ac66dc43cf8282c84172bbee98
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/normalColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Button/normalColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2434,7 +2434,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 0a37215ecf304984bbc73265fcecbdbd
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/highlightedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Button/highlightedColor"
     Target: 3
     Mode: 1
     Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
@@ -2444,7 +2444,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 67575cf67d1f41b3abf656592f68c9ce
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/pressedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Button/pressedColor"
     Target: 3
     Mode: 1
     Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -2454,7 +2454,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: bb69569b892d46d3910abc0a98312fcd
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/selectedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Button/selectedColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2464,7 +2464,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 13105d258b814955ad80b7122131a91c
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/disabledColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Button/disabledColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2474,7 +2474,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 9a6f1341e0ca40b9bb4bcf701fb0354c
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/highlightedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Button/highlightedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2484,7 +2484,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 1196f9b3795b4f97b9dfa36cd53317bb
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/pressedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Button/pressedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2494,7 +2494,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 65e1c26d7a394fc79e6d1ed6e509a870
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/selectedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Button/selectedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2504,7 +2504,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 5e18dcf926cd4d70bb937b138652a00d
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Break \xB7 Button/disabledSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Break \xB7 Button/disabledSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2514,7 +2514,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 59174f2af9b44d8fa7f859f9a5f5bbaa
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Image/Appearance"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Image/Appearance"
     Target: 0
     Mode: 0
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2524,7 +2524,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 735daf16b0af457d9f63c4f6e9cda544
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/normalColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Button/normalColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2534,7 +2534,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 8c97a874ec09496a94416bed5331e181
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/highlightedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Button/highlightedColor"
     Target: 3
     Mode: 1
     Color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
@@ -2544,7 +2544,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 2aaf94753bfc45f5bcb63f568810a9e1
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/pressedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Button/pressedColor"
     Target: 3
     Mode: 1
     Color: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -2554,7 +2554,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 628305c7abd44dc1b8f7b24fc7c18a3b
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/selectedColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Button/selectedColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2564,7 +2564,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 1d7bef712b3e4400a0475f3dcf3dd4d8
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/disabledColor"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Button/disabledColor"
     Target: 3
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2574,7 +2574,7 @@ MonoBehaviour:
     AllowsSprite: 0
     ColorRole: 0
   - Id: 5ffcb94e358d49978ffa74899f463046
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/highlightedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Button/highlightedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2584,7 +2584,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: 19c184a33f1a44e39b592bd0358981c2
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/pressedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Button/pressedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2594,7 +2594,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: c1597fb09aa94571b29d79a65508d4b9
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/selectedSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Button/selectedSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2604,7 +2604,7 @@ MonoBehaviour:
     AllowsSprite: 1
     ColorRole: 0
   - Id: f72375a86f134e14b784e515a8d7f3a9
-    Label: "DOTORIONCanvas/WindowBackground/LocalControls/Meal \xB7 Button/disabledSprite"
+    Label: "DOTORIONCanvas/WindowBackground/LocalControls/ActivityDock/Tray/Meal \xB7 Button/disabledSprite"
     Target: 4
     Mode: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
