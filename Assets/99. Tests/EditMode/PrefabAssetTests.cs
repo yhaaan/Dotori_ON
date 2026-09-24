@@ -346,6 +346,33 @@ namespace DOTORION.Tests.EditMode
             Assert.That(appData.FindProperty("_firstRunNamePrefab").objectReferenceValue, Is.EqualTo(name));
         }
 
+        [Test]
+        public void ActivityDock_CarriesClockOutAndStatusButtonsOnItsTray()
+        {
+            var main = AssetDatabase.LoadAssetAtPath<DOTORIONView>(
+                "Assets/02. Prefabs/DOTORIONCanvas.prefab");
+            var mainData = new SerializedObject(main);
+            AssertReference(mainData, "_activityDock");
+            var dock = (ActivityDockView)mainData.FindProperty("_activityDock").objectReferenceValue;
+            var dockData = new SerializedObject(dock);
+            AssertReference(dockData, "_tray");
+            var tray = (RectTransform)dockData.FindProperty("_tray").objectReferenceValue;
+            Assert.That(tray.IsChildOf(dock.transform), Is.True);
+
+            // The dock hides these by hiding itself, and slides them by sliding
+            // the tray, so a button left outside it would stay on screen folded.
+            foreach (var field in new[] { "_checkOutButton", "_workingButton", "_breakButton", "_mealButton" })
+            {
+                AssertReference(mainData, field);
+                var button = (Button)mainData.FindProperty(field).objectReferenceValue;
+                Assert.That(button.transform.IsChildOf(tray), Is.True, field);
+            }
+
+            // Folded, the arch sits below the compact window, which is exactly
+            // where the statistics and settings panels open.
+            Assert.That(dock.GetComponent<RectMask2D>(), Is.Not.Null);
+        }
+
         private static void AssertReference(SerializedObject data, string propertyName)
         {
             var property = data.FindProperty(propertyName);
