@@ -34,6 +34,28 @@ namespace DOTORION.Tests.EditMode
                 main.transform.Find(
                     "WindowBackground/SettingsPanel/HideFromTaskbarToggle"),
                 Is.Not.Null);
+
+            // Two round theme buttons sit right of the "설정" heading, one per
+            // entry in the app's _themes list, and each has to be clickable.
+            var swatches = settingsData.FindProperty("_themeSwatches");
+            Assert.That(swatches.arraySize, Is.EqualTo(2));
+            var heading = main.transform.Find("WindowBackground/SettingsPanel/Heading")
+                .GetComponent<RectTransform>();
+            for (var index = 0; index < swatches.arraySize; index++)
+            {
+                var swatch = (Image)swatches.GetArrayElementAtIndex(index).objectReferenceValue;
+                Assert.That(swatch, Is.Not.Null, "_themeSwatches[" + index + "]");
+                Assert.That(swatch.GetComponent<Button>(), Is.Not.Null, swatch.name);
+                Assert.That(swatch.raycastTarget, Is.True, swatch.name);
+                Assert.That(swatch.transform.parent, Is.SameAs(settingsRect.transform), swatch.name);
+                Assert.That(
+                    swatch.rectTransform.anchoredPosition.y,
+                    Is.EqualTo(heading.anchoredPosition.y),
+                    swatch.name + " sits on the heading's line");
+            }
+
+            AssertReference(settingsData, "_swatchSprite");
+            AssertReference(settingsData, "_swatchSelectedSprite");
         }
 
         [Test]
@@ -343,6 +365,15 @@ namespace DOTORION.Tests.EditMode
 
             var appData = new SerializedObject(app);
             Assert.That(appData.FindProperty("_mainViewPrefab").objectReferenceValue, Is.EqualTo(main));
+            // The round theme buttons in the settings panel pick from this
+            // list, so a missing or one-entry list would leave them pointing
+            // at nothing.
+            var themes = appData.FindProperty("_themes");
+            Assert.That(themes.arraySize, Is.EqualTo(2));
+            for (var index = 0; index < themes.arraySize; index++)
+            {
+                Assert.That(themes.GetArrayElementAtIndex(index).objectReferenceValue, Is.Not.Null, "_themes[" + index + "]");
+            }
             Assert.That(appData.FindProperty("_firstRunNamePrefab").objectReferenceValue, Is.EqualTo(name));
         }
 
