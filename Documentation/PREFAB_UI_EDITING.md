@@ -143,7 +143,9 @@ ActivityDock   RectMask2D + ActivityDockView — 이 rect 밖은 그려지지도
 | --- | --- |
 | 버튼·아치·돔 위치 | `Tray` 아래 각 오브젝트의 rect |
 | "근처"의 범위 | `HoverZone`의 크기. 단 `ActivityDock` rect 밖으로 나가면 마스크에 잘려 반응하지 않습니다 |
-| 속도·닫힘 지연 | `ActivityDockView`의 `_slideSeconds`(0.18초)·`_closeDelaySeconds`(0.35초) |
+| 속도 | `ActivityDockView`의 `_openSeconds`(0.14초)·`_closeSeconds`(0.15초) |
+| 움직임(ease) | `_openCurve`(빠르게 출발해 부드럽게 멈춤)·`_closeCurve`(천천히 출발해 천천히 멈춤). 인스펙터에서 커브를 직접 편집합니다 |
+| 닫힘 지연 | `_closeDelaySeconds`(0.35초) |
 
 **`ActivityDock`의 RectMask2D를 지우면 안 됩니다.** 접힌 아치는 창 아래 220px 너머에 있는데, 거기는 통계·설정 패널이 열리는 자리라 마스크가 없으면 패널 위에 아치가 그려지고 클릭까지 가로챕니다.
 
