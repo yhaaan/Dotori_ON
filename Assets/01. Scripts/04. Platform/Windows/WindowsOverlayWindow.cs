@@ -89,34 +89,34 @@ namespace DOTORION.Platform.Windows
 
         /// <summary>
         /// Extra height the statistics panel needs under the compact layout. It
-        /// mirrors the panel's own height in the prefab, which PrefabAssetTests
-        /// pins so the two cannot drift apart.
+        /// mirrors the panel's own height in the prefab, so the two have to change
+        /// together.
         /// </summary>
         public const int StatisticsPanelHeight = 424;
 
         /// <summary>
         /// Extra height the avatar picker needs. Unlike the statistics panel this
         /// one is taken off the top of the window, so it also mirrors the panel's
-        /// height in the prefab; PrefabAssetTests pins the pair.
+        /// height in the prefab, so the two have to change together.
         /// </summary>
         public const int AvatarPickerPanelHeight = 160;
 
         /// <summary>
         /// The mini overlay's client size. It mirrors the panel's own size in the
-        /// prefab, which PrefabAssetTests pins so the two cannot drift apart.
+        /// prefab, so the two have to change together.
         /// Roughly one member card, which is all a name-and-status list needs.
         /// </summary>
         /// <summary>
         /// Extra height the developer dashboard needs. Like the statistics panel
         /// it is taken off the bottom, and it mirrors the panel's own height in
-        /// the prefab; PrefabAssetTests pins the pair.
+        /// the prefab, so the two have to change together.
         /// </summary>
         public const int DashboardPanelHeight = 300;
 
         /// <summary>
         /// Extra height the settings panel needs. Like the statistics panel it is
         /// taken off the bottom, and it mirrors the panel's own height in the
-        /// prefab; PrefabAssetTests pins the pair.
+        /// prefab, so the two have to change together.
         /// </summary>
         public const int SettingsPanelHeight = 268;
 

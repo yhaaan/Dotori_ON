@@ -33,15 +33,14 @@ namespace DOTORION.Editor
         /// <summary>
         /// The avatar picker's own height in the prefab. The window grows upwards
         /// by exactly this much, so it has to match
-        /// <c>WindowsOverlayWindow.AvatarPickerPanelHeight</c>; PrefabAssetTests
-        /// pins the pair. Two rows of cells plus the heading fit in it.
+        /// <c>WindowsOverlayWindow.AvatarPickerPanelHeight</c>. Two rows of cells plus the heading fit in it.
         /// </summary>
         public const float AvatarPickerPanelHeight = 160f;
 
         /// <summary>
         /// The mini overlay's size in the prefab. The window is resized to exactly
         /// this, so it has to match <c>WindowsOverlayWindow.MiniWindowWidth</c>
-        /// and <c>MiniWindowHeight</c>; PrefabAssetTests pins the pairs. It is
+        /// and <c>MiniWindowHeight</c>. It is
         /// authored in real pixels rather than in the 480 wide reference space,
         /// because the canvas scaler is switched off while the mini overlay shows.
         /// Narrow enough to live down the side of a screen: the rows carry the
@@ -54,23 +53,19 @@ namespace DOTORION.Editor
         /// <summary>
         /// The developer dashboard's height in the prefab. The window grows by
         /// exactly this much, so it has to match
-        /// <c>WindowsOverlayWindow.DashboardPanelHeight</c>; PrefabAssetTests pins
-        /// the pair. Six rows plus a header, a footer and the confirmation.
+        /// <c>WindowsOverlayWindow.DashboardPanelHeight</c>. Six rows plus a header, a footer and the confirmation.
         /// </summary>
         public const float DashboardPanelHeight = 300f;
 
         /// <summary>
         /// The settings panel's own height in the prefab. The window grows
         /// downwards by exactly this much, so it has to match
-        /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>; PrefabAssetTests pins
-        /// the pair. The heading and six rows fit in it.
+        /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>. The heading and six rows fit in it.
         /// </summary>
         public const float SettingsPanelHeight = 268f;
 
-        /// <summary>Shared with the migration so the two rows read identically.</summary>
         public const string AutoStartRowLabel = "자동 시작";
 
-        /// <summary>Shared with the migration so the two rows read identically.</summary>
         public const string AutoStartRowHint = "윈도우를 켤 때 같이 실행합니다.";
 
         public const string HideFromTaskbarRowLabel = "작업표시줄";
@@ -86,12 +81,7 @@ namespace DOTORION.Editor
         private const float SettingsRowHeight = 28f;
         private const float SettingsRowSpacing = 8f;
 
-        /// <summary>
-        /// How far down the next settings row starts. Public because the
-        /// migration that adds a row to a prefab already in hand has to move the
-        /// rows below it by exactly this much, and guessing it twice is how the
-        /// two drift apart.
-        /// </summary>
+        /// <summary>How far down the next settings row starts.</summary>
         public const float SettingsRowStep = SettingsRowHeight + SettingsRowSpacing;
 
         private const float DashboardRowTop = 60f;
@@ -488,8 +478,7 @@ namespace DOTORION.Editor
 
         /// <summary>
         /// Makes a card's avatar tile clickable and gives it somewhere to draw a
-        /// picked icon. Shared with the migration command so a prefab that was
-        /// hand-tweaked can gain the feature without being regenerated.
+        /// picked icon.
         /// </summary>
         internal static void AttachAvatarPicking(Image avatar, out Button button, out Image icon)
         {
