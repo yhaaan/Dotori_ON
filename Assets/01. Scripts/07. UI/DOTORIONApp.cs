@@ -169,8 +169,8 @@ namespace DOTORION.UI
             if (prefab == null)
             {
                 Debug.LogError(
-                    "Resources/" + AppPrefabResourcePath + ".prefab is missing. " +
-                    "Run DOTORI ON/Create Missing Editable UI Prefabs to recreate it.");
+                    "Resources/" + AppPrefabResourcePath + ".prefab 파일이 없습니다. " +
+                    "git에서 복구하세요.");
                 return;
             }
 

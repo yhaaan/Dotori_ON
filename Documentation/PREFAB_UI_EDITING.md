@@ -15,9 +15,7 @@
 3. 네 카드에 공통으로 적용할 디자인은 `TeamMemberCard.prefab`에서 수정합니다.
 4. 최초 이름 입력 화면은 `FirstRunNameModal.prefab`에서 수정합니다.
 5. Play 버튼으로 480x220 화면과 버튼 동작을 확인합니다.
-6. `DOTORI ON > Build Windows x86_64`로 빌드합니다.
-
-`DOTORI ON > Create Missing Editable UI Prefabs`는 파일이 없을 때만 생성하며 기존 수정 내용을 덮어쓰지 않습니다.
+6. `DOTORI ON > Windows 빌드 (x86_64)`로 빌드합니다.
 
 **프리팹을 다시 만드는 메뉴는 없습니다.** 프리팹에는 이제 다른 어디에도 없는 아트가 들어 있어서, 재생성은 스프라이트·9-slice·손으로 맞춘 rect를 전부 지웁니다. `DOTORIONPrefabBuilder.RebuildPrefabsFromCommandLine`과 `RebuildCardAndMainView`는 코드로 남아 있으니, 정말 초기화가 필요하면 스크립트에서 이름으로 부르세요. 메뉴에서 실수로 눌릴 일은 없습니다.
 
@@ -368,7 +366,7 @@ update public.members set is_admin = true where display_name = '이름';
 1. `Assets/04. Avatars`에 PNG를 넣습니다.
    - 일반 그림: **128x128 정사각형, 투명 배경**.
    - 픽셀아트: `Assets/04. Avatars/Pixel/` 하위 폴더에 **24x24**(2배) 또는 **16x16**(3배), **48x48**(1:1)도 됩니다. 48의 약수가 아닌 크기는 픽셀 폭이 들쭉날쭉해집니다. 32는 1.5배라 여기에 해당합니다.
-2. `DOTORI ON > Refresh Avatar Catalog From Folder`를 누릅니다. `Resources/DOTORION/TeamAvatarCatalog.asset` 목록이 폴더 내용(하위 폴더 포함)으로 갱신됩니다.
+2. `DOTORI ON > 아바타 카탈로그 폴더에서 갱신`을 누릅니다. `Resources/DOTORION/TeamAvatarCatalog.asset` 목록이 폴더 내용(하위 폴더 포함)으로 갱신됩니다.
 3. 목록에 직접 드래그해서 넣어도 됩니다. 카탈로그가 길어지면 선택창 격자가 그만큼 늘어나고, 두 줄을 넘으면 스크롤됩니다.
 
 임포트 설정은 `AvatarSpriteImporter`가 자동으로 걸어 줍니다. 손으로 만질 필요가 없고, 만져도 다음 재임포트에 되돌아갑니다.

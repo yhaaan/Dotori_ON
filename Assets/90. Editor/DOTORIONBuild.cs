@@ -16,16 +16,7 @@ namespace DOTORION.Editor
         private const string ScenePath = SceneFolder + "/DOTORION.unity";
         private const string BuildPath = "Builds/Windows/DOTORI ON.exe";
 
-        [MenuItem("DOTORI ON/Configure Project")]
-        public static void ConfigureProject()
-        {
-            if (!TryConfigureProject())
-            {
-                Debug.LogWarning("DOTORI ON configuration was cancelled because an open scene has unsaved changes.");
-            }
-        }
-
-        [MenuItem("DOTORI ON/Build Windows x86_64")]
+        [MenuItem("DOTORI ON/Windows 빌드 (x86_64)")]
         public static void BuildWindows()
         {
             if (!TryConfigureProject())
@@ -47,17 +38,17 @@ namespace DOTORION.Editor
             if (summary.result != BuildResult.Succeeded)
             {
                 throw new InvalidOperationException(
-                    $"DOTORI ON Windows build failed: {summary.result} ({summary.totalErrors} errors)");
+                    $"DOTORI ON Windows 빌드에 실패했습니다: {summary.result} (오류 {summary.totalErrors}개)");
             }
 
-            Debug.Log($"DOTORI ON Windows build completed: {Path.GetFullPath(BuildPath)}");
+            Debug.Log($"DOTORI ON Windows 빌드를 마쳤습니다: {Path.GetFullPath(BuildPath)}");
         }
 
         public static void ConfigureProjectFromCommandLine()
         {
             if (!TryConfigureProject())
             {
-                throw new InvalidOperationException("Could not configure the DOTORI ON project.");
+                throw new InvalidOperationException("DOTORI ON 프로젝트를 설정하지 못했습니다.");
             }
         }
 
@@ -73,10 +64,10 @@ namespace DOTORION.Editor
                 return false;
             }
 
-            // Windows builds the per-user paths out of this: PlayerPrefs land in
-            // HKCU\Software\<company>\<product>, and Application.persistentDataPath
-            // is AppData\LocalLow\<company>\<product>. Changing it moves both, so
-            // an install that ran under the old name looks like a first run.
+            // Windows는 이 값으로 사용자별 경로를 만듭니다. PlayerPrefs는
+            // HKCU\Software\<company>\<product>에, Application.persistentDataPath는
+            // AppData\LocalLow\<company>\<product>에 저장됩니다. 값을 바꾸면 둘 다 옮겨 가므로,
+            // 이전 이름으로 실행하던 설치본은 처음 실행한 것처럼 보입니다.
             PlayerSettings.companyName = "Dotori Doguldan";
             PlayerSettings.productName = "DOTORI ON";
             PlayerSettings.defaultScreenWidth = 480;
@@ -88,19 +79,17 @@ namespace DOTORION.Editor
             PlayerSettings.forceSingleInstance = true;
             PlayerSettings.usePlayerLog = true;
 
-            // Re-asserted on every build because the Editor silently restores the
-            // splash under some licences, and it kept coming back after being
-            // switched off by hand.
+            // 빌드할 때마다 다시 꺼 둡니다. 일부 라이선스에서는 에디터가 스플래시를 몰래
+            // 되살리고, 손으로 꺼도 계속 돌아왔습니다.
             PlayerSettings.SplashScreen.show = false;
             PlayerSettings.SplashScreen.showUnityLogo = false;
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
             QualitySettings.vSyncCount = 0;
 
-            // A 480x220 2D overlay gains nothing from D3D12, and the run that froze
-            // logged "IDXGISwapChain::GetFrameStatistics is broken" repeatedly —
-            // this app rewrites its own window style after the swapchain exists,
-            // which D3D12 does not take well. Pinned so the shipped build behaves
-            // like a launch with -force-d3d11.
+            // 480x220 2D 오버레이는 D3D12의 이점이 없습니다. 멈췄던 실행에서
+            // "IDXGISwapChain::GetFrameStatistics is broken"이 반복해서 찍혔는데, 이 앱은
+            // 스왑체인이 만들어진 뒤에 자기 창 스타일을 다시 쓰고, D3D12는 이를 잘 받아들이지
+            // 못합니다. 배포 빌드가 -force-d3d11로 실행한 것과 같게 동작하도록 고정합니다.
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.StandaloneWindows64, false);
             PlayerSettings.SetGraphicsAPIs(
                 BuildTarget.StandaloneWindows64,
@@ -115,7 +104,7 @@ namespace DOTORION.Editor
             };
 
             AssetDatabase.SaveAssets();
-            Debug.Log("DOTORI ON project configured for a 480x220 Windows mock build.");
+            Debug.Log("DOTORI ON 프로젝트를 480x220 Windows 빌드용으로 설정했습니다.");
             return true;
         }
 
@@ -138,7 +127,7 @@ namespace DOTORION.Editor
 
             if (!EditorSceneManager.SaveScene(scene, ScenePath))
             {
-                throw new InvalidOperationException("Failed to create the DOTORI ON bootstrap scene.");
+                throw new InvalidOperationException("DOTORI ON 시작 씬을 만들지 못했습니다.");
             }
         }
 

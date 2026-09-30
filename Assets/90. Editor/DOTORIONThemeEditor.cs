@@ -21,11 +21,11 @@ namespace DOTORION.Editor
         private bool _overridesOnly;
         private int _tab;
 
-        [MenuItem("DOTORI ON/Theme Editor")]
-        public static void Open() => GetWindow<DOTORIONThemeEditor>("Theme Editor");
+        [MenuItem("DOTORI ON/테마 편집기")]
+        public static void Open() => GetWindow<DOTORIONThemeEditor>("테마 편집기");
         public static void Open(DOTORIONTheme theme)
         {
-            var window = GetWindow<DOTORIONThemeEditor>("Theme Editor");
+            var window = GetWindow<DOTORIONThemeEditor>("테마 편집기");
             window._theme = theme;
             window._tab = 0;
         }
@@ -47,7 +47,7 @@ namespace DOTORION.Editor
             {
                 if (GUILayout.Button("기준 목록 연결"))
                 {
-                    Undo.RecordObject(_theme, "Assign catalog");
+                    Undo.RecordObject(_theme, "카탈로그 지정");
                     _theme.Catalog = AssetDatabase.LoadAssetAtPath<DOTORIONThemeCatalog>(CatalogPath);
                     EditorUtility.SetDirty(_theme);
                 }
@@ -85,7 +85,7 @@ namespace DOTORION.Editor
                     EditorGUILayout.LabelField("공통 역할: " + ThemeRoleRules.Label(ThemeRoleRules.RoleOf(slot)), EditorStyles.miniLabel);
                     if (value != null && GUILayout.Button("개별 설정 해제 · 공통 설정 따르기"))
                     {
-                        Undo.RecordObject(_theme, "Clear theme exception");
+                        Undo.RecordObject(_theme, "테마 개별 설정 해제");
                         _theme.Overrides.Remove(value);
                         EditorUtility.SetDirty(_theme);
                         continue;
@@ -100,7 +100,7 @@ namespace DOTORION.Editor
                         }
                         if (GUILayout.Button("이 항목만 개별 설정"))
                         {
-                            Undo.RecordObject(_theme, "Add theme exception");
+                            Undo.RecordObject(_theme, "테마 개별 설정 추가");
                             _theme.Overrides.Add(new ThemeOverride
                             {
                                 Id = slot.Id,
@@ -140,7 +140,7 @@ namespace DOTORION.Editor
                         color = EditorGUILayout.ColorField("새 색상", color);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject(_theme, "Edit theme slot");
+                        Undo.RecordObject(_theme, "테마 항목 수정");
                         if (value == null) { value = new ThemeOverride { Id = slot.Id }; _theme.Overrides.Add(value); }
                         if (mode == ThemeMode.SpriteSwap && value.Mode != mode && !colorOnly) color = Color.white;
                         value.Mode = mode; value.Sprite = sprite; value.Color = color;
@@ -175,7 +175,7 @@ namespace DOTORION.Editor
                     color = EditorGUILayout.ColorField(new GUIContent(ThemeRoleRules.Label(role), slots.Length + "개 연결 + 코드 팔레트"), color, true, false, false);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject(theme, "Change shared palette");
+                        Undo.RecordObject(theme, "공통 팔레트 변경");
                         if (entry == null) { entry = new ThemePaletteOverride { Role = role }; theme.Palette.Add(entry); }
                         entry.Color = color;
                         EditorUtility.SetDirty(theme);
@@ -184,7 +184,7 @@ namespace DOTORION.Editor
                     {
                         if (GUILayout.Button("복원", GUILayout.Width(45)))
                         {
-                            Undo.RecordObject(theme, "Restore shared palette");
+                            Undo.RecordObject(theme, "공통 팔레트 복원");
                             theme.Palette.Remove(entry);
                             EditorUtility.SetDirty(theme);
                         }
@@ -220,7 +220,7 @@ namespace DOTORION.Editor
                     var tint = EditorGUILayout.Toggle("팔레트 / 틴트 유지", entry == null || entry.PreserveTint);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject(_theme, "Replace shared sprite");
+                        Undo.RecordObject(_theme, "공통 이미지 교체");
                         if (entry == null) { entry = new ThemeSpriteOverride { Original = group.Key }; _theme.Sprites.Add(entry); }
                         entry.Replacement = replacement; entry.PreserveTint = tint;
                         EditorUtility.SetDirty(_theme);
@@ -275,10 +275,10 @@ namespace DOTORION.Editor
             AssetDatabase.SaveAssets();
         }
 
-        [MenuItem("DOTORI ON/Themes/Collect Baseline UI")]
+        [MenuItem("DOTORI ON/테마/기준 UI 수집")]
         public static void Collect()
         {
-            if (Application.isPlaying) throw new InvalidOperationException("Stop Play mode before collecting the baseline.");
+            if (Application.isPlaying) throw new InvalidOperationException("기준 UI를 수집하기 전에 Play 모드를 끄세요.");
             var catalog = AssetDatabase.LoadAssetAtPath<DOTORIONThemeCatalog>(CatalogPath);
             if (catalog == null) { catalog = CreateInstance<DOTORIONThemeCatalog>(); AssetDatabase.CreateAsset(catalog, CatalogPath); }
             var slots = new List<ThemeSlot>();
@@ -303,7 +303,7 @@ namespace DOTORION.Editor
                             if (Regex.IsMatch(source, Regex.Escape(field.Name) + @"\.sprite\s*=")) dynamicSprites.Add(graphic);
                         }
                     }
-                    // These views write through local variables rather than their serialized Graphic field.
+                    // 이 뷰들은 직렬화된 Graphic 필드가 아니라 지역 변수를 통해 색을 씁니다.
                     foreach (var view in root.GetComponentsInChildren<DOTORIONView>(true))
                     {
                         var data = new SerializedObject(view);
@@ -368,7 +368,7 @@ namespace DOTORION.Editor
                 if (theme.Catalog == null) { theme.Catalog = catalog; EditorUtility.SetDirty(theme); }
             }
             AssetDatabase.SaveAssets();
-            Debug.Log("Theme catalog collected: " + slots.Count + " slots. Existing baseline values and IDs preserved.");
+            Debug.Log("테마 카탈로그를 수집했습니다: 항목 " + slots.Count + "개. 기존 기준값과 ID는 그대로 유지했습니다.");
         }
     }
 
@@ -378,7 +378,7 @@ namespace DOTORION.Editor
         public override void OnInspectorGUI()
         {
             var theme = (DOTORIONTheme)target;
-            if (GUILayout.Button("Theme Editor 열기 · 이미지 교체 / 개별 예외")) DOTORIONThemeEditor.Open(theme);
+            if (GUILayout.Button("테마 편집기 열기 · 이미지 교체 / 개별 예외")) DOTORIONThemeEditor.Open(theme);
             DOTORIONThemeEditor.DrawPalette(theme);
         }
     }

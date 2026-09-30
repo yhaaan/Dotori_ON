@@ -30,7 +30,7 @@ Unity 의 Project Settings > Player 에서 고쳐도 되고, 파일을 직접 �
 
 ## 2. 빌드
 
-Unity 메뉴에서 **DOTORI ON > Build Windows x86_64** 를 실행한다.
+Unity 메뉴에서 **DOTORI ON > Windows 빌드 (x86_64)** 를 실행한다.
 결과는 `Builds/Windows/` 에 떨어진다.
 
 ## 3. 커밋하고 푸시

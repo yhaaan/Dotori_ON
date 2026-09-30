@@ -70,7 +70,7 @@ Write-Host "    bundleVersion : $version"
 
 Step '사전 점검'
 if (-not (Test-Path -LiteralPath $exePath)) {
-    Fail "빌드가 없다: $exePath`n    Unity 에서 [DOTORI ON > Build Windows x86_64] 를 먼저 실행할 것."
+    Fail "빌드가 없다: $exePath`n    Unity 에서 [DOTORI ON > Windows 빌드 (x86_64)] 를 먼저 실행할 것."
 }
 
 # 버전만 올리고 다시 빌드하지 않은 채 올리는 사고가 가장 흔하다. 빌드 시각이 마지막

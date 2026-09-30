@@ -17,50 +17,47 @@ namespace DOTORION.Editor
         public const string NameViewPath = PrefabFolder + "/FirstRunNameModal.prefab";
         public const string UpdatePromptPath = PrefabFolder + "/UpdatePromptModal.prefab";
 
-        // Resources.Load resolves paths relative to a folder named exactly
-        // "Resources", so this one keeps its engine-given name and sits at the
-        // Assets root rather than taking a numbered folder.
+        // Resources.Load는 이름이 정확히 "Resources"인 폴더를 기준으로 경로를 찾으므로,
+        // 이 폴더만 엔진이 정한 이름을 그대로 쓰고 번호 없이 Assets 바로 아래에 둡니다.
         public const string ResourceFolder = "Assets/Resources/DOTORION";
         public const string AppPath = ResourceFolder + "/DOTORIONApp.prefab";
         public const string SoundsPath = ResourceFolder + "/DOTORIONSounds.asset";
         public const string AvatarCatalogPath = ResourceFolder + "/TeamAvatarCatalog.asset";
         public const string ThemePath = ResourceFolder + "/DarkTheme.asset";
 
-        /// <summary>Where the team drops profile icon images.</summary>
+        /// <summary>팀이 프로필 아이콘 이미지를 넣어 두는 폴더입니다.</summary>
         public const string AvatarSpriteFolder = "Assets/04. Avatars";
         public const string DailyGiftSpritePath = "Assets/05. Sprites/DailyGift.png";
 
         /// <summary>
-        /// The avatar picker's own height in the prefab. The window grows upwards
-        /// by exactly this much, so it has to match
-        /// <c>WindowsOverlayWindow.AvatarPickerPanelHeight</c>. Two rows of cells plus the heading fit in it.
+        /// 프리팹 안에서 아바타 선택창 자체의 높이. 창이 정확히 이만큼 위로 늘어나므로
+        /// <c>WindowsOverlayWindow.AvatarPickerPanelHeight</c>와 같아야 합니다. 셀 두 줄과
+        /// 제목이 들어가는 높이입니다.
         /// </summary>
         public const float AvatarPickerPanelHeight = 160f;
 
         /// <summary>
-        /// The mini overlay's size in the prefab. The window is resized to exactly
-        /// this, so it has to match <c>WindowsOverlayWindow.MiniWindowWidth</c>
-        /// and <c>MiniWindowHeight</c>. It is
-        /// authored in real pixels rather than in the 480 wide reference space,
-        /// because the canvas scaler is switched off while the mini overlay shows.
-        /// Narrow enough to live down the side of a screen: the rows carry the
-        /// name inside the status pill, so there is nothing to put side by side.
+        /// 프리팹 안에서 소형 오버레이의 크기. 창이 정확히 이 크기로 바뀌므로
+        /// <c>WindowsOverlayWindow.MiniWindowWidth</c>·<c>MiniWindowHeight</c>와 같아야 합니다.
+        /// 기준 해상도 480 폭이 아니라 실제 픽셀로 만듭니다. 소형 오버레이가 보이는 동안
+        /// 캔버스 스케일러가 꺼지기 때문입니다. 화면 옆에 세워 둘 수 있을 만큼 좁습니다.
+        /// 각 줄이 상태 pill 안에 이름을 담고 있어서 나란히 놓을 것이 없습니다.
         /// </summary>
         public const float MiniPanelWidth = 75f;
 
         public const float MiniPanelHeight = 130f;
 
         /// <summary>
-        /// The developer dashboard's height in the prefab. The window grows by
-        /// exactly this much, so it has to match
-        /// <c>WindowsOverlayWindow.DashboardPanelHeight</c>. Six rows plus a header, a footer and the confirmation.
+        /// 프리팹 안에서 개발자 대시보드의 높이. 창이 정확히 이만큼 늘어나므로
+        /// <c>WindowsOverlayWindow.DashboardPanelHeight</c>와 같아야 합니다. 여섯 줄과
+        /// 머리글, 바닥글, 확인 문구가 들어가는 높이입니다.
         /// </summary>
         public const float DashboardPanelHeight = 300f;
 
         /// <summary>
-        /// The settings panel's own height in the prefab. The window grows
-        /// downwards by exactly this much, so it has to match
-        /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>. The heading and six rows fit in it.
+        /// 프리팹 안에서 설정 패널 자체의 높이. 창이 정확히 이만큼 아래로 늘어나므로
+        /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>와 같아야 합니다. 제목과 여섯 줄이
+        /// 들어가는 높이입니다.
         /// </summary>
         public const float SettingsPanelHeight = 268f;
 
@@ -76,28 +73,27 @@ namespace DOTORION.Editor
 
         public const string UiScaleRowHint = "4K 모니터에서 전체 화면을 확대합니다.";
 
-        /// <summary>Settings panel geometry, in pixels from the top of the panel.</summary>
+        /// <summary>설정 패널 배치. 패널 위쪽에서 잰 픽셀입니다.</summary>
         private const float SettingsRowTop = 44f;
         private const float SettingsRowHeight = 28f;
         private const float SettingsRowSpacing = 8f;
 
-        /// <summary>How far down the next settings row starts.</summary>
+        /// <summary>다음 설정 줄이 시작하는 간격입니다.</summary>
         public const float SettingsRowStep = SettingsRowHeight + SettingsRowSpacing;
 
         private const float DashboardRowTop = 60f;
         private const float DashboardRowHeight = 32f;
         private const float DashboardRowSpacing = 2f;
 
-        /// <summary>Mini overlay geometry, in pixels from the top of the panel.</summary>
+        /// <summary>소형 오버레이 배치. 패널 위쪽에서 잰 픽셀입니다.</summary>
         internal const float MiniDragStripHeight = 18f;
         internal const float MiniRowTop = 21f;
         internal const float MiniRowHeight = 25f;
         internal const float MiniRowSpacing = 2f;
         internal const int MiniRowCount = 4;
         /// <summary>
-        /// Month calendar geometry, in pixels inside the statistics content area.
-        /// Seven columns across the panel's 480 with a pixel between them, and six
-        /// rows that fit the 340 the content area has.
+        /// 월 달력 배치. 통계 내용 영역 안의 픽셀입니다. 패널 폭 480에 일곱 칸을 1px 간격으로
+        /// 놓고, 내용 영역 340에 맞는 여섯 줄을 둡니다.
         /// </summary>
         private const float CalendarTop = 24f;
         private const float CalendarHeight = 306f;
@@ -108,33 +104,31 @@ namespace DOTORION.Editor
         private const float CalendarCellGap = 1f;
 
         /// <summary>
-        /// How large a profile icon is drawn, on the card and in the picker
-        /// alike. The icon fills its tile edge to edge, so this is also the tile
-        /// size on the card. Pixel art divides into it cleanly at 24 (x2) and 16
-        /// (x3); 32 would land on a half pixel.
+        /// 카드와 선택창에서 프로필 아이콘이 그려지는 크기. 아이콘이 타일을 가장자리까지
+        /// 채우므로 카드의 타일 크기이기도 합니다. 픽셀아트는 24(2배)와 16(3배)에서 깔끔하게
+        /// 나눠 떨어지고, 32는 반 픽셀에 걸립니다.
         /// </summary>
         internal const float AvatarIconSize = 48f;
 
         /// <summary>
-        /// The size one card actually gets on screen, and therefore the size its
-        /// artwork is drawn at. Four cards plus three 5px gaps have to land on
-        /// whole pixels or the pixel art resamples: 4*113 + 3*5 = 467, which is
-        /// why the row is 467 wide inside a 480 window rather than a rounder 468.
+        /// 카드 한 장이 화면에서 실제로 받는 크기이자 그림이 그려지는 크기. 카드 네 장과 5px
+        /// 간격 세 개가 정수 픽셀에 떨어져야 픽셀아트가 리샘플링되지 않습니다.
+        /// 4*113 + 3*5 = 467이라 480 창 안의 줄이 468처럼 둥근 값이 아니라 467 폭입니다.
         /// </summary>
         internal const float CardWidth = 113f;
         internal const float CardHeight = 138f;
         internal const float CardRowSpacing = 5f;
 
-        /// <summary>Card geometry, in pixels from the top of the card.</summary>
+        /// <summary>카드 배치. 카드 위쪽에서 잰 픽셀입니다.</summary>
         internal const float CardAvatarTop = 24f;
         internal const float CardNameTop = 73f;
         internal const float CardStatusTop = 94f;
         internal const float CardDetailTop = 110f;
 
         /// <summary>
-        /// The picker cell is a little larger than the icon so the selected
-        /// colour survives as a ring around it. An icon that filled the cell
-        /// would hide the only mark saying which one is yours.
+        /// 선택창의 셀은 아이콘보다 조금 크게 잡아, 선택된 색이 아이콘 둘레의 고리로
+        /// 남게 합니다. 아이콘이 셀을 꽉 채우면 어느 것이 내 것인지 알려 주는 유일한
+        /// 표시가 가려집니다.
         /// </summary>
         internal const float AvatarCellPadding = 2f;
         internal const float AvatarCellSize = AvatarIconSize + (AvatarCellPadding * 2f);
@@ -142,35 +136,17 @@ namespace DOTORION.Editor
         internal const int AvatarGridColumns = 8;
 
         /// <summary>
-        /// Safe to click: it only fills in prefabs that are missing entirely and
-        /// never overwrites one that exists.
-        /// </summary>
-        [MenuItem("DOTORI ON/Create Missing Editable UI Prefabs")]
-        public static void CreateMissingPrefabs()
-        {
-            if (AllPrefabsExist())
-            {
-                Debug.Log("All DOTORI ON editable UI prefabs already exist. Nothing was overwritten.");
-                Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(MainViewPath);
-                return;
-            }
-            BuildAll();
-        }
-
-        /// <summary>
-        /// Regenerating a prefab throws away everything an artist put into it -
-        /// sprites, nine-slice borders, hand-tuned rects - and the prefabs now
-        /// carry artwork that exists nowhere else. So the rebuilds are no longer
-        /// menu items: nothing in the DOTORI ON menu can destroy that work by
-        /// being clicked. They are still callable by name from a script or the
-        /// command line for the rare deliberate reset.
+        /// 프리팹을 다시 만들면 아티스트가 넣은 스프라이트, 9-slice 경계, 손으로 맞춘 rect가
+        /// 전부 사라지고, 지금 프리팹에는 다른 곳에 없는 아트가 들어 있습니다. 그래서
+        /// 재생성은 메뉴에서 뺐습니다. DOTORI ON 메뉴의 어떤 항목도 클릭만으로 그 작업을
+        /// 망칠 수 없습니다. 정말 초기화해야 할 때는 스크립트나 명령줄에서 이름으로 부를 수
+        /// 있습니다.
         /// </summary>
         public static void RebuildPrefabsFromCommandLine() => BuildAll();
 
         /// <summary>
-        /// Rebuilds the two prefabs a UI change normally touches, and only those.
-        /// The name modal and the app prefab are generated too, so a full rebuild
-        /// churns their YAML alongside a change that never involved them.
+        /// UI를 고칠 때 보통 건드리는 프리팹 둘만 다시 만듭니다. 이름 모달과 앱 프리팹도
+        /// 생성 대상이라, 전체를 다시 만들면 관련 없는 변경에 그쪽 YAML까지 흔들립니다.
         /// </summary>
         public static void RebuildCardAndMainView()
         {
@@ -185,25 +161,17 @@ namespace DOTORION.Editor
         {
             SeedPaletteFromThemeAsset();
             var cardPrefab = AssetDatabase.LoadAssetAtPath<TeamMemberCardView>(CardPath);
-            if (cardPrefab == null) throw new InvalidOperationException("Missing member card prefab.");
+            if (cardPrefab == null) throw new InvalidOperationException("멤버 카드 프리팹이 없습니다.");
             var mainPrefab = BuildMainView(cardPrefab);
             AssetDatabase.SaveAssets();
             Selection.activeObject = mainPrefab.gameObject;
         }
 
-        public static bool AllPrefabsExist()
-        {
-            return File.Exists(CardPath) && File.Exists(MainViewPath) &&
-                   File.Exists(NameViewPath) && File.Exists(AppPath) &&
-                   File.Exists(UpdatePromptPath);
-        }
-
         /// <summary>
-        /// Points the palette at the theme asset before anything is built.
+        /// 무엇이든 만들기 전에 팔레트가 테마 에셋을 가리키게 합니다.
         ///
-        /// The builder bakes colours into the prefabs it writes, and without this
-        /// it would bake the built-in defaults - so a colour tuned in the asset
-        /// would be quietly undone by the next rebuild.
+        /// 빌더는 자기가 쓰는 프리팹에 색을 구워 넣는데, 이게 없으면 내장 기본값을 굽게 되어
+        /// 에셋에서 다듬은 색이 다음 재생성에서 조용히 되돌아갑니다.
         /// </summary>
         private static void SeedPaletteFromThemeAsset()
         {
@@ -224,7 +192,7 @@ namespace DOTORION.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Selection.activeObject = mainPrefab.gameObject;
-            Debug.Log("Created editable DOTORI ON prefabs. Builds will not regenerate or overwrite them.");
+            Debug.Log("편집 가능한 DOTORI ON 프리팹을 만들었습니다. 빌드는 이 프리팹을 다시 만들거나 덮어쓰지 않습니다.");
         }
 
         private static TeamMemberCardView BuildCard()
@@ -268,10 +236,8 @@ namespace DOTORION.Editor
                     TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary, FontStyle.Bold);
                 SetCardLine(name, CardNameTop, 21f);
                 name.text = "김햄초";
-                // Alone among the labels the name is clicked, so it is the only
-                // one that has to be a raycast target. The handle ships disabled:
-                // Bind turns it on for the local member's own card, once they
-                // have clocked out.
+                // 라벨 중 이름만 클릭되므로 raycast target이어야 하는 것도 이것뿐입니다.
+                // 핸들은 꺼진 채로 나가고, 본인 카드에서 퇴근한 뒤에 Bind가 켭니다.
                 name.raycastTarget = true;
                 var nameDoubleClick = name.gameObject.AddComponent<DoubleClickHandle>();
                 nameDoubleClick.enabled = false;
@@ -339,11 +305,9 @@ namespace DOTORION.Editor
                 Button fake = null;
                 var teamNudge = TopButton(topBar.transform, font, "TeamNudge", "전체호출", 105f, 52f);
                 teamNudge.GetComponentInChildren<Text>().fontSize = 9;
-                // Inside the drag area, which is the only part of the bar with
-                // room left: everything to the right of it is buttons, edge to
-                // edge, and the first attempt at this sat underneath 소형. A
-                // Button consumes its own pointer-down, so the window still drags
-                // from everywhere around it.
+                // 드래그 영역 안에 둡니다. 막대에서 자리가 남은 곳이 여기뿐이고, 오른쪽은 버튼이
+                // 가장자리까지 빈틈없이 차 있습니다. 처음 시도는 소형 버튼 뒤에 깔렸습니다.
+                // Button은 자기 pointer-down을 소비하므로 그 주변 어디서나 창은 여전히 드래그됩니다.
                 var dailyCheckIn = TopButtonAt(dragArea.transform, font, "DailyCheckIn", "출석",
                     126f, 36f, DOTORIONPalette.Accent);
                 dailyCheckIn.GetComponentInChildren<Text>().fontSize = 9;
@@ -351,9 +315,8 @@ namespace DOTORION.Editor
                     TextAnchor.MiddleLeft, DOTORIONPalette.Accent, FontStyle.Bold);
                 checkInPoints.text = "0P";
                 UiFactory.AnchorTop(checkInPoints.rectTransform, 166f, 5f, 40f, 22f);
-                // Takes over the slot and the width the rename button had, so the
-                // rest of the bar keeps the offsets it was tuned with. Renaming
-                // moved onto the name it changes, where a double click does it.
+                // 이름 변경 버튼이 차지하던 자리와 폭을 이어받아 나머지 막대가 맞춰 둔 오프셋을
+                // 그대로 유지합니다. 이름 변경은 바뀌는 이름 위로 옮겨 갔고, 더블클릭으로 합니다.
                 var miniMode = TopButton(topBar.transform, font, "MiniMode", "소형", 161f, 54f);
                 var stats = TopButton(topBar.transform, font, "Statistics", "\uD1B5\uACC4", 219f, 48f);
                 var settings = TopButton(topBar.transform, font, "Settings", "설정", 63f, 38f);
@@ -366,9 +329,8 @@ namespace DOTORION.Editor
                 cardsRect.anchorMin = new Vector2(0f, 1f);
                 cardsRect.anchorMax = new Vector2(1f, 1f);
                 cardsRect.pivot = new Vector2(0.5f, 1f);
-                // 6px in on the left, 7px on the right: the odd 13 is what makes
-                // each card exactly CardWidth instead of 113.25, and the half
-                // pixel is spent on the margin where nothing is drawn.
+                // 왼쪽 6px, 오른쪽 7px: 홀수 13이 각 카드를 113.25가 아니라 정확히 CardWidth로
+                // 만들고, 남는 반 픽셀은 아무것도 그려지지 않는 여백에 씁니다.
                 cardsRect.anchoredPosition = new Vector2(-0.5f, -36f);
                 cardsRect.sizeDelta = new Vector2(
                     -(480f - ((CardWidth * 4f) + (CardRowSpacing * 3f))),
@@ -406,7 +368,7 @@ namespace DOTORION.Editor
                 var noteInput = noteBackground.gameObject.AddComponent<InputField>();
                 noteInput.targetGraphic = noteBackground;
                 noteInput.lineType = InputField.LineType.SingleLine;
-                // Matches the 24-character check on member_current_state.status_note.
+                // member_current_state.status_note의 24자 검사와 맞춥니다.
                 noteInput.characterLimit = 24;
                 noteInput.caretColor = DOTORIONPalette.TextPrimary;
                 var noteText = UiFactory.CreateText("Text", noteBackground.transform, font, 10,
@@ -427,20 +389,16 @@ namespace DOTORION.Editor
                 UiFactory.Stretch(feedback.rectTransform, 4f, 0f, 4f, 31f);
 
                 var statisticsPanel = BuildStatisticsPanel(background.transform, font);
-                // A child of the window background like the statistics panel, and
-                // it unfolds downwards the same way.
+                // 통계 패널처럼 창 배경의 자식이고, 같은 방식으로 아래로 펼쳐집니다.
                 var settingsPanel = BuildSettingsPanel(background.transform, font);
-                // A sibling of the window background rather than a child of it:
-                // the picker owns the top strip of the canvas and the background
-                // is pushed down under it, which is what lets the window grow
-                // upwards without moving anything inside the compact layout.
+                // 창 배경의 자식이 아니라 형제입니다. 선택창이 캔버스 맨 위 띠를 차지하고 배경이
+                // 그 아래로 밀리는 구조라, 기본 레이아웃 안의 어떤 것도 옮기지 않고 창이 위로
+                // 늘어날 수 있습니다.
                 var avatarPicker = BuildAvatarPickerPanel(root.transform, font);
-                // Also a sibling of the window background rather than a child of
-                // it, for a different reason: the mini overlay replaces the whole
-                // overlay instead of folding out of it.
+                // 이것도 창 배경의 형제인데 이유가 다릅니다. 소형 오버레이는 전체 오버레이에서
+                // 펼쳐지는 것이 아니라 그것을 통째로 대체합니다.
                 var miniPanel = BuildMiniPanel(root.transform, font);
-                // A child of the window background, like the statistics panel: it
-                // unfolds downwards under the overlay rather than replacing it.
+                // 통계 패널처럼 창 배경의 자식입니다. 오버레이를 대체하지 않고 그 아래로 펼쳐집니다.
                 var dashboard = BuildDashboardPanel(background.transform, font);
                 var view = root.GetComponent<DOTORIONView>();
                 var serialized = new SerializedObject(view);
@@ -477,15 +435,13 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// Makes a card's avatar tile clickable and gives it somewhere to draw a
-        /// picked icon.
+        /// 카드의 아바타 타일을 클릭할 수 있게 하고, 고른 아이콘이 그려질 자리를 만듭니다.
         /// </summary>
         internal static void AttachAvatarPicking(Image avatar, out Button button, out Image icon)
         {
-            // The tile keeps its status colour, so the button must not tint it: a
-            // hover that repainted the tile would read as a status change. The
-            // picked icon is inset instead of filling the tile, which leaves the
-            // status colour as a frame around it.
+            // 타일은 상태색을 유지하므로 버튼이 색을 덧입히면 안 됩니다. hover로 타일이 다시
+            // 칠해지면 상태가 바뀐 것처럼 읽힙니다. 고른 아이콘은 타일을 채우지 않고 안쪽에
+            // 들어가서, 상태색이 아이콘 둘레의 테두리로 남습니다.
             button = avatar.GetComponent<Button>();
             if (button == null)
             {
@@ -499,21 +455,19 @@ namespace DOTORION.Editor
             icon = existing != null
                 ? existing.GetComponent<Image>()
                 : UiFactory.CreateImage("Icon", avatar.transform, Color.white);
-            // Edge to edge: a margin inside the tile reads as the picture being
-            // smaller than the space made for it.
+            // 가장자리까지 채웁니다. 타일 안에 여백이 있으면 그림이 자리보다 작게 보입니다.
             UiFactory.Stretch(icon.rectTransform);
             icon.raycastTarget = false;
             icon.preserveAspect = true;
             icon.enabled = false;
-            // Above the tile but under the initial, which is what shows when
-            // nobody has picked an icon yet.
+            // 타일 위, 글자 머리글자 아래입니다. 아직 아무도 아이콘을 고르지 않았을 때 보이는 것이
+            // 머리글자입니다.
             icon.transform.SetSiblingIndex(0);
         }
 
         /// <summary>
-        /// The icon grid. The cells are not built here: the catalog is an asset
-        /// the team keeps adding to, so the panel clones one template at runtime
-        /// as many times as the catalog is long.
+        /// 아이콘 격자. 셀은 여기서 만들지 않습니다. 카탈로그는 팀이 계속 늘리는 에셋이라,
+        /// 패널이 실행 중에 템플릿 하나를 카탈로그 길이만큼 복제합니다.
         /// </summary>
         internal static AvatarPickerPanelView BuildAvatarPickerPanel(Transform parent, Font font)
         {
@@ -535,9 +489,8 @@ namespace DOTORION.Editor
                 null, DOTORIONPalette.Accent);
             UiFactory.AnchorRight(confirm.GetComponent<RectTransform>(), 10f, 6f, 56f, 24f);
 
-            // RectMask2D clips without needing a mask sprite, and the scroll rect
-            // uses the viewport as its own so there is one fewer object to keep
-            // in sync with the panel height.
+            // RectMask2D는 마스크 스프라이트 없이 잘라 내고, 스크롤 rect는 viewport를 자기 것으로
+            // 써서 패널 높이와 맞춰 둘 오브젝트가 하나 줄어듭니다.
             var viewport = UiFactory.CreateImage("Viewport", panel.transform, new Color(0f, 0f, 0f, 0.001f));
             UiFactory.Stretch(viewport.rectTransform, 10f, 8f, 10f, 34f);
             viewport.gameObject.AddComponent<RectMask2D>();
@@ -568,8 +521,8 @@ namespace DOTORION.Editor
             var template = UiFactory.CreateButton("OptionTemplate", content.transform, font, string.Empty);
             UnityEngine.Object.DestroyImmediate(template.transform.Find("Label").gameObject);
             var templateIcon = UiFactory.CreateImage("Icon", template.transform, Color.white);
-            // Same drawn size as the card tile, so pixel art lands on whole
-            // pixels in both places instead of being resampled in one of them.
+            // 카드 타일과 같은 그려지는 크기라서 픽셀아트가 두 곳 모두 정수 픽셀에 놓이고, 한쪽에서만
+            // 리샘플링되는 일이 없습니다.
             UiFactory.Stretch(
                 templateIcon.rectTransform,
                 AvatarCellPadding, AvatarCellPadding, AvatarCellPadding, AvatarCellPadding);
@@ -591,9 +544,8 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// The mini overlay: a drag strip and four name-and-status lines, sized
-        /// to about one member card. It ships switched off, and the app swaps it
-        /// for the window background rather than showing both.
+        /// 소형 오버레이: 드래그 띠와 이름·상태 줄 네 개로, 멤버 카드 한 장 정도 크기입니다.
+        /// 꺼진 채로 나가며, 앱이 창 배경과 둘을 함께 보여 주지 않고 서로 바꿔 끼웁니다.
         /// </summary>
         private static MiniOverlayPanelView BuildMiniPanel(Transform parent, Font font)
         {
@@ -605,9 +557,8 @@ namespace DOTORION.Editor
             panelRect.sizeDelta = new Vector2(MiniPanelWidth, MiniPanelHeight);
             var panelView = panel.gameObject.AddComponent<MiniOverlayPanelView>();
 
-            // The strip is the only part that drags, because a body that started
-            // a native window drag on pointer down would swallow the first half
-            // of the double click that brings the full overlay back.
+            // 드래그하는 곳은 띠뿐입니다. 본문이 pointer down에서 네이티브 창 드래그를 시작하면
+            // 전체 오버레이로 돌아오는 더블클릭의 첫 번째 클릭이 사라집니다.
             var strip = UiFactory.CreateImage("MiniDragStrip", panel.transform, DOTORIONPalette.TopBar);
             strip.rectTransform.anchorMin = new Vector2(0f, 1f);
             strip.rectTransform.anchorMax = new Vector2(1f, 1f);
@@ -639,9 +590,9 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// One mini line. Nothing in it is a raycast target: the whole body has
-        /// to reach the panel's double click handler, and a pill that ate the
-        /// click would leave dead spots you cannot restore the overlay from.
+        /// 소형 오버레이의 한 줄. 안의 어떤 것도 raycast target이 아닙니다. 본문 전체가 패널의
+        /// 더블클릭 처리기에 닿아야 하고, 클릭을 먹는 pill이 있으면 오버레이를 되돌릴 수 없는
+        /// 죽은 영역이 생깁니다.
         /// </summary>
         private static MiniMemberRowView BuildMiniRow(Transform parent, Font font, int index)
         {
@@ -655,12 +606,10 @@ namespace DOTORION.Editor
             rowRect.sizeDelta = new Vector2(0f, MiniRowHeight);
             var rowView = row.AddComponent<MiniMemberRowView>();
 
-            // The pill is the row. At 75px wide there is nothing to put beside
-            // it, so the name goes on top of the status colour instead of
-            // competing with it for the width.
-            // Anchored from the top with whole-pixel offsets rather than
-            // centred: 18 inside 25, and 7 inside 18, both land on a half pixel
-            // if you centre them, and a half pixel is where a pixel font blurs.
+            // pill이 곧 줄입니다. 폭 75px에서는 옆에 놓을 자리가 없어서, 이름이 상태색과 폭을
+            // 다투지 않고 그 위에 올라앉습니다.
+            // 가운데 정렬 대신 위에서 잰 정수 픽셀 오프셋으로 놓습니다. 25 안의 18, 18 안의 7은
+            // 가운데에 놓으면 반 픽셀에 걸리고, 픽셀 폰트가 흐려지는 곳이 반 픽셀입니다.
             var pill = UiFactory.CreateImage("Pill", row.transform, DOTORIONPalette.Working);
             var pillRect = pill.rectTransform;
             pillRect.anchorMin = pillRect.anchorMax = new Vector2(0f, 1f);
@@ -691,9 +640,8 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// The rounded pill and its dot are the only shaped graphics in the UI,
-        /// which is otherwise flat rectangles. Unity ships both, so neither costs
-        /// the project an imported sprite.
+        /// 둥근 pill과 점은 평평한 사각형뿐인 UI에서 모양이 있는 유일한 그래픽입니다. 둘 다
+        /// Unity가 기본 제공하므로 프로젝트에 스프라이트를 따로 들이지 않습니다.
         /// </summary>
         private static Sprite BuiltinSprite(string path)
         {
@@ -708,8 +656,8 @@ namespace DOTORION.Editor
             panelRect.anchorMax = new Vector2(1f, 1f);
             panelRect.pivot = new Vector2(0.5f, 1f);
             panelRect.anchoredPosition = new Vector2(0f, -220f);
-            // Keep in sync with WindowsOverlayWindow.StatisticsPanelHeight: the
-            // window grows by exactly this much when the panel opens.
+            // WindowsOverlayWindow.StatisticsPanelHeight와 맞춰야 합니다. 패널이 열릴 때 창이
+            // 정확히 이만큼 늘어납니다.
             panelRect.sizeDelta = new Vector2(0f, 424f);
             var panelView = panel.gameObject.AddComponent<TeamStatisticsPanelView>();
 
@@ -730,7 +678,7 @@ namespace DOTORION.Editor
             rankingTab.GetComponentInChildren<Text>().fontStyle = FontStyle.Normal;
             UiFactory.AnchorTop(rankingTab.GetComponent<RectTransform>(), 108f, 39f, 88f, 28f);
 
-            // Period sits next to the tabs because it applies to both of them.
+            // 기간은 두 탭에 모두 적용되므로 탭 옆에 둡니다.
             var periodButtons = new Button[3];
             var periodLabels = new[] { "7\uC77C", "\uC774\uBC88 \uB2EC", "\uB204\uC801" };
             var periodNames = new[] { "PeriodSevenDays", "PeriodThisMonth", "PeriodAllTime" };
@@ -757,9 +705,8 @@ namespace DOTORION.Editor
                 statRows[index] = BuildPeriodStatRow(dailyContent.transform, font, 24f + index * 42f);
             }
 
-            // Shares the space the rows use, because the month and the other
-            // periods are two readings of the same daily buckets and only one of
-            // them is ever on screen.
+            // 행이 쓰는 자리를 함께 씁니다. 월 달력과 다른 기간은 같은 일별 집계를 읽는 두
+            // 방식이고 둘 중 하나만 화면에 나오기 때문입니다.
             var calendar = BuildCalendar(dailyContent.transform, font);
 
             var rankingContent = CreateStatisticsContent("RankingContent", panel.transform);
@@ -811,9 +758,8 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// The settings panel. The switches that used to cost a slot each on the
-        /// top bar live here as labelled rows, which is also the only place with
-        /// room to say what each one does.
+        /// 설정 패널. 상단바에서 하나씩 자리를 차지하던 스위치들이 이름 붙은 줄로 여기 있고,
+        /// 각각이 무엇을 하는지 설명을 적을 자리도 여기뿐입니다.
         /// </summary>
         private static SettingsPanelView BuildSettingsPanel(Transform parent, Font font)
         {
@@ -872,9 +818,8 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// A name, a line saying what it does, and the switch itself on the right.
-        /// The switch label is the value, so the panel writes 켜짐 and 꺼짐 into
-        /// the button's own text rather than keeping a second label beside it.
+        /// 이름, 하는 일을 설명하는 줄, 오른쪽의 스위치. 스위치 라벨이 곧 값이라서 옆에 라벨을
+        /// 따로 두지 않고 패널이 버튼 자신의 글자에 켜짐·꺼짐을 씁니다.
         /// </summary>
         private static Button SettingsSwitchRow(
             Transform parent,
@@ -911,9 +856,8 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// Six rows of seven squares under a weekday header, Monday first. The
-        /// sixth row is there for the months that need it - a 31 day month
-        /// starting on a Saturday - and stays switched off the rest of the time.
+        /// 요일 머리글 아래 일곱 칸짜리 여섯 줄, 월요일부터. 여섯째 줄은 필요한 달을 위한
+        /// 것이고(토요일에 시작하는 31일 달) 나머지 때는 꺼 둡니다.
         /// </summary>
         private static TeamCalendarView BuildCalendar(Transform parent, Font font)
         {
@@ -969,14 +913,14 @@ namespace DOTORION.Editor
             float left,
             float top)
         {
-            // No palette colour here: the prefab owns the empty-day base colour.
-            // Runtime attendance shading starts from whatever the Image stores.
+            // 여기에는 팔레트 색이 없습니다. 빈 날의 기본색은 프리팹이 정하고, 실행 중 출석
+            // 음영은 Image에 저장된 값에서 시작합니다.
             var background = UiFactory.CreateImage(
                 "CalendarDay_" + (index + 1), parent);
             UiFactory.AnchorTop(
                 background.rectTransform, left, top, CalendarCellWidth, CalendarCellHeight);
-            // The squares are the grid's only control: clicking any of them swaps
-            // what every square shows, so they have to take the raycast.
+            // 칸은 격자의 유일한 컨트롤입니다. 어느 칸을 눌러도 모든 칸이 보여 주는 내용이
+            // 바뀌므로 raycast를 받아야 합니다.
             background.raycastTarget = true;
             var cell = background.gameObject.AddComponent<TeamCalendarDayView>();
 
@@ -988,8 +932,7 @@ namespace DOTORION.Editor
             var duration = UiFactory.CreateText("Duration", background.transform, font, 11,
                 TextAnchor.MiddleCenter, DOTORIONPalette.TextPrimary);
             duration.text = "00:00";
-            // Tall enough for the three stacked lines of the breakdown, and
-            // allowed to overflow so a tight fit clips nothing.
+            // 세부 내역의 쌓인 세 줄이 들어갈 높이이고, 빠듯해서 잘리지 않도록 넘침을 허용합니다.
             UiFactory.AnchorTop(duration.rectTransform, 0f, 13f, CalendarCellWidth, 30f);
             duration.lineSpacing = 0.85f;
             duration.verticalOverflow = VerticalWrapMode.Overflow;
@@ -1022,13 +965,13 @@ namespace DOTORION.Editor
             }
 
             throw new InvalidOperationException(
-                "Sprite '" + spriteName + "' was not found at " + assetPath + ".");
+                "스프라이트 '" + spriteName + "'을(를) " + assetPath + "에서 찾지 못했습니다.");
         }
 
         /// <summary>
-        /// The developer dashboard: the roster as rows of numbers. Plain on
-        /// purpose - it is read far more often than it is acted on, and the one
-        /// thing it can destroy is behind a confirmation that names its target.
+        /// 개발자 대시보드: 명단을 숫자 줄로 보여 줍니다. 일부러 꾸미지 않았습니다. 조작하는
+        /// 일보다 읽는 일이 훨씬 많고, 여기서 파괴할 수 있는 유일한 것은 대상 이름을 말해
+        /// 주는 확인 뒤에 있습니다.
         /// </summary>
         private static DeveloperDashboardView BuildDashboardPanel(Transform parent, Font font)
         {
@@ -1137,8 +1080,8 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// Covers the whole panel while it is up, so the list underneath cannot be
-        /// clicked while a question about one of its rows is unanswered.
+        /// 떠 있는 동안 패널 전체를 덮습니다. 한 줄에 대한 질문에 답하기 전에는 아래 목록을
+        /// 누를 수 없게 하기 위해서입니다.
         /// </summary>
         private static GameObject BuildDashboardConfirm(
             Transform parent,
@@ -1217,8 +1160,8 @@ namespace DOTORION.Editor
             var name = UiFactory.CreateText("Name", background.transform, font, 12,
                 TextAnchor.MiddleLeft, DOTORIONPalette.TextPrimary);
             UiFactory.AnchorTop(name.rectTransform, 46f, 3f, 104f, 22f);
-            // Under the name, where a second line about the person fits without
-            // crowding the numbers the ranking is actually sorted by.
+            // 이름 아래, 사람에 대한 둘째 줄이 들어갈 자리입니다. 랭킹이 실제로 정렬되는 숫자를
+            // 비좁게 하지 않습니다.
             var points = UiFactory.CreateText("Points", background.transform, font, 9,
                 TextAnchor.UpperLeft, DOTORIONPalette.Accent);
             UiFactory.AnchorTop(points.rectTransform, 46f, 24f, 104f, 18f);
@@ -1258,8 +1201,8 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// A top-bar button placed from the left. The usual one measures from the
-        /// right, which is what the packed right-hand side of the bar needs.
+        /// 왼쪽에서 재는 상단바 버튼. 보통은 오른쪽에서 재는데, 상단바 오른쪽은 빈틈없이 차
+        /// 있어서 그쪽이 필요합니다.
         /// </summary>
         private static Button TopButtonAt(Transform parent, Font font, string name, string label,
             float left, float width, Color? color = null)
@@ -1328,14 +1271,13 @@ namespace DOTORION.Editor
                 input.placeholder = placeholder;
                 var confirm = UiFactory.CreateButton("Confirm", panel.transform, font, "확인", null, DOTORIONPalette.Accent);
                 UiFactory.AnchorTop(confirm.GetComponent<RectTransform>(), 274f, 76f, 80f, 36f);
-                // Only a rename shows this. The first run has nothing behind it
-                // to go back to, so it stays hidden there.
+                // 이름 변경일 때만 보입니다. 처음 실행에는 되돌아갈 곳이 없어서 숨겨 둡니다.
                 var cancel = UiFactory.CreateButton("Cancel", panel.transform, font, "×");
                 UiFactory.AnchorRight(cancel.GetComponent<RectTransform>(), 12f, 10f, 26f, 26f);
                 cancel.gameObject.SetActive(false);
-                // The title is the only line that speaks: it invites, and then it
-                // says what was wrong with what was typed. A separate hint under
-                // the field would only be a second voice to contradict it.
+                // 제목이 유일하게 말하는 줄입니다. 입력을 권하고, 입력이 잘못되었으면 무엇이
+                // 잘못이었는지 말합니다. 입력칸 아래에 힌트를 따로 두면 제목과 엇갈리는 두 번째
+                // 목소리가 될 뿐입니다.
                 Assign(root.GetComponent<FirstRunNameView>(), ("_nameInput", input),
                     ("_confirmButton", confirm), ("_cancelButton", cancel),
                     ("_messageText", title));
@@ -1345,9 +1287,9 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// The "there is a newer version" modal. Laid out like the first-run name
-        /// modal because it interrupts the same way, and sits above it in the
-        /// sorting order for the one case where both could want the screen.
+        /// "새 버전이 있습니다" 모달. 같은 방식으로 화면을 가로막기 때문에 처음 실행 이름
+        /// 모달과 같은 모양으로 만들고, 둘이 동시에 화면을 원하는 경우를 위해 정렬 순서에서
+        /// 그 위에 둡니다.
         /// </summary>
         public static UpdatePromptView BuildUpdatePrompt()
         {
@@ -1387,8 +1329,8 @@ namespace DOTORION.Editor
                 status.horizontalOverflow = HorizontalWrapMode.Wrap;
                 UiFactory.AnchorTop(status.rectTransform, 18f, 78f, 336f, 24f);
 
-                // 네 carries the accent because it is the answer being offered;
-                // 나중에 is the quiet one beside it rather than a second shout.
+                // 네는 제안되는 답이라 강조색을 받고, 나중에는 또 하나의 외침이 아니라 그 옆의
+                // 조용한 버튼입니다.
                 var confirm = UiFactory.CreateButton(
                     "Confirm", panel.transform, font, "네", null, DOTORIONPalette.Accent);
                 UiFactory.AnchorTop(confirm.GetComponent<RectTransform>(), 274f, 110f, 80f, 36f);
@@ -1425,11 +1367,9 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// Creates the sound settings asset the first time and never touches it
-        /// again: it holds hand-picked clips, so a rebuild must not reset it the
-        /// way it resets the generated prefabs.
+        /// 효과음 설정 에셋을 처음에만 만들고 이후에는 건드리지 않습니다. 손으로 고른 클립이
+        /// 들어 있어서, 프리팹처럼 재생성하면서 초기화되면 안 됩니다.
         /// </summary>
-        [MenuItem("DOTORI ON/Create Missing Sound Settings Asset")]
         public static DOTORIONSounds EnsureSoundsAsset()
         {
             EnsureFolder("Assets", "Resources");
@@ -1445,20 +1385,17 @@ namespace DOTORION.Editor
             AssetDatabase.CreateAsset(created, SoundsPath);
             AssetDatabase.SaveAssets();
             Selection.activeObject = created;
-            Debug.Log("Created " + SoundsPath + ". Drop the team's audio clips into it.");
+            Debug.Log(SoundsPath + "을(를) 만들었습니다. 팀의 오디오 클립을 여기에 넣으세요.");
             return created;
         }
 
         /// <summary>
-        /// Creates the shipped colour scheme the first time and never touches it
-        /// again, for the same reason as the sound asset: once someone has tuned
-        /// a colour in it, a prefab rebuild must not put the defaults back.
+        /// 배포하는 색 구성을 처음에만 만들고 이후에는 건드리지 않습니다. 효과음 에셋과 같은
+        /// 이유로, 누가 색을 다듬어 두었다면 프리팹 재생성이 기본값을 되돌려서는 안 됩니다.
         ///
-        /// A new asset starts out holding exactly the built-in scheme, because
-        /// the values are <see cref="DOTORIONTheme"/>'s field defaults, so
-        /// creating it changes nothing about how the overlay looks.
+        /// 새 에셋은 내장 구성을 그대로 담고 시작합니다. 값이 <see cref="DOTORIONTheme"/>의
+        /// 필드 기본값이라서 에셋을 만든다고 오버레이 모습이 달라지지 않습니다.
         /// </summary>
-        [MenuItem("DOTORI ON/Create Missing Theme Asset")]
         public static DOTORIONTheme EnsureThemeAsset()
         {
             EnsureFolder("Assets", "Resources");
@@ -1472,16 +1409,14 @@ namespace DOTORION.Editor
             var created = ScriptableObject.CreateInstance<DOTORIONTheme>();
             AssetDatabase.CreateAsset(created, ThemePath);
             AssetDatabase.SaveAssets();
-            Debug.Log("Created " + ThemePath + " holding the built-in scheme.");
+            Debug.Log(ThemePath + "을(를) 만들었습니다. 내장 색 구성을 담고 있습니다.");
             return created;
         }
 
         /// <summary>
-        /// Creates the icon catalog the first time and never touches it again, for
-        /// the same reason as the sound asset: it holds hand-picked artwork, so a
-        /// prefab rebuild must not empty it.
+        /// 아이콘 카탈로그를 처음에만 만들고 이후에는 건드리지 않습니다. 효과음 에셋과 같은
+        /// 이유로, 손으로 고른 그림이 들어 있어서 프리팹 재생성이 비우면 안 됩니다.
         /// </summary>
-        [MenuItem("DOTORI ON/Create Missing Avatar Catalog Asset")]
         public static TeamAvatarCatalog EnsureAvatarCatalogAsset()
         {
             EnsureFolder("Assets", "Resources");
@@ -1495,22 +1430,22 @@ namespace DOTORION.Editor
             var created = ScriptableObject.CreateInstance<TeamAvatarCatalog>();
             AssetDatabase.CreateAsset(created, AvatarCatalogPath);
             AssetDatabase.SaveAssets();
-            Debug.Log("Created " + AvatarCatalogPath + ". Drop the team's profile icons into it.");
+            Debug.Log(AvatarCatalogPath + "을(를) 만들었습니다. 팀의 프로필 아이콘을 여기에 넣으세요.");
             return created;
         }
 
         /// <summary>
-        /// Fills the catalog with every sprite in <see cref="AvatarSpriteFolder"/>,
-        /// so adding an icon is dropping a file in a folder rather than also
-        /// remembering to drag it into a list.
+        /// <see cref="AvatarSpriteFolder"/>의 모든 스프라이트로 카탈로그를 채웁니다. 아이콘을
+        /// 더하는 일이 폴더에 파일을 넣는 것으로 끝나고, 목록에 따로 끌어다 놓을 필요가
+        /// 없습니다.
         /// </summary>
-        [MenuItem("DOTORI ON/Refresh Avatar Catalog From Folder")]
+        [MenuItem("DOTORI ON/아바타 카탈로그 폴더에서 갱신")]
         public static void RefreshAvatarCatalogFromFolder()
         {
             var catalog = EnsureAvatarCatalogAsset();
             if (!AssetDatabase.IsValidFolder(AvatarSpriteFolder))
             {
-                Debug.LogWarning(AvatarSpriteFolder + " does not exist yet. Create it and drop the icons in.");
+                Debug.LogWarning(AvatarSpriteFolder + " 폴더가 아직 없습니다. 폴더를 만들고 아이콘을 넣으세요.");
                 return;
             }
 
@@ -1543,13 +1478,12 @@ namespace DOTORION.Editor
                 Debug.LogWarning("\uc544\ubc14\ud0c0 \uce74\ud0c8\ub85c\uadf8: " + problem);
             }
 
-            Debug.Log("Avatar catalog now lists " + catalog.Count + " icon(s) from " + AvatarSpriteFolder + ".");
+            Debug.Log("아바타 카탈로그에 " + AvatarSpriteFolder + "의 아이콘 " + catalog.Count + "개를 담았습니다.");
         }
 
         /// <summary>
-        /// The pixel font the UI is drawn in. Falls back to Unity's built-in
-        /// face only if the asset is missing, so a rebuild in a checkout that
-        /// lost the font still produces readable prefabs instead of blank ones.
+        /// UI를 그리는 픽셀 폰트. 에셋이 없을 때만 Unity 내장 폰트로 대체하므로, 폰트를
+        /// 잃은 체크아웃에서 재생성해도 빈 프리팹이 아니라 읽을 수 있는 프리팹이 나옵니다.
         /// </summary>
         internal static Font PreviewFont()
         {
@@ -1558,10 +1492,9 @@ namespace DOTORION.Editor
         }
 
         /// <summary>
-        /// The body face. Gulim carries hand-drawn bitmaps for 11px through
-        /// 25px, so any whole size in that range is crisp and anything below it
-        /// is not. The builder only knows this one face; a rebuild is a reset,
-        /// not a way to reproduce the typography.
+        /// 본문 폰트. 굴림은 11px부터 25px까지 손으로 그린 비트맵을 갖고 있어서, 그 범위의
+        /// 정수 크기는 또렷하고 그 아래는 그렇지 않습니다. 빌더는 이 폰트 하나만 알고,
+        /// 재생성은 초기화이지 타이포그래피를 재현하는 수단이 아닙니다.
         /// </summary>
         internal const string UiFontPath = "Assets/GULIM.TTC";
         private static void ConfigureScaler(CanvasScaler scaler)
@@ -1604,7 +1537,7 @@ namespace DOTORION.Editor
         private static void Set(SerializedObject serialized, string name, UnityEngine.Object value)
         {
             var property = serialized.FindProperty(name);
-            if (property == null) throw new InvalidOperationException("Missing serialized field " + name);
+            if (property == null) throw new InvalidOperationException("직렬화된 필드가 없습니다: " + name);
             property.objectReferenceValue = value;
         }
         private static void EnsureFolder(string parent, string child)

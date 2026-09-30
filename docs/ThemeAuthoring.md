@@ -1,6 +1,6 @@
 # 테마 제작
 
-Unity 메뉴 **DOTORI ON → Theme Editor**를 열거나 테마 SO를 선택합니다.
+Unity 메뉴 **DOTORI ON → 테마 편집기**를 열거나 테마 SO를 선택합니다.
 
 ## 기본 팔레트
 

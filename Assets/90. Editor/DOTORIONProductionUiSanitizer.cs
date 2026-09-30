@@ -4,12 +4,11 @@ using UnityEngine;
 
 namespace DOTORION.Editor
 {
-    /// <summary>Removes development-only controls if an older builder or prefab reintroduces them.</summary>
+    /// <summary>예전 빌더나 프리팹이 개발 전용 컨트롤을 다시 넣으면 제거합니다.</summary>
     public sealed class DOTORIONProductionUiSanitizer : AssetPostprocessor
     {
         private static bool _scheduled;
 
-        [MenuItem("DOTORI ON/Remove Development Controls From UI")]
         public static void SanitizeMainPrefab()
         {
             var root = PrefabUtility.LoadPrefabContents(DOTORIONPrefabBuilder.MainViewPath);
@@ -31,7 +30,7 @@ namespace DOTORION.Editor
                 var drag = root.transform.Find("WindowBackground/TopBar/WindowDragArea") as RectTransform;
                 if (drag != null) drag.offsetMax = new Vector2(-215f, drag.offsetMax.y);
                 PrefabUtility.SaveAsPrefabAsset(root, DOTORIONPrefabBuilder.MainViewPath);
-                Debug.Log("Removed development-only fake check-in from the production DOTORIONCanvas prefab.");
+                Debug.Log("개발 전용 가짜 출근 버튼을 배포용 DOTORIONCanvas 프리팹에서 제거했습니다.");
             }
             finally
             {
