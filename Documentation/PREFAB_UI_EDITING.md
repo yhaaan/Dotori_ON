@@ -326,7 +326,14 @@ update public.members set is_admin = true where display_name = '이름';
 | --- | --- | --- |
 | `항상 위` | 다른 창 위에 계속 띄웁니다 | 창 스타일. 저장하지 않습니다 |
 | `알림음` | 출근·퇴근·호출 소리를 끕니다 | `PlayerPrefs`의 `DOTORION.Muted` |
+| 테마 버튼 | "설정" 제목 오른쪽의 동그라미 두 개. 누르면 그 테마로 바뀝니다 | `PlayerPrefs`의 `DOTORION.Theme` |
 | `버전` | 실행 중인 빌드의 `Application.version` | — |
+
+**테마 버튼은 토글이 아니라 테마마다 하나씩입니다.** `Heading`("설정") 오른쪽에 `ThemeDefault`(기본)·`ThemePink`(핑크)가 있고, 각 버튼은 **항상 자기 테마의 색**(`DOTORIONTheme.Swatch` = `Accent`)으로 칠해져 있습니다. 지금 쓰는 테마의 버튼만 바깥에 흰 고리가 있는 그림(`ThemeSwatchSelected`)으로 바뀌고, 나머지는 `ThemeSwatch`입니다. 버튼 i번은 앱 프리팹(`Resources/DOTORION/DOTORIONApp.prefab`) `_themes`의 i번 테마입니다. 테마가 버튼 수보다 적으면 남는 버튼은 숨습니다.
+
+**고른 테마는 껐다 켜도, PC를 재시작해도 남습니다.** `PlayerPrefs`(윈도우에서는 레지스트리)에 에셋 이름을 저장하므로 테마를 추가하거나 순서를 바꿔도 고른 테마가 바뀌지 않습니다. 저장된 이름이 목록에 없으면 앱 프리팹의 `_theme`(기본)으로 시작합니다. 피드백에 뜨는 이름은 각 테마 에셋의 `Display Name`입니다.
+
+**이 버튼들은 테마 바인딩에 넣지 않습니다.** 색을 코드가 칠하므로 테마가 덮어쓰면 안 됩니다. `기준 UI 수집`을 다시 돌려도 `_themeSwatches` 이미지에 대한 `.color =` 대입을 보고 `RuntimeColor`로 잡힙니다. 세 번째 테마를 넣으려면 `_themes`에 추가하고 `SettingsPanel`에 `ThemeDefault`를 복제해 `_themeSwatches`에 끼우세요.
 
 **`항상 위`는 예전 `TOP` 버튼 그대로입니다.** 상단바 480px에 버튼이 더 들어갈 자리가 없어서, 한 자리로 전부를 여는 쪽으로 바꿨습니다. 창 스타일이라 다음 실행에는 켜진 상태로 시작합니다(`DOTORIONApp.Awake`가 `SetAlwaysOnTop(true)`).
 

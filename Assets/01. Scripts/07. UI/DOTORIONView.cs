@@ -87,6 +87,8 @@ namespace DOTORION.UI
 
         public event Action UiScaleChangeRequested;
 
+        public event Action<int> ThemeSelectRequested;
+
         public event Action MinimizeRequested;
         public event Action ExitRequested;
 
@@ -222,6 +224,7 @@ namespace DOTORION.UI
                 _settingsPanel.HideFromTaskbarToggleRequested +=
                     () => HideFromTaskbarToggleRequested?.Invoke();
                 _settingsPanel.UiScaleChangeRequested += () => UiScaleChangeRequested?.Invoke();
+                _settingsPanel.ThemeSelectRequested += index => ThemeSelectRequested?.Invoke(index);
                 _settingsPanel.gameObject.SetActive(false);
             }
 
@@ -566,6 +569,11 @@ namespace DOTORION.UI
         public void SetHiddenFromTaskbar(bool hidden)
         {
             _settingsPanel?.SetHiddenFromTaskbar(hidden);
+        }
+
+        public void SetThemes(System.Collections.Generic.IReadOnlyList<DOTORIONTheme> themes, DOTORIONTheme active)
+        {
+            _settingsPanel?.SetThemes(themes, active);
         }
 
         public void SetUiScalePercent(int percent)

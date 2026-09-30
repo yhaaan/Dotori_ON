@@ -77,6 +77,13 @@ namespace DOTORION.UI
 
         private const string UiScalePreferenceKey = "DOTORION.UiScalePercent";
 
+        /// <summary>
+        /// The asset name of the theme the round button last switched to. Kept
+        /// in PlayerPrefs, which Windows stores in the registry, so the choice
+        /// outlives both quitting the app and restarting the PC.
+        /// </summary>
+        private const string ThemePreferenceKey = "DOTORION.Theme";
+
         [Header("Prefab references")]
         [SerializeField] private DOTORIONView _mainViewPrefab;
         [SerializeField] private FirstRunNameView _firstRunNamePrefab;
@@ -89,6 +96,9 @@ namespace DOTORION.UI
 
         [Tooltip("색상 테마 에셋. 비워 두면 빌드에 들어 있는 기본 어두운 테마를 씁니다.")]
         [SerializeField] private DOTORIONTheme _theme;
+
+        [Tooltip("설정 패널의 둥근 테마 버튼들이 가리키는 테마. 첫 번째 테마가 첫 버튼, 두 번째가 두 번째 버튼입니다.")]
+        [SerializeField] private DOTORIONTheme[] _themes;
 
         [Tooltip("새 버전을 알리는 모달 프리팹. 비워 두면 업데이트 확인을 하지 않습니다.")]
         [SerializeField] private UpdatePromptView _updatePromptPrefab;
@@ -142,6 +152,7 @@ namespace DOTORION.UI
         private bool _dashboardBusy;
         private bool _mutationInProgress;
         private int _uiScalePercent = 100;
+        private DOTORIONTheme _activeTheme;
         private int _statisticsRequestId;
         private StatisticsPeriod _statisticsPeriod = StatisticsPeriod.LastSevenDays;
         private bool _quitting;
@@ -185,7 +196,9 @@ namespace DOTORION.UI
             // Before the first view exists: everything the overlay draws reads
             // its colours through the palette, so the theme has to be in place
             // ahead of anything that paints itself.
-            DOTORIONPalette.Use(_theme);
+            _activeTheme = ThemeSelection.Resolve(
+                _themes, _theme, PlayerPrefs.GetString(ThemePreferenceKey, string.Empty));
+            DOTORIONPalette.Use(_activeTheme);
 
             _lifetime = new CancellationTokenSource();
             _identityStore = new LocalIdentityProfileStore();
@@ -693,6 +706,7 @@ namespace DOTORION.UI
             _view.ActivityChangeRequested += HandleActivityChangeRequested;
             _view.FakeCheckInRequested += HandleFakeCheckInRequested;
             _view.SettingsToggleRequested += HandleSettingsToggleRequested;
+            _view.ThemeSelectRequested += HandleThemeSelectRequested;
             _view.AlwaysOnTopToggleRequested += HandleAlwaysOnTopToggleRequested;
             _view.MuteToggleRequested += HandleMuteToggleRequested;
             _view.AutoStartToggleRequested += HandleAutoStartToggleRequested;
@@ -724,6 +738,7 @@ namespace DOTORION.UI
             _view.SetAutoStart(WindowsStartupRegistration.IsEnabled());
             _view.SetHiddenFromTaskbar(_window.IsHiddenFromTaskbar);
             _view.SetUiScalePercent(_uiScalePercent);
+            _view.SetThemes(_themes, _activeTheme);
             _firstRunNameView.Hide();
             CheckForUpdate();
             _view.SetDailyCheckIn(null, _backend is ITeamCheckIn);
@@ -799,6 +814,7 @@ namespace DOTORION.UI
             _view.ActivityChangeRequested -= HandleActivityChangeRequested;
             _view.FakeCheckInRequested -= HandleFakeCheckInRequested;
             _view.SettingsToggleRequested -= HandleSettingsToggleRequested;
+            _view.ThemeSelectRequested -= HandleThemeSelectRequested;
             _view.AlwaysOnTopToggleRequested -= HandleAlwaysOnTopToggleRequested;
             _view.MuteToggleRequested -= HandleMuteToggleRequested;
             _view.AutoStartToggleRequested -= HandleAutoStartToggleRequested;
@@ -1169,6 +1185,27 @@ namespace DOTORION.UI
             PlayerPrefs.SetInt(UiScalePreferenceKey, _uiScalePercent);
             PlayerPrefs.Save();
             _view.ShowFeedback("UI 크기를 " + _uiScalePercent + "%로 변경했습니다.");
+        }
+
+        /// <summary>
+        /// Switches to the theme behind the round button that was pressed and
+        /// remembers it. The palette repaints everything bound to it on its own;
+        /// what is left here is the choice itself and which button is marked.
+        /// </summary>
+        private void HandleThemeSelectRequested(int index)
+        {
+            var chosen = ThemeSelection.At(_themes, index);
+            if (_view == null || chosen == null || chosen == _activeTheme)
+            {
+                return;
+            }
+
+            _activeTheme = chosen;
+            DOTORIONPalette.Use(chosen);
+            PlayerPrefs.SetString(ThemePreferenceKey, chosen.name);
+            PlayerPrefs.Save();
+            _view.SetThemes(_themes, chosen);
+            _view.ShowFeedback("테마를 " + ThemeSelection.LabelOf(chosen) + "(으)로 바꿨습니다.");
         }
 
         private static int NormalizeUiScalePercent(int percent)

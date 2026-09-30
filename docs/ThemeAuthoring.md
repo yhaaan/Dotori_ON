@@ -45,3 +45,7 @@ Unity 메뉴 **DOTORI ON → Theme Editor**를 열거나 테마 SO를 선택합�
 테마 SO: `Palette`(19개 역할의 변경값), `Sprites`(원본별 이미지 교체), `Overrides`(개별 예외). 기존 색상 필드는 이전 데이터 호환과 코드 기본값으로 유지합니다.
 
 런타임 전환: `DOTORIONPalette.Use(theme)`.
+
+## 설정 패널에서 고르기
+
+설정 패널의 "설정" 제목 옆에 테마마다 둥근 버튼이 하나씩 있습니다. 버튼 i번은 `DOTORIONApp`의 `_themes`(`Resources/DOTORION/DOTORIONApp.prefab`) i번 테마이고, 칠해진 색은 그 테마의 `Accent`입니다. 새 테마를 버튼으로 고르게 하려면 목록에 넣고 `Display Name`을 채우세요. 다른 테마와 구분되는 강조색이 필요합니다. 고른 테마는 `PlayerPrefs`(`DOTORION.Theme`)에 에셋 이름으로 저장되어 재시작해도 유지됩니다.

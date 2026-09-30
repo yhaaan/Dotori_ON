@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,6 +25,15 @@ namespace DOTORION.UI
         [SerializeField] private Text _uiScaleValue;
         [SerializeField] private Text _versionText;
 
+        [Header("Theme buttons")]
+        [Tooltip("제목 옆의 둥근 버튼들. 왼쪽부터 DOTORIONApp의 _themes 순서입니다.")]
+        [SerializeField] private Image[] _themeSwatches;
+
+        [SerializeField] private Sprite _swatchSprite;
+
+        [Tooltip("지금 쓰는 테마의 버튼에 입히는, 바깥에 고리가 있는 그림.")]
+        [SerializeField] private Sprite _swatchSelectedSprite;
+
         private bool _initialized;
 
         public event Action AlwaysOnTopToggleRequested;
@@ -35,6 +45,8 @@ namespace DOTORION.UI
         public event Action HideFromTaskbarToggleRequested;
 
         public event Action UiScaleChangeRequested;
+
+        public event Action<int> ThemeSelectRequested;
 
         public void Initialize()
         {
@@ -50,6 +62,44 @@ namespace DOTORION.UI
             _autoStartButton?.onClick.AddListener(() => AutoStartToggleRequested?.Invoke());
             _hideFromTaskbarButton?.onClick.AddListener(() => HideFromTaskbarToggleRequested?.Invoke());
             _uiScaleButton?.onClick.AddListener(() => UiScaleChangeRequested?.Invoke());
+            for (var index = 0; _themeSwatches != null && index < _themeSwatches.Length; index++)
+            {
+                var slot = index;
+                _themeSwatches[index]?.GetComponent<Button>()?.onClick
+                    .AddListener(() => ThemeSelectRequested?.Invoke(slot));
+            }
+        }
+
+        /// <summary>
+        /// Paints each round button with its own theme's colour and rings the
+        /// one in use. Unlike a toggle the buttons never change colour: each one
+        /// is always the theme it selects, so the ring is the only thing that
+        /// moves. A button with no theme behind it is hidden.
+        /// </summary>
+        public void SetThemes(IReadOnlyList<DOTORIONTheme> themes, DOTORIONTheme active)
+        {
+            for (var index = 0; _themeSwatches != null && index < _themeSwatches.Length; index++)
+            {
+                var swatch = _themeSwatches[index];
+                if (swatch == null)
+                {
+                    continue;
+                }
+
+                var theme = ThemeSelection.At(themes, index);
+                swatch.gameObject.SetActive(theme != null);
+                if (theme == null)
+                {
+                    continue;
+                }
+
+                swatch.color = theme.Swatch;
+                var sprite = theme == active ? _swatchSelectedSprite : _swatchSprite;
+                if (sprite != null)
+                {
+                    swatch.sprite = sprite;
+                }
+            }
         }
 
         public void SetAlwaysOnTop(bool enabled)
@@ -110,6 +160,11 @@ namespace DOTORION.UI
             if (_autoStartButton != null) _autoStartButton.interactable = !busy;
             if (_hideFromTaskbarButton != null) _hideFromTaskbarButton.interactable = !busy;
             if (_uiScaleButton != null) _uiScaleButton.interactable = !busy;
+            for (var index = 0; _themeSwatches != null && index < _themeSwatches.Length; index++)
+            {
+                var button = _themeSwatches[index] != null ? _themeSwatches[index].GetComponent<Button>() : null;
+                if (button != null) button.interactable = !busy;
+            }
         }
 
         /// <summary>

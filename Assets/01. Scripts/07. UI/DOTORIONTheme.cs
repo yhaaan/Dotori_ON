@@ -26,6 +26,12 @@ namespace DOTORION.UI
         order = 1)]
     public sealed class DOTORIONTheme : ScriptableObject
     {
+        [Tooltip("테마 버튼을 눌렀을 때 피드백에 쓰는 이름입니다. 비우면 에셋 이름을 씁니다.")]
+        public string DisplayName;
+
+        /// <summary>The colour of the round button that switches to this theme.</summary>
+        public Color Swatch => Accent;
+
         public DOTORIONThemeCatalog Catalog;
         public System.Collections.Generic.List<ThemeOverride> Overrides = new System.Collections.Generic.List<ThemeOverride>();
         public ThemeOverride Find(string id) => Overrides.Find(value => value.Id == id);
