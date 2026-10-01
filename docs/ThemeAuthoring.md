@@ -48,4 +48,15 @@ Unity 메뉴 **DOTORI ON → 테마 편집기**를 열거나 테마 SO를 선택
 
 ## 설정 패널에서 고르기
 
-설정 패널의 "설정" 제목 옆에 테마마다 둥근 버튼이 하나씩 있습니다. 버튼 i번은 `DOTORIONApp`의 `_themes`(`Resources/DOTORION/DOTORIONApp.prefab`) i번 테마이고, 칠해진 색은 그 테마의 `Accent`입니다. 새 테마를 버튼으로 고르게 하려면 목록에 넣고 `Display Name`을 채우세요. 다른 테마와 구분되는 강조색이 필요합니다. 고른 테마는 `PlayerPrefs`(`DOTORION.Theme`)에 에셋 이름으로 저장되어 재시작해도 유지됩니다.
+설정 패널의 "설정" 제목 옆에 테마마다 둥근 버튼이 하나씩 있습니다(기본·다크·핑크·윈도우). 버튼 i번은 `DOTORIONApp`의 `_themes`(`Resources/DOTORION/DOTORIONApp.prefab`) i번 테마이고, 칠해진 색은 그 테마의 `Swatch`(비워 두면 `Accent`)입니다. 새 테마를 버튼으로 고르게 하려면 목록에 넣고 `Display Name`과 `Swatch`를 채우세요. 고른 테마는 `PlayerPrefs`(`DOTORION.Theme`)에 에셋 이름으로 저장되어 재시작해도 유지됩니다.
+
+## 스킨 네 벌
+
+| 에셋 | 표시 이름 | 그림 |
+| --- | --- | --- |
+| `DefaultSkinTheme` | 기본 | `Default_*` (프리팹이 들고 있는 그림이라 교체 목록이 비어 있습니다) |
+| `DarkSkinTheme` | 다크 | `Dark_*` |
+| `PinkSkinTheme` | 핑크 | `Pink_*` |
+| `WindowsSkinTheme` | 윈도우 | `Windows_*` |
+
+그림은 모두 `Assets/05. Sprites/UI_sheet-skin_all.aseprite`(프레임 4개)에서 나옵니다. 스프라이트 이름, 자르는 방법, 스킨별 `PreserveTint`와 팔레트는 `Documentation/PREFAB_UI_EDITING.md`의 **스킨** 절에 있습니다.

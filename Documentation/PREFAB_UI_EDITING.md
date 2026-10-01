@@ -111,6 +111,40 @@
 
 ColorTint는 **곱하기**라 흰색보다 밝게는 못 만듭니다. hover에서 밝아지게 하려면 `Normal`을 0.88쯤으로 낮춰 평소를 어둡게 깔아야 하고, 그만큼 그림이 원본보다 어둡게 나옵니다. 그래서 밝히는 대신 어둡게 하는 쪽을 골랐습니다.
 
+## 스킨
+
+스킨은 네 벌입니다: **기본**(파랑)·**다크**·**핑크**·**윈도우**(Windows 95풍 회색과 남색). 그림은 전부 `Assets/05. Sprites/UI_sheet-skin_all.aseprite` 한 파일에 있고, **프레임 하나가 스킨 하나**입니다(0 기본 · 1 다크 · 2 핑크 · 3 윈도우). 네 프레임은 같은 자리에 같은 부품을 그립니다. 예전 `UI_sheet.aseprite`(기본)와 `UI_sheet_skin.aseprite`(핑크)는 이 파일로 합쳐졌고, 쓰지 않던 그림(올림 화살표, 말풍선, 손가락 커서 둘, 중복 상태 원 셋)은 뺐습니다. 프리팹과 테마는 이제 두 옛 파일을 전혀 참조하지 않으므로 지워도 됩니다.
+
+**스프라이트 이름은 `{스킨}_{부품}`입니다**(`Default_Window`, `Dark_Card`, `Pink_StatusMeal`, `Windows_Button` …). 스킨당 35개, 윈도우만 `Windows_Blank`까지 36개, 모두 141개입니다. **프리팹이 들고 있는 것은 전부 `Default_*`입니다.** 다른 스킨은 테마 에셋(`DefaultSkinTheme`·`DarkSkinTheme`·`PinkSkinTheme`·`WindowsSkinTheme`)의 `Sprites`가 `Default_X`를 `다크_X`로 바꿔 끼우는 방식이라, 프리팹을 고칠 때는 기본 스킨 그림만 보면 됩니다.
+
+| 부품 | 쓰는 곳 |
+| --- | --- |
+| `Window` · `Modal` · `MiniPanel` · `StatsPanel` | 창 바탕 · 이름/업데이트 모달 · 소형 오버레이 · 통계·설정·아바타 패널과 출근 전 덮개 |
+| `Card` · `AvatarTile` · `StatusPill` · `Dot` | 팀원 카드 · 카드 아바타 타일 · 소형 행의 알약과 점(상태색을 곱합니다) |
+| `TopAlert` · `TopMini` · `TopStats` · `TopSettings` · `TopMinimize` · `TopClose` | 상단바 `전체호출` · `소형` · `통계` · `설정` · `—` · `×` |
+| `DailyGiftClaimed` · `DailyGiftAvailable` | 출석 버튼(받음 / 받을 수 있음) |
+| `CheckInDisc` · `CheckOutDisc` | 출근 · 퇴근 원 |
+| `StatusWorking` · `StatusBreak` · `StatusMeal` | 아치 위 작업중 · 쉬는중 · 식사중 |
+| `Arch` · `Dome` · `Pill` | 아치 · 아치 손잡이 돔 · 메모/이름 입력칸 |
+| `Button` · `ButtonAlt` · `ModalArrow` · `Squirrel` · `Bell` | 공통 버튼(9-slice 3·2·2·3)과 눌림 그림 · 이름 모달 확인 화살표 · 이름 모달 프로필 그림 · 카드의 호출 종 |
+| `PowerRed` · `PowerBlue` · `Extra*` · `Windows_Blank` | 아직 프리팹이 쓰지 않는 그림. 자리만 잡아 둔 것입니다 |
+
+**같은 부품이 스킨마다 다른 자리에 있는 경우가 있습니다.** 상태 원 세 개는 기본이 작업·휴식·식사, 다크가 작업·식사·휴식, 핑크와 윈도우가 식사·작업·휴식 순이고, 윈도우는 출석 선물 두 개도 앞뒤가 바뀌어 있습니다. 이름이 부품의 뜻을 따르므로(`Windows_DailyGiftAvailable`) 테마 교체는 자리가 아니라 이름으로 짝을 짓습니다. 윈도우의 `ModalArrow`는 19x19(나머지는 18x18)입니다. 윈도우의 상단바 아이콘 여섯 개(`Windows_Top*`)는 사각형을 다른 스킨보다 2px 위(캔버스 y 0), 1px 오른쪽에서 잘라 둡니다. 윈도우의 남색 제목 줄은 4행에서 시작하고 아이콘이 19px라서, 같은 버튼 자리에 그대로 두면 그림이 줄의 위쪽 끝에 붙기 때문입니다. 사각형을 위로 2px, 오른쪽으로 1px 옮기면 그림이 2px 내려오고 1px 왼쪽으로 가서 줄 안의 위·아래·오른쪽 여백이 모두 2px이 됩니다. 슬라이스를 다시 자를 때 이 오프셋을 잃지 마세요.
+
+**슬라이스는 자동이 아니라 메타에 저장된 사각형입니다.** Aseprite 임포터의 스프라이트 시트 모드는 조각을 스스로 나누지 않습니다. 프레임은 텍스처에 세로로 쌓이고(프레임 k의 바닥이 y = 4 + 466k, 왼쪽이 x = 4), 사각형은 `UI_sheet-skin_all.aseprite.meta`의 `spriteSheetImportData`에 있습니다. 캔버스 위치 (x, y, 폭, 높이)는 텍스처에서 **(x, 465 + 466·프레임 − y − 높이)** 입니다. 그림을 옮기거나 프레임의 바깥 경계(캔버스 4..1687 × 3..460)가 바뀌면 사각형이 어긋나므로 Sprite Editor에서 다시 자르세요.
+
+**`PreserveTint`는 스킨별로 갈립니다.** 테마는 교체한 그림을 기본적으로 흰색으로 그립니다(그림 자체가 색이므로). 카드·아바타 타일·알약·점·다람쥐처럼 런타임이 색을 곱하는 자리는 기본 색을 유지합니다. 통계 패널(`StatsPanel`)과 종(`Bell`)은 핑크만 유지하고, 다크와 윈도우는 그림 색을 그대로 씁니다 — 이 둘은 그림에 색이 구워져 있어서 곱하면 탁해집니다. 단 `StatsPanel`은 출근 전 덮개(`IMG_Background_offline`)로도 쓰이므로 다크·윈도우에서는 덮개가 검은 막이 아니라 패널 색의 반투명 막으로 보입니다.
+
+**팔레트(`Palette`)는 글자와 상태색을 스킨에 맞춥니다.** 다크는 글자가 밝고, 윈도우는 글자가 검정, 상태색도 윈도우는 아이콘에서 뽑은 진한 색입니다. **윈도우의 제목 줄 글자 네 개는 `Overrides`로 흰색에 고정했습니다** — 남색 줄 위에서 `기본 글자`(검정)가 그대로 나오면 읽을 수 없기 때문입니다. 제목 줄 글자를 바꿔야 하면 이 네 예외(`테마 편집기`의 개별 예외 탭)를 고치세요.
+
+**다크의 모달 글자 일곱 개도 `Overrides`입니다.** 이름·업데이트 모달은 계층 이름이 `ModalBackdrop`이라서 그 아래 글자가 전부 `팝업 뒤 배경` 역할로 분류됩니다. 핑크·윈도우는 모달 바탕이 밝아 그 어두운 색이 그대로 읽히지만, 다크는 어두운 바탕에 어두운 글자가 되어 읽을 수 없어서 제목·설명·입력·확인·나중에 글자를 밝은 색으로 고정했습니다. 업데이트 진행 문구(`Status`)는 코드가 색을 정하는 자리라 이 예외가 닿지 않습니다.
+
+**스킨을 하나 더 넣으려면:**
+1. Aseprite에서 프레임을 추가하고 같은 자리에 그립니다.
+2. Sprite Editor에서 기존 프레임의 사각형을 복사해 새 프레임 위치에 붙이고 이름을 `{새 스킨}_{부품}`으로 맞춥니다.
+3. 기존 스킨의 테마 에셋을 복제해 `Sprites`의 `Replacement`를 새 스프라이트로 바꾸고, `Display Name`·`Swatch`·`Palette`를 채웁니다.
+4. 앱 프리팹의 `_themes`에 넣고 `SettingsPanel`에 동그라미 버튼을 하나 더 만듭니다.
+
 ## 주의할 참조
 
 각 프리팹 루트 컴포넌트의 `Prefab references` 필드는 버튼 동작과 데이터 바인딩에 사용됩니다. 계층 안의 오브젝트를 삭제하거나 교체했다면 대응하는 필드를 새 오브젝트로 다시 연결하세요. 단순한 위치, 크기, 색상, 텍스트 스타일 수정에는 참조를 바꿀 필요가 없습니다.
@@ -127,8 +161,8 @@ ColorTint는 **곱하기**라 흰색보다 밝게는 못 만듭니다. hover에�
 ActivityDock   RectMask2D + ActivityDockView — 이 rect 밖은 그려지지도 눌리지도 않음
 ├ HoverZone    투명 Image — 접혀 있을 때 "근처"로 치는 범위
 └ Tray         올라오고 내려가는 묶음
-  ├ Arch       UI_sheet_15
-  ├ Handle     UI_sheet_9 (돔)
+  ├ Arch       Default_Arch
+  ├ Handle     Default_Dome (돔)
   ├ Working · Break · Meal
   └ CheckOut   아치 안쪽 빈 곳
 ```
@@ -322,14 +356,14 @@ update public.members set is_admin = true where display_name = '이름';
 | --- | --- | --- |
 | `항상 위` | 다른 창 위에 계속 띄웁니다 | 창 스타일. 저장하지 않습니다 |
 | `알림음` | 출근·퇴근·호출 소리를 끕니다 | `PlayerPrefs`의 `DOTORION.Muted` |
-| 테마 버튼 | "설정" 제목 오른쪽의 동그라미 두 개. 누르면 그 테마로 바뀝니다 | `PlayerPrefs`의 `DOTORION.Theme` |
+| 테마 버튼 | "설정" 제목 오른쪽의 동그라미 네 개(기본·다크·핑크·윈도우). 누르면 그 스킨으로 바뀝니다 | `PlayerPrefs`의 `DOTORION.Theme` |
 | `버전` | 실행 중인 빌드의 `Application.version` | — |
 
-**테마 버튼은 토글이 아니라 테마마다 하나씩입니다.** `Heading`("설정") 오른쪽에 `ThemeDefault`(기본)·`ThemePink`(핑크)가 있고, 각 버튼은 **항상 자기 테마의 색**(`DOTORIONTheme.Swatch` = `Accent`)으로 칠해져 있습니다. 지금 쓰는 테마의 버튼만 바깥에 흰 고리가 있는 그림(`ThemeSwatchSelected`)으로 바뀌고, 나머지는 `ThemeSwatch`입니다. 버튼 i번은 앱 프리팹(`Resources/DOTORION/DOTORIONApp.prefab`) `_themes`의 i번 테마입니다. 테마가 버튼 수보다 적으면 남는 버튼은 숨습니다.
+**테마 버튼은 토글이 아니라 스킨마다 하나씩입니다.** `Heading`("설정") 오른쪽에 `ThemeDefault`(기본)·`ThemeDark`(다크)·`ThemePink`(핑크)·`ThemeWindows`(윈도우)가 차례로 있고, 각 버튼은 **항상 자기 스킨의 색**(`DOTORIONTheme.Swatch`)으로 칠해져 있습니다. 색은 그 스킨의 제목 줄 색입니다(파랑·어두운 보라·분홍·남색). 지금 쓰는 스킨의 버튼만 바깥에 흰 고리가 있는 그림(`ThemeSwatchSelected`)으로 바뀌고, 나머지는 `ThemeSwatch`입니다. 버튼 i번은 앱 프리팹(`Resources/DOTORION/DOTORIONApp.prefab`) `_themes`의 i번 테마입니다. 테마가 버튼 수보다 적으면 남는 버튼은 숨습니다.
 
-**고른 테마는 껐다 켜도, PC를 재시작해도 남습니다.** `PlayerPrefs`(윈도우에서는 레지스트리)에 에셋 이름을 저장하므로 테마를 추가하거나 순서를 바꿔도 고른 테마가 바뀌지 않습니다. 저장된 이름이 목록에 없으면 앱 프리팹의 `_theme`(기본)으로 시작합니다. 피드백에 뜨는 이름은 각 테마 에셋의 `Display Name`입니다.
+**고른 스킨은 껐다 켜도, PC를 재시작해도 남습니다.** `PlayerPrefs`(윈도우에서는 레지스트리)에 에셋 이름을 저장하므로 테마를 추가하거나 순서를 바꿔도 고른 스킨이 바뀌지 않습니다. 저장된 이름이 목록에 없으면 앱 프리팹의 `_theme`(기본)으로 시작합니다. 피드백에 뜨는 이름은 각 테마 에셋의 `Display Name`입니다.
 
-**이 버튼들은 테마 바인딩에 넣지 않습니다.** 색을 코드가 칠하므로 테마가 덮어쓰면 안 됩니다. `기준 UI 수집`을 다시 돌려도 `_themeSwatches` 이미지에 대한 `.color =` 대입을 보고 `RuntimeColor`로 잡힙니다. 세 번째 테마를 넣으려면 `_themes`에 추가하고 `SettingsPanel`에 `ThemeDefault`를 복제해 `_themeSwatches`에 끼우세요.
+**이 버튼들은 테마 바인딩에 넣지 않습니다.** 색을 코드가 칠하므로 테마가 덮어쓰면 안 됩니다. `기준 UI 수집`을 다시 돌려도 `_themeSwatches` 이미지에 대한 `.color =` 대입을 보고 `RuntimeColor`로 잡힙니다. 스킨을 더 넣으려면 `_themes`에 추가하고 `SettingsPanel`에 `ThemeDefault`를 복제해 `_themeSwatches`에 끼우세요. 버튼 사이 간격은 23px(`x = 50 + 23·번호`)입니다.
 
 **`항상 위`는 예전 `TOP` 버튼 그대로입니다.** 상단바 480px에 버튼이 더 들어갈 자리가 없어서, 한 자리로 전부를 여는 쪽으로 바꿨습니다. 창 스타일이라 다음 실행에는 켜진 상태로 시작합니다(`DOTORIONApp.Awake`가 `SetAlwaysOnTop(true)`).
 
