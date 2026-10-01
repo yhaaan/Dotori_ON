@@ -29,8 +29,8 @@ namespace DOTORION.UI
         [Tooltip("테마 버튼을 눌렀을 때 피드백에 쓰는 이름입니다. 비우면 에셋 이름을 씁니다.")]
         public string DisplayName;
 
-        /// <summary>The colour of the round button that switches to this theme.</summary>
-        public Color Swatch => Accent;
+        /// <summary>The colour of the round button that switches to this theme; the accent colour when left transparent.</summary>
+        public Color Swatch => _swatch.a > 0f ? _swatch : Accent;
 
         public DOTORIONThemeCatalog Catalog;
         public System.Collections.Generic.List<ThemeOverride> Overrides = new System.Collections.Generic.List<ThemeOverride>();
@@ -111,6 +111,10 @@ namespace DOTORION.UI
 
         [Tooltip("마우스를 올렸을 때의 버튼 바탕색입니다.")]
         [SerializeField] private Color _buttonHover = Hex("34445D");
+
+        [Header("테마 버튼")]
+        [Tooltip("설정 패널의 둥근 테마 버튼에 칠하는 색입니다. 투명으로 두면 강조색을 씁니다.")]
+        [SerializeField] private Color _swatch = new Color(0f, 0f, 0f, 0f);
 
         public Color Window => ResolveRoleColor(ThemeColorRole.Window, _window);
         public Color TopBar => ResolveRoleColor(ThemeColorRole.TopBar, _topBar);

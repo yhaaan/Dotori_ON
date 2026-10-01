@@ -10,155 +10,171 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e246123cf5a045369fd6da2e09cf4d46, type: 3}
-  m_Name: PinkSkinTheme
+  m_Name: WindowsSkinTheme
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONTheme
-  DisplayName: "\uD551\uD06C"
+  DisplayName: "\uC708\uB3C4\uC6B0"
   Catalog: {fileID: 11400000, guid: 9b3c7589070c34c4185e75d5b1503912, type: 2}
-  Overrides: []
+  Overrides:
+  - Id: ae9a459af26043b29d61929349306c76
+    Mode: 1
+    Color: {r: 1, g: 1, b: 1, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 02c9c7ea96024f74a847b7d96c350ecd
+    Mode: 1
+    Color: {r: 1, g: 1, b: 1, a: 1}
+    Sprite: {fileID: 0}
+  - Id: b8e9c5f99dbc4510a65d2c5365ec9629
+    Mode: 1
+    Color: {r: 1, g: 1, b: 1, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 0f07209ecb764e5eaf7e3f68e1c93fed
+    Mode: 1
+    Color: {r: 1, g: 1, b: 1, a: 1}
+    Sprite: {fileID: 0}
   Palette:
   - Role: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
   - Role: 2
-    Color: {r: 1, g: 0.7058824, b: 0.9098039, a: 1}
+    Color: {r: 0.03137255, g: 0, b: 0.70980394, a: 1}
   - Role: 3
-    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Color: {r: 1, g: 1, b: 1, a: 1}
   - Role: 4
-    Color: {r: 0.95686275, g: 0.9137255, b: 0.9411765, a: 1}
+    Color: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 1}
   - Role: 5
-    Color: {r: 1, g: 0.8235294, b: 0.9372549, a: 1}
+    Color: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 1}
   - Role: 6
-    Color: {r: 0.32156864, g: 0.2, b: 0.27058825, a: 1}
+    Color: {r: 0, g: 0, b: 0, a: 1}
   - Role: 7
-    Color: {r: 0.5803922, g: 0.41568628, b: 0.50980395, a: 1}
+    Color: {r: 0.3019608, g: 0.3019608, b: 0.3019608, a: 1}
   - Role: 8
-    Color: {r: 0.23921569, g: 0.14901961, b: 0.20392157, a: 1}
+    Color: {r: 0, g: 0, b: 0, a: 1}
   - Role: 9
-    Color: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
+    Color: {r: 0, g: 0.57254905, b: 0.050980393, a: 1}
   - Role: 10
-    Color: {r: 0.95686275, g: 0.7882353, b: 0.3647059, a: 1}
+    Color: {r: 0.83137256, g: 0.64705884, b: 0, a: 1}
   - Role: 11
-    Color: {r: 1, g: 0.5568628, b: 0.44705883, a: 1}
+    Color: {r: 1, g: 0.42352942, b: 0, a: 1}
   - Role: 12
-    Color: {r: 0.6039216, g: 0.50980395, b: 0.57254905, a: 1}
+    Color: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
   - Role: 13
-    Color: {r: 0.84313726, g: 0.2784314, b: 0.64705884, a: 1}
+    Color: {r: 0.03137255, g: 0, b: 0.70980394, a: 1}
   - Role: 14
-    Color: {r: 0.8509804, g: 0.29411766, b: 0.4117647, a: 1}
+    Color: {r: 0.78431374, g: 0.1254902, b: 0.1254902, a: 1}
   - Role: 15
-    Color: {r: 1, g: 0.8352941, b: 0.93333334, a: 1}
+    Color: {r: 0.8235294, g: 0.8235294, b: 0.8235294, a: 1}
   - Role: 16
-    Color: {r: 1, g: 0.91764706, b: 0.96862745, a: 1}
+    Color: {r: 0.93333334, g: 0.93333334, b: 0.93333334, a: 1}
   - Role: 17
-    Color: {r: 0.9098039, g: 0.69411767, b: 0.827451, a: 1}
+    Color: {r: 0.6901961, g: 0.6901961, b: 0.6901961, a: 1}
   - Role: 18
-    Color: {r: 0.78431374, g: 0.7137255, b: 0.75686276, a: 1}
+    Color: {r: 0.5764706, g: 0.5764706, b: 0.5764706, a: 1}
   - Role: 19
-    Color: {r: 0.22352941, g: 0.14117648, b: 0.19607843, a: 1}
+    Color: {r: 0.0627451, g: 0.0627451, b: 0.0627451, a: 1}
   Sprites:
   - Original: {fileID: 6823056307663999641, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 8560072878102653140, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 2881362997463389846, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 4594524852010441828, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 3545628563809144922, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 2532468644271409535, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -2375252202341576513, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 6965476413758237147, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 8041830295023852690, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -855244552696761644, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -3107801857906394016, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -5611719261512884406, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 1130023068349862255, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 5625833857817353587, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 4634498960101007559, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 3126065208718254620, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 7536635936366339447, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 1755007223590775137, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -2574128946863980043, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -5256598578692361234, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 13229986611504308, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 5951197005930186694, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -5147771896966574814, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 2585329463455883518, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 1
   - Original: {fileID: -3383653190666022547, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 6834635164099899422, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -4327398060601711844, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 283495433077348524, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -6892150499932293882, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 8329955105962487462, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 6048310837311471627, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -5893953430766557653, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 429315192543840743, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -6526499077035062391, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -1456178667965898874, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -2318460142860839568, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 2291562561604100359, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -5849248079821625988, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 1495385216471196373, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -145329152216810761, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -269747070943771992, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -14535111666769259, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 3040754371601784299, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 5935824544477241627, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -5845298471921756740, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 297012406009618183, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -1662657462468266254, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -9052257186730138372, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 1
   - Original: {fileID: 5347648604640936786, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -6996689909481891090, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 7121605145256179958, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 1
   - Original: {fileID: 7465038509489913690, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -9182212746940298063, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 7520425482353510081, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -8580202324720881581, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 7143353407753689302, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 4005030657679792260, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -5962968272173729960, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 7637340886372641449, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 6312385213702517659, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 1
   - Original: {fileID: 2913914030623995161, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 5948240151486401307, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 4224867795639928160, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 9132914386406528632, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 6355453178905245860, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -3070422072867240214, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 4308642812907061438, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -1687416481820024501, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -1547490562874904770, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -7925882652987733410, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 8029413569296366900, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 5363265252900382400, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 1
   - Original: {fileID: -4619150755933060684, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -2167576403357196093, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    PreserveTint: 1
+    Replacement: {fileID: -3842880529278680444, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    PreserveTint: 0
   - Original: {fileID: 6027239768049112412, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 7488874067812498174, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    PreserveTint: 1
+    Replacement: {fileID: 3184675435033773864, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    PreserveTint: 0
   - Original: {fileID: 5954083636947738322, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -5140018960717084086, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 1611526770313274003, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 9215321387082249851, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -6954505903590289167, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -7813765152561719110, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 7045818945381139674, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -3237379967221303261, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -6984141111600330871, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -3661874509819988517, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 2547835599035864534, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -7460692969165758140, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 719706502463273531, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -263020323479450563, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 1
   - Original: {fileID: -6924683231162956708, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 804671244104166393, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 662339500486522635, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 7565262906173101187, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 2605383779479295120, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -5389123403951514759, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: 8227724721445270621, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: 3687835341571523534, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: -2449362441018354743, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   - Original: {fileID: -84888443168597853, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
-    Replacement: {fileID: -3119371930484477405, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+    Replacement: {fileID: 4922554811686178328, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
     PreserveTint: 0
   _window: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
   _topBar: {r: 0.09019608, g: 0.12156863, b: 0.1764706, a: 1}
@@ -175,4 +191,4 @@ MonoBehaviour:
   _danger: {r: 0.9137255, g: 0.44313726, b: 0.44313726, a: 1}
   _button: {r: 0.15294118, g: 0.20392157, b: 0.28627452, a: 1}
   _buttonHover: {r: 0.20392157, g: 0.26666668, b: 0.3647059, a: 1}
-  _swatch: {r: 1, g: 0.6156863, b: 0.8862745, a: 1}
+  _swatch: {r: 0.03137255, g: 0, b: 0.70980394, a: 1}

@@ -47,6 +47,7 @@ namespace DOTORION.UI
         [SerializeField] private Sprite _dailyCheckInClaimedSprite;
 
         private bool _dailyCheckInSupported;
+        private bool? _dailyCheckInClaimed;
         private bool _isClockedIn;
         [SerializeField] private Text _feedbackText;
         [SerializeField] private Text _versionLabel;
@@ -349,6 +350,7 @@ namespace DOTORION.UI
         public void SetDailyCheckIn(DailyCheckInState state, bool supported)
         {
             _dailyCheckInSupported = supported && state != null;
+            _dailyCheckInClaimed = _dailyCheckInSupported ? state.ClaimedToday : (bool?)null;
             ApplyDailyCheckInVisibility();
 
             if (!supported || state == null)
@@ -379,6 +381,16 @@ namespace DOTORION.UI
         private void ApplyDailyCheckInVisibility()
         {
             SetActive(_dailyCheckInButton, _dailyCheckInSupported && _isClockedIn);
+            // The two faces are theme fields, so a skin change swaps them behind
+            // the button's back. Bind runs this every refresh, which repaints the
+            // button from the last known state instead of waiting for the next read.
+            if (_dailyCheckInClaimed.HasValue)
+            {
+                SetDailyCheckInSprite(_dailyCheckInClaimed.Value
+                    ? _dailyCheckInClaimedSprite
+                    : _dailyCheckInAvailableSprite);
+            }
+
             if (_dailyCheckInPointsLabel != null)
             {
                 _dailyCheckInPointsLabel.gameObject.SetActive(_dailyCheckInSupported);

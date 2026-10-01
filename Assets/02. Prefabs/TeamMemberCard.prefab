@@ -67,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -8177735682962812375, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+  m_Sprite: {fileID: 6027239768049112412, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -140,7 +140,7 @@ MonoBehaviour:
       Target: 0
       Mode: 0
       Color: {r: 0.5882353, g: 0.69411767, b: 0.92156863, a: 1}
-      Sprite: {fileID: -8177735682962812375, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      Sprite: {fileID: 6027239768049112412, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 1
@@ -348,7 +348,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -4691332597965536479, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+  m_Sprite: {fileID: 5951197005930186694, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -428,7 +428,7 @@ MonoBehaviour:
       Target: 0
       Mode: 0
       Color: {r: 0.84705883, g: 0.8901961, b: 0.9764706, a: 1}
-      Sprite: {fileID: -4691332597965536479, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      Sprite: {fileID: 5951197005930186694, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
       RuntimeColor: 1
       RuntimeSprite: 0
       AllowsSprite: 1
@@ -1040,7 +1040,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -5489898661777849415, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+  m_Sprite: {fileID: 297012406009618183, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1113,7 +1113,7 @@ MonoBehaviour:
       Target: 0
       Mode: 0
       Color: {r: 0.30980393, g: 0.81960785, b: 0.6313726, a: 1}
-      Sprite: {fileID: -5489898661777849415, guid: 8a59e14353a11ff44844ed432b47f908, type: 3}
+      Sprite: {fileID: 297012406009618183, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
       RuntimeColor: 1
       RuntimeSprite: 0
       AllowsSprite: 1

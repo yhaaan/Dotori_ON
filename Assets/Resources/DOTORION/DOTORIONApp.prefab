@@ -51,6 +51,8 @@ MonoBehaviour:
   _theme: {fileID: 11400000, guid: f1d9f5b36af14901b2ae257292c013a8, type: 2}
   _themes:
   - {fileID: 11400000, guid: f1d9f5b36af14901b2ae257292c013a8, type: 2}
+  - {fileID: 11400000, guid: 222568faa43b9425f8375d3d63176d8b, type: 2}
   - {fileID: 11400000, guid: 98f6ebc521fd6524ea100ced5bdeda94, type: 2}
+  - {fileID: 11400000, guid: becff54e99251cadecff8f37cd80a4c7, type: 2}
   _updatePromptPrefab: {fileID: 3791415601624418992, guid: 7028ed52d1f81674da3a1e9b336aea96, type: 3}
   _useMockBackend: 0

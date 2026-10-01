@@ -23,7 +23,7 @@ namespace DOTORION.Editor
         public const string AppPath = ResourceFolder + "/DOTORIONApp.prefab";
         public const string SoundsPath = ResourceFolder + "/DOTORIONSounds.asset";
         public const string AvatarCatalogPath = ResourceFolder + "/TeamAvatarCatalog.asset";
-        public const string ThemePath = ResourceFolder + "/DarkTheme.asset";
+        public const string ThemePath = ResourceFolder + "/DefaultSkinTheme.asset";
 
         /// <summary>팀이 프로필 아이콘 이미지를 넣어 두는 폴더입니다.</summary>
         public const string AvatarSpriteFolder = "Assets/04. Avatars";

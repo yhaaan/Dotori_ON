@@ -10,11 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e246123cf5a045369fd6da2e09cf4d46, type: 3}
-  m_Name: DarkTheme
+  m_Name: DefaultSkinTheme
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONTheme
+  DisplayName: "\uAE30\uBCF8"
   Catalog: {fileID: 11400000, guid: 9b3c7589070c34c4185e75d5b1503912, type: 2}
-  DisplayName: "기본"
   Overrides: []
+  Palette: []
+  Sprites: []
   _window: {r: 0.0627451, g: 0.08627451, b: 0.12941177, a: 1}
   _topBar: {r: 0.09019608, g: 0.12156863, b: 0.1764706, a: 1}
   _card: {r: 0.10980392, g: 0.14901961, b: 0.20784314, a: 1}
@@ -30,3 +32,4 @@ MonoBehaviour:
   _danger: {r: 0.9137255, g: 0.44313726, b: 0.44313726, a: 1}
   _button: {r: 0.15294118, g: 0.20392157, b: 0.28627452, a: 1}
   _buttonHover: {r: 0.20392157, g: 0.26666668, b: 0.3647059, a: 1}
+  _swatch: {r: 0.22745098, g: 0.47058824, b: 1, a: 1}
