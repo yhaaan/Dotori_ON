@@ -31,10 +31,10 @@ namespace DOTORION.Editor
 
         /// <summary>
         /// 프리팹 안에서 아바타 선택창 자체의 높이. 창이 정확히 이만큼 위로 늘어나므로
-        /// <c>WindowsOverlayWindow.AvatarPickerPanelHeight</c>와 같아야 합니다. 셀 두 줄과
-        /// 제목이 들어가는 높이입니다.
+        /// <c>WindowsOverlayWindow.AvatarPickerPanelHeight</c>와 같아야 합니다. 셀 세 줄(아이콘 두 줄과
+        /// 내 사진 한 줄)과 제목이 들어가는 높이입니다.
         /// </summary>
-        public const float AvatarPickerPanelHeight = 160f;
+        public const float AvatarPickerPanelHeight = 216f;
 
         /// <summary>
         /// 프리팹 안에서 소형 오버레이의 크기. 창이 정확히 이 크기로 바뀌므로

@@ -98,6 +98,7 @@ namespace DOTORION.UI
         private const long MaximumAvatarPhotoFileBytes = 20L * 1024 * 1024;
 
         private AvatarPhotoCache _avatarPhotos;
+        private AvatarSlotStore _avatarSlots;
 
         [Tooltip("색상 테마 에셋. 비워 두면 빌드에 들어 있는 기본 어두운 테마를 씁니다.")]
         [SerializeField] private DOTORIONTheme _theme;
@@ -746,9 +747,10 @@ namespace DOTORION.UI
             _view.StatusNoteSubmitted += HandleStatusNoteSubmitted;
             _view.AvatarPickerRequested += HandleAvatarPickerRequested;
             _view.AvatarPickerCloseRequested += CloseAvatarPicker;
-            _view.AvatarPicked += HandleAvatarPicked;
-            _view.AvatarPhotoRequested += HandleAvatarPhotoRequested;
-            _view.AvatarPhotoCropped += HandleAvatarPhotoCropped;
+            _view.AvatarSlotPicked += HandleAvatarSlotPicked;
+            _view.AvatarSlotPhotoRequested += HandleAvatarSlotPhotoRequested;
+            _view.AvatarSlotResetRequested += HandleAvatarSlotResetRequested;
+            _view.AvatarSlotPhotoCropped += HandleAvatarSlotPhotoCropped;
             _view.MiniModeRequested += HandleMiniModeRequested;
             _view.DailyCheckInRequested += HandleDailyCheckInRequested;
             if (_view.Dashboard != null)
@@ -763,6 +765,9 @@ namespace DOTORION.UI
             _avatarPhotos?.Dispose();
             _avatarPhotos = _backend is ITeamAvatarPhotos photos ? new AvatarPhotoCache(photos) : null;
             _view.SetAvatarPhotos(_avatarPhotos);
+            _avatarSlots?.Dispose();
+            _avatarSlots = new AvatarSlotStore(_backend.LocalMemberId);
+            _view.SetAvatarSlotSource(_avatarSlots.Find, AvatarSlotForKey);
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _view.SetMuted(_tonePlayer.IsMuted);
             _view.SetAutoStart(WindowsStartupRegistration.IsEnabled());
@@ -822,6 +827,8 @@ namespace DOTORION.UI
             _eventSubscription = null;
             _avatarPhotos?.Dispose();
             _avatarPhotos = null;
+            _avatarSlots?.Dispose();
+            _avatarSlots = null;
             (_backend as IDisposable)?.Dispose();
             _backend = null;
             _mockControls = null;
@@ -861,9 +868,10 @@ namespace DOTORION.UI
             _view.StatusNoteSubmitted -= HandleStatusNoteSubmitted;
             _view.AvatarPickerRequested -= HandleAvatarPickerRequested;
             _view.AvatarPickerCloseRequested -= CloseAvatarPicker;
-            _view.AvatarPicked -= HandleAvatarPicked;
-            _view.AvatarPhotoRequested -= HandleAvatarPhotoRequested;
-            _view.AvatarPhotoCropped -= HandleAvatarPhotoCropped;
+            _view.AvatarSlotPicked -= HandleAvatarSlotPicked;
+            _view.AvatarSlotPhotoRequested -= HandleAvatarSlotPhotoRequested;
+            _view.AvatarSlotResetRequested -= HandleAvatarSlotResetRequested;
+            _view.AvatarSlotPhotoCropped -= HandleAvatarSlotPhotoCropped;
             _view.MiniModeRequested -= HandleMiniModeRequested;
             _view.DailyCheckInRequested -= HandleDailyCheckInRequested;
             if (_view.Dashboard != null)
@@ -1794,21 +1802,38 @@ namespace DOTORION.UI
             _window?.CollapseAvatarPicker();
         }
 
-        private void HandleAvatarPicked(string avatarKey)
+        /// <summary>
+        /// Wears what a picker cell shows: the photo put into it on this PC, or
+        /// else its catalog icon. A photo is uploaded again on every switch - it
+        /// is a few kilobytes, and it keeps the server holding only the one
+        /// picture teammates need.
+        /// </summary>
+        private void HandleAvatarSlotPicked(string slotId)
         {
-            RunMutation(
-                token => _backend.SetAvatarKeyAsync(avatarKey, token),
-                "프로필 아이콘을 바꿨습니다.");
+            var png = _avatarSlots?.ReadPng(slotId);
+            if (png != null)
+            {
+                WearSlotPhoto(slotId, png);
+                return;
+            }
+
+            var catalogKey = AvatarSlotStore.CatalogKeyOf(slotId);
+            if (catalogKey != null)
+            {
+                RunMutation(
+                    token => _backend.SetAvatarKeyAsync(catalogKey, token),
+                    "프로필 아이콘을 바꿨습니다.");
+            }
         }
 
         /// <summary>
-        /// 내 사진: the file dialog is modal, so the overlay simply waits on it.
-        /// The file is decoded here and handed to the picker's crop editor;
-        /// nothing leaves the machine until the person presses 적용.
+        /// "+" or 교체: the file dialog is modal, so the overlay simply waits on
+        /// it. The file is decoded here and handed to the picker's crop editor;
+        /// nothing is saved or sent until the person presses 적용.
         /// </summary>
-        private void HandleAvatarPhotoRequested()
+        private void HandleAvatarSlotPhotoRequested(string slotId)
         {
-            if (_view == null || _window == null || !(_backend is ITeamAvatarPhotos))
+            if (_view == null || _window == null || _avatarSlots == null || !(_backend is ITeamAvatarPhotos))
             {
                 _view?.ShowFeedback("이 연결에서는 사진을 쓸 수 없습니다.", true);
                 return;
@@ -1843,10 +1868,66 @@ namespace DOTORION.UI
                 return;
             }
 
-            _view.BeginAvatarPhotoCrop(picture);
+            _view.BeginAvatarPhotoCrop(picture, slotId);
         }
 
-        private void HandleAvatarPhotoCropped(byte[] png)
+        private void HandleAvatarSlotPhotoCropped(string slotId, byte[] png, bool wear)
+        {
+            if (_avatarSlots == null)
+            {
+                return;
+            }
+
+            try
+            {
+                _avatarSlots.Save(slotId, png);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                _view?.ShowFeedback("사진을 이 PC에 저장하지 못했습니다.", true);
+                return;
+            }
+
+            _view?.RefreshAvatarSlots();
+            if (wear)
+            {
+                WearSlotPhoto(slotId, png);
+            }
+            else
+            {
+                _view?.ShowFeedback("사진을 등록했습니다.");
+            }
+        }
+
+        /// <summary>
+        /// 기본: the cell goes back to its icon or to "+". If it was the one being
+        /// worn, the avatar follows it back - to the icon, or to the name initial
+        /// for a custom cell that has nothing left to show.
+        /// </summary>
+        private void HandleAvatarSlotResetRequested(string slotId)
+        {
+            if (_avatarSlots == null)
+            {
+                return;
+            }
+
+            var wasWorn = string.Equals(_view?.SelectedAvatarSlot, slotId, StringComparison.Ordinal);
+            _avatarSlots.Delete(slotId);
+            _view?.RefreshAvatarSlots();
+            if (!wasWorn)
+            {
+                _view?.ShowFeedback("기본으로 되돌렸습니다.");
+                return;
+            }
+
+            var catalogKey = AvatarSlotStore.CatalogKeyOf(slotId) ?? TeamAvatarCatalog.DefaultKey;
+            RunMutation(
+                token => _backend.SetAvatarKeyAsync(catalogKey, token),
+                "기본으로 되돌렸습니다.");
+        }
+
+        private void WearSlotPhoto(string slotId, byte[] png)
         {
             if (!(_backend is ITeamAvatarPhotos photos))
             {
@@ -1859,13 +1940,33 @@ namespace DOTORION.UI
                 () =>
                 {
                     // This machine already has the picture; seeding the cache
-                    // saves the download the new key would otherwise trigger.
+                    // saves the download the new key would otherwise trigger,
+                    // and remembering the version is how the picker later knows
+                    // which cell photo.N came from.
                     var local = LocalMember();
                     if (local != null && AvatarPhotoKey.TryParse(local.AvatarKey, out var version))
                     {
                         _avatarPhotos?.Put(local.MemberId, version, png);
+                        _avatarSlots?.SetWorn(slotId, version);
+                        _view?.SetAvatarPickerSelection(local.AvatarKey);
                     }
                 });
+        }
+
+        /// <summary>
+        /// Which picker cell a worn avatar key belongs to. A photo is found by the
+        /// version this PC uploaded it as; an icon by its cell, unless that cell
+        /// now shows a photo instead, in which case nothing on screen is worn.
+        /// </summary>
+        private string AvatarSlotForKey(string avatarKey)
+        {
+            if (AvatarPhotoKey.TryParse(avatarKey, out var version))
+            {
+                return _avatarSlots?.WornSlotFor(version);
+            }
+
+            var slot = AvatarSlotStore.IconSlot(avatarKey);
+            return _avatarSlots != null && _avatarSlots.Has(slot) ? null : slot;
         }
 
         /// <summary>

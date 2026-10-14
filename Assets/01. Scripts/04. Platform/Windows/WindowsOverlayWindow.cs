@@ -99,7 +99,7 @@ namespace DOTORION.Platform.Windows
         /// one is taken off the top of the window, so it also mirrors the panel's
         /// height in the prefab, so the two have to change together.
         /// </summary>
-        public const int AvatarPickerPanelHeight = 160;
+        public const int AvatarPickerPanelHeight = 216;
 
         /// <summary>
         /// The mini overlay's client size. It mirrors the panel's own size in the

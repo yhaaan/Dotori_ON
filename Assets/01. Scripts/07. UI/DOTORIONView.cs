@@ -120,14 +120,17 @@ namespace DOTORION.UI
 
         public event Action AvatarPickerCloseRequested;
 
-        /// <summary>Carries the catalog key the local member picked.</summary>
-        public event Action<string> AvatarPicked;
+        /// <summary>Raised with the picker cell (slot) the person clicked to wear.</summary>
+        public event Action<string> AvatarSlotPicked;
 
-        /// <summary>Raised by the picker's 내 사진 button.</summary>
-        public event Action AvatarPhotoRequested;
+        /// <summary>Raised by a cell's "+" or 교체: the app opens a picture for that slot.</summary>
+        public event Action<string> AvatarSlotPhotoRequested;
 
-        /// <summary>Raised with the cropped photo, encoded as the PNG to upload.</summary>
-        public event Action<byte[]> AvatarPhotoCropped;
+        /// <summary>Raised by a cell's 기본.</summary>
+        public event Action<string> AvatarSlotResetRequested;
+
+        /// <summary>Raised with the slot, the cropped PNG, and whether to wear it now.</summary>
+        public event Action<string, byte[], bool> AvatarSlotPhotoCropped;
 
         public bool IsStatisticsVisible => _statisticsPanel != null && _statisticsPanel.gameObject.activeSelf;
 
@@ -238,9 +241,10 @@ namespace DOTORION.UI
             if (_avatarPickerPanel != null)
             {
                 _avatarPickerPanel.Initialize();
-                _avatarPickerPanel.AvatarPicked += key => AvatarPicked?.Invoke(key);
-                _avatarPickerPanel.PhotoRequested += () => AvatarPhotoRequested?.Invoke();
-                _avatarPickerPanel.PhotoCropped += png => AvatarPhotoCropped?.Invoke(png);
+                _avatarPickerPanel.SlotPicked += slot => AvatarSlotPicked?.Invoke(slot);
+                _avatarPickerPanel.SlotPhotoRequested += slot => AvatarSlotPhotoRequested?.Invoke(slot);
+                _avatarPickerPanel.SlotResetRequested += slot => AvatarSlotResetRequested?.Invoke(slot);
+                _avatarPickerPanel.SlotPhotoCropped += (slot, png, wear) => AvatarSlotPhotoCropped?.Invoke(slot, png, wear);
                 _avatarPickerPanel.CloseRequested += () => AvatarPickerCloseRequested?.Invoke();
                 SetAvatarPickerVisible(false);
             }
@@ -447,11 +451,25 @@ namespace DOTORION.UI
             }
         }
 
-        /// <summary>Opens the picker's crop editor on a picture the app loaded.</summary>
-        public void BeginAvatarPhotoCrop(Texture2D picture)
+        /// <summary>Opens the picker's crop editor on a picture the app loaded for a slot.</summary>
+        public void BeginAvatarPhotoCrop(Texture2D picture, string slotId)
         {
-            _avatarPickerPanel?.BeginPhotoCrop(picture);
+            _avatarPickerPanel?.BeginPhotoCrop(picture, slotId);
         }
+
+        /// <summary>Tells the picker where slot photos come from and redraws it.</summary>
+        public void SetAvatarSlotSource(Func<string, Sprite> slotPhoto, Func<string, string> slotForAvatarKey)
+        {
+            _avatarPickerPanel?.SetSlotSource(slotPhoto, slotForAvatarKey);
+        }
+
+        public void RefreshAvatarSlots()
+        {
+            _avatarPickerPanel?.RefreshCells();
+        }
+
+        /// <summary>The picker cell marked as worn, or null.</summary>
+        public string SelectedAvatarSlot => _avatarPickerPanel != null ? _avatarPickerPanel.SelectedSlot : null;
 
         /// <summary>
         /// Opens the picker above the rest of the overlay. The panel sits at the
