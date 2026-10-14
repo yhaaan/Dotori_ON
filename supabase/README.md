@@ -137,6 +137,16 @@ operation. A Unity build may contain only the project's publishable/legacy anon
 key. Never place the `service_role` key in client configuration, source files,
 logs, or a shipped build.
 
+## Profile photos
+
+`member_avatar_photos` holds at most one cropped 64x64 PNG per member, as base64
+text (a few KB each; the column is capped at 32 KiB of PNG). It is written only
+through `set_avatar_photo(p_member_id, p_png_base64)`, which checks the PNG
+signature and that the IHDR says 64x64, bumps `version`, and sets
+`members.avatar_key = 'photo.<version>'`. Members of the same team can `select`
+the row (RLS mirrors `members`); clients fetch it only when the roster shows a
+version they have not cached.
+
 ## Client RPC payload shapes
 
 After Auth and name claim, examples sent through the Supabase Data API are:
