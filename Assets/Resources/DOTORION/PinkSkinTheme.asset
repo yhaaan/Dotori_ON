@@ -14,7 +14,283 @@ MonoBehaviour:
   m_EditorClassIdentifier: DOTORION.Runtime::DOTORION.UI.DOTORIONTheme
   DisplayName: "\uD551\uD06C"
   Catalog: {fileID: 11400000, guid: 9b3c7589070c34c4185e75d5b1503912, type: 2}
-  Overrides: []
+  Overrides:
+  - Id: d6536279317e415e99d0f3e3f63aa1de
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: d66bff1e5d04441c8753b93cf10f2caf
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 973f3039224645c8a9017816a8ea280a
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: cba15253b3ff4d12b74fc62a261a586c
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 7d5846208f674436a2a6ede7d883f315
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 0ecedbfa6d434fc3934f9a709ae40e3d
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: aa9acffc8fbe479ea7ffca138239d0f1
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: df210f1fb4fc473bb626dfd76dd2aabd
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: 49bb8345eac74d019b5affe45ec4fbe2
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: ad401870e0014ab7a4bbc75f5991e9a6
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: e17208734b034b368f3c0eb79b6f54fb
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 0d090175a73a4a96a28016726ea0f39a
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 6be46ff04e8b49e1bb0a3edfb5719110
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: efe048b6943e4e818f415632e9cbc11f
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 0af05861e63f4fc99d5d38aca02bc1ff
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: 539f987969aa4f86a034e625ce976b15
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 97606fa1182b4cf6b4d7b7bea23a9a30
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 2ea74b9098cc4785a9439dea15a3a462
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: d1a7fd4901524f12b3aaf171bdc1b552
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 83e5bee0b7de484eb8447c01ad644a11
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 7afe818681b347ea97d5b58971bb046a
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: ac03304311cd4cefad9d5c1f970bd275
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: 4a9c86e915704c67866cce1e5fb6314c
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 8a5f64017d7849c7ba999527f3713d27
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 9d2f6bb3035a4381bfd8bdd3e481f610
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 9dd3c15997ff44919bd5eee0492a225f
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: be9398ca0ae9411c8020b1381741b942
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 2954a4a7c0dc4d87a4ad5f3f3f2c1011
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 6a1df936eb4e4f7980048bc80418adac
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: 136ff9aca5b34ad9b1a02fdb630e7b4c
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 0e2d9d76d95f45c7bc7eb5cb82ac14c1
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 3e4d33a864194ac7bba0efa9244792e7
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 640a3f4d71c34f1aae5fe7a4f74367c8
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 6d77f50f796145e19fd691b0fa3b4bc1
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: f9839834089a4e3290a07ea89827cc28
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 666e2ed79c4845f7b0cab64f6e6d198f
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: cc016bc9960748a1aad9802ce4c76907
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 7f649884d52548ef9e5dfb9c5a5d5d29
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 643b7d6d27e34639b70b29a8e4ccaf3c
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 83426bbe275b40e49d35beaeb2175d5b
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 42d007159bd645a3a03126c967783cad
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: ff065bd04c5d4269a8e95dcaa11aaf35
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 7fdf9e9be840447382d0eb5083dd7f6c
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: 333fe0a9a2e242668df5f7b9810924f7
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 081ccc0ab6214c70acb0686faa3aab61
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 5c395583b4194c72b07c1fa2cc5f2777
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: bce7c90e0b17400ba54d1650fea287ef
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 11a9b9506caa4c639928d3fc1f173f35
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: c448f59fdb5c451582012a6df73e3796
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 9329d0683f62489eb7339bec75d0f015
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: b5ac0396627047caa3359b728977612c
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: af3fd00811fb42c6977b3cb015876ab6
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: c98d13c2422d4798b970871020416ea1
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 569a8fbcde56422babaaae84b35c6d74
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 5fcc57f526f0488d92ab78a191afd78c
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: d2cd0e10918e46ffb1a424ef61889384
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 0d3e76343f244bcca7a3417a7e03aee4
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: ca6038331ec54d8cbde2c764ded54e66
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 1697dfcafeb745d1be2164e5b026f2d4
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: c407e718f6ed4f6e88ebc207ce220494
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: 3677692fff714974b0f880817da430f6
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 15f8cc9fcfda4c0bb240add07bb14d6a
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 9fe2779ef0444538af220fadf8faa2e2
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 1539f91644934a919ee9c6d24b417a5b
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 0eb775b84d9e403cb27139400f607982
+    Mode: 2
+    Color: {r: 0.4784314, g: 0.1960784, b: 0.3966942, a: 1}
+    Sprite: {fileID: -937427698343550886, guid: 6d712d1a50caea04bb3037180b3756cc, type: 3}
+  - Id: 9507f71fb433494fa12b823fd2678e97
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 7b893d12e967409490be07e198a2ffcb
+    Mode: 1
+    Color: {r: 1, g: 0.9647059, b: 0.9882353, a: 1}
+    Sprite: {fileID: 0}
+  - Id: 2975ddb83cbb4d80916f9908e0dc705e
+    Mode: 1
+    Color: {r: 1, g: 0.7254902, b: 0.9333333, a: 1}
+    Sprite: {fileID: 0}
+  - Id: b4477dda7ca646ed812461c2380ad90e
+    Mode: 1
+    Color: {r: 0.2901961, g: 0.07058824, b: 0.2196078, a: 1}
+    Sprite: {fileID: 0}
   Palette:
   - Role: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
