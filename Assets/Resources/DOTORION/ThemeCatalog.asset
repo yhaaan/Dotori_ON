@@ -3509,12 +3509,12 @@ MonoBehaviour:
       \xB7 Text/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 0
-    ColorRole: 0
+    ColorRole: 6
   - Id: cba15253b3ff4d12b74fc62a261a586c
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow/Other
       \xB7 Text/Appearance"
@@ -3564,12 +3564,12 @@ MonoBehaviour:
       \xB7 Image/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 1
-    ColorRole: 0
+    ColorRole: 6
   - Id: df210f1fb4fc473bb626dfd76dd2aabd
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow
       \xB7 Image/Appearance"
@@ -3608,12 +3608,12 @@ MonoBehaviour:
       \xB7 Text/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 0
-    ColorRole: 0
+    ColorRole: 6
   - Id: e17208734b034b368f3c0eb79b6f54fb
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow/Other
       \xB7 Text/Appearance"
@@ -3663,12 +3663,12 @@ MonoBehaviour:
       \xB7 Image/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 1
-    ColorRole: 0
+    ColorRole: 6
   - Id: 0af05861e63f4fc99d5d38aca02bc1ff
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow
       \xB7 Image/Appearance"
@@ -3707,12 +3707,12 @@ MonoBehaviour:
       \xB7 Text/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 0
-    ColorRole: 0
+    ColorRole: 6
   - Id: 2ea74b9098cc4785a9439dea15a3a462
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow/Other
       \xB7 Text/Appearance"
@@ -3762,12 +3762,12 @@ MonoBehaviour:
       \xB7 Image/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 1
-    ColorRole: 0
+    ColorRole: 6
   - Id: ac03304311cd4cefad9d5c1f970bd275
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow
       \xB7 Image/Appearance"
@@ -3806,12 +3806,12 @@ MonoBehaviour:
       \xB7 Text/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 0
-    ColorRole: 0
+    ColorRole: 6
   - Id: 9d2f6bb3035a4381bfd8bdd3e481f610
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow/Other
       \xB7 Text/Appearance"
@@ -3861,12 +3861,12 @@ MonoBehaviour:
       \xB7 Image/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 1
-    ColorRole: 0
+    ColorRole: 6
   - Id: 6a1df936eb4e4f7980048bc80418adac
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow
       \xB7 Image/Appearance"
@@ -3905,12 +3905,12 @@ MonoBehaviour:
       \xB7 Text/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 0
-    ColorRole: 0
+    ColorRole: 6
   - Id: 3e4d33a864194ac7bba0efa9244792e7
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow/Other
       \xB7 Text/Appearance"
@@ -3960,12 +3960,12 @@ MonoBehaviour:
       \xB7 Image/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 1
-    ColorRole: 0
+    ColorRole: 6
   - Id: 666e2ed79c4845f7b0cab64f6e6d198f
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow
       \xB7 Image/Appearance"
@@ -4004,12 +4004,12 @@ MonoBehaviour:
       \xB7 Text/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 0
-    ColorRole: 0
+    ColorRole: 6
   - Id: 643b7d6d27e34639b70b29a8e4ccaf3c
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow/Other
       \xB7 Text/Appearance"
@@ -4059,12 +4059,12 @@ MonoBehaviour:
       \xB7 Image/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 1
-    ColorRole: 0
+    ColorRole: 6
   - Id: 7fdf9e9be840447382d0eb5083dd7f6c
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow
       \xB7 Image/Appearance"
@@ -4103,12 +4103,12 @@ MonoBehaviour:
       \xB7 Text/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 0
-    ColorRole: 0
+    ColorRole: 6
   - Id: 5c395583b4194c72b07c1fa2cc5f2777
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/StatRow/Other
       \xB7 Text/Appearance"
@@ -4158,12 +4158,12 @@ MonoBehaviour:
       \xB7 Image/Appearance"
     Target: 0
     Mode: 1
-    Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+    Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
     Sprite: {fileID: 0}
     RuntimeColor: 0
     RuntimeSprite: 0
     AllowsSprite: 1
-    ColorRole: 0
+    ColorRole: 6
   - Id: 8e385e4d381a41429bd814bca891b9fd
     Label: "DOTORIONCanvas/WindowBackground/StatisticsPanel/DailyContent/Calendar
       \xB7 TeamCalendarView/_dailyGiftUnclaimedSprite"

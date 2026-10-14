@@ -33,11 +33,11 @@ namespace DOTORION.UI
             }
             _workLabel.text = MetricName(metric) + " "
                 + TeamPeriodStatRowView.FormatDuration(entry.SecondsFor(metric));
-            _workLabel.color = MetricColor(metric);
+            _workLabel.color = ColorFor(metric);
             TeamPeriodStatRowView.SetBarRatio(_workBar, entry.SecondsFor(metric), maximumSeconds);
             if (_workBar != null)
             {
-                _workBar.color = MetricColor(metric);
+                _workBar.color = ColorFor(metric);
             }
 
             // The second line is the number the ranked one is most often compared
@@ -47,7 +47,19 @@ namespace DOTORION.UI
                 : RankingMetric.Work;
             _attendanceLabel.text = MetricName(comparison) + " "
                 + TeamPeriodStatRowView.FormatDuration(entry.SecondsFor(comparison));
-            _attendanceLabel.color = MetricColor(comparison);
+            _attendanceLabel.color = ColorFor(comparison);
+        }
+
+        /// <summary>
+        /// Total time is not a state, so it has no state colour to carry: it is
+        /// drawn like the name next to it, which each skin already keeps readable
+        /// on its own row.
+        /// </summary>
+        private Color ColorFor(RankingMetric metric)
+        {
+            return metric == RankingMetric.Attendance && _nameLabel != null
+                ? _nameLabel.color
+                : MetricColor(metric);
         }
 
         public static string MetricName(RankingMetric metric)

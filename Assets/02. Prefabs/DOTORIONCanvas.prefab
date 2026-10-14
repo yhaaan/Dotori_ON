@@ -1702,7 +1702,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1742,12 +1742,12 @@ MonoBehaviour:
         \xB7 Text/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 0
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 18615667096242862}
     Member: Appearance
     OriginalTransition: 0
@@ -2754,7 +2754,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2790,12 +2790,12 @@ MonoBehaviour:
         \xB7 Image/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 1
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 8351404159241580370}
     Member: Appearance
     OriginalTransition: 0
@@ -3089,7 +3089,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3129,12 +3129,12 @@ MonoBehaviour:
         \xB7 Text/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 0
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 3187099800866927912}
     Member: Appearance
     OriginalTransition: 0
@@ -3797,7 +3797,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3837,12 +3837,12 @@ MonoBehaviour:
         \xB7 Text/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 0
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 2324984694346550638}
     Member: Appearance
     OriginalTransition: 0
@@ -4570,7 +4570,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4606,12 +4606,12 @@ MonoBehaviour:
         \xB7 Image/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 1
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 6701349769378747559}
     Member: Appearance
     OriginalTransition: 0
@@ -4887,7 +4887,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4927,12 +4927,12 @@ MonoBehaviour:
         \xB7 Text/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 0
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 8411158955373832890}
     Member: Appearance
     OriginalTransition: 0
@@ -23140,7 +23140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -23180,12 +23180,12 @@ MonoBehaviour:
         \xB7 Text/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 0
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 4640778090658545696}
     Member: Appearance
     OriginalTransition: 0
@@ -24671,7 +24671,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -24707,12 +24707,12 @@ MonoBehaviour:
         \xB7 Image/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 1
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 5236303554186307476}
     Member: Appearance
     OriginalTransition: 0
@@ -30172,7 +30172,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -30208,12 +30208,12 @@ MonoBehaviour:
         \xB7 Image/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 1
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 7559612762116388935}
     Member: Appearance
     OriginalTransition: 0
@@ -36422,7 +36422,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -36462,12 +36462,12 @@ MonoBehaviour:
         \xB7 Text/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 0
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 7509181748807439696}
     Member: Appearance
     OriginalTransition: 0
@@ -37630,7 +37630,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -37670,12 +37670,12 @@ MonoBehaviour:
         \xB7 Text/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 0
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 6670376292508590103}
     Member: Appearance
     OriginalTransition: 0
@@ -41599,7 +41599,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -41635,12 +41635,12 @@ MonoBehaviour:
         \xB7 Image/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 1
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 12397686327340523}
     Member: Appearance
     OriginalTransition: 0
@@ -45261,7 +45261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -45297,12 +45297,12 @@ MonoBehaviour:
         \xB7 Image/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 1
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 3737761660369661358}
     Member: Appearance
     OriginalTransition: 0
@@ -47410,7 +47410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+  m_Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -47446,12 +47446,12 @@ MonoBehaviour:
         \xB7 Image/Appearance"
       Target: 0
       Mode: 1
-      Color: {r: 0.43137255, g: 0.65882355, b: 0.99607843, a: 1}
+      Color: {r: 0.95686275, g: 0.96862745, b: 0.9843137, a: 1}
       Sprite: {fileID: 0}
       RuntimeColor: 0
       RuntimeSprite: 0
       AllowsSprite: 1
-      ColorRole: 0
+      ColorRole: 6
     Target: {fileID: 6204703924481339085}
     Member: Appearance
     OriginalTransition: 0
