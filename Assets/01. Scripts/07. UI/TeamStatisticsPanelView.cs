@@ -44,6 +44,8 @@ namespace DOTORION.UI
         private RankingMetric _metric = RankingMetric.Work;
         private IReadOnlyList<TeamRankingEntry> _ranking;
         private string _localMemberId;
+        private bool _selectionDirty = true;
+        private readonly Dictionary<Button, ColorBlock> _authoredButtonColors = new Dictionary<Button, ColorBlock>();
 
         /// <summary>
         /// Raised when the person picks a different period. Only the app can serve
@@ -91,6 +93,7 @@ namespace DOTORION.UI
         public void SetPeriod(StatisticsPeriod period)
         {
             _period = period;
+            _selectionDirty = true;
         }
 
         public void ShowLoading(StatisticsRange range)
@@ -198,6 +201,7 @@ namespace DOTORION.UI
         private void SelectMetric(RankingMetric metric)
         {
             _metric = metric;
+            _selectionDirty = true;
             BindRankingRows();
         }
 
@@ -230,6 +234,75 @@ namespace DOTORION.UI
             _showRanking = showRanking;
             if (_dailyContent != null) _dailyContent.SetActive(!showRanking);
             if (_rankingContent != null) _rankingContent.SetActive(showRanking);
+            _selectionDirty = true;
+        }
+
+        private void OnEnable()
+        {
+            DOTORIONPalette.ThemeChanged += MarkSelectionDirty;
+            _selectionDirty = true;
+        }
+
+        private void OnDisable()
+        {
+            DOTORIONPalette.ThemeChanged -= MarkSelectionDirty;
+        }
+
+        private void MarkSelectionDirty()
+        {
+            _selectionDirty = true;
+        }
+
+        /// <summary>
+        /// Marking waits for the end of the frame because the theme bindings
+        /// repaint these same buttons when a theme changes or the panel opens,
+        /// and whichever of us runs last would otherwise win.
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (!_selectionDirty)
+            {
+                return;
+            }
+
+            _selectionDirty = false;
+            ShadeSelection(_dailyTabButton, !_showRanking);
+            ShadeSelection(_rankingTabButton, _showRanking);
+            for (var index = 0; index < _periodButtons.Length && index < Periods.Length; index++)
+            {
+                ShadeSelection(_periodButtons[index], Periods[index] == _period);
+            }
+
+            for (var index = 0; index < _metricButtons.Length && index < Metrics.Length; index++)
+            {
+                ShadeSelection(_metricButtons[index], Metrics[index] == _metric);
+            }
+        }
+
+        /// <summary>
+        /// The picked button rests in its pressed colour, so it keeps looking
+        /// clicked. Unity's Selected state is set to the same colour; otherwise
+        /// the button just clicked would show its plain selected tint until
+        /// focus moved elsewhere.
+        /// </summary>
+        private void ShadeSelection(Button button, bool selected)
+        {
+            if (button == null)
+            {
+                return;
+            }
+
+            if (!_authoredButtonColors.TryGetValue(button, out var authored))
+            {
+                authored = button.colors;
+                _authoredButtonColors[button] = authored;
+            }
+
+            var colors = button.colors;
+            var pressed = DOTORIONThemeBinding.ThemedColor(button, "pressedColor", authored.pressedColor);
+            colors.normalColor = selected ? pressed : DOTORIONThemeBinding.ThemedColor(button, "normalColor", authored.normalColor);
+            colors.selectedColor = selected ? pressed : DOTORIONThemeBinding.ThemedColor(button, "selectedColor", authored.selectedColor);
+            button.colors = colors;
         }
 
         private void SetRowsVisible(bool visible)

@@ -30,6 +30,13 @@ namespace DOTORION.UI
             if (value != null) return value.Mode == ThemeMode.Original ? fallback : value.Color;
             return DOTORIONPalette.Active.ResolveRoleColor(ThemeRoleRules.RoleOf(entry.Slot), fallback);
         }
+        // The ColorBlock colour Apply would give this button, so code can swap states around without losing the theme's value.
+        public static Color ThemedColor(Selectable selectable, string member, Color fallback)
+        {
+            var binding = selectable.GetComponent<DOTORIONThemeBinding>();
+            var entry = binding != null ? binding.Entries.Find(e => e.Target == selectable && e.Slot.Target == ThemeTarget.ButtonColor && e.Member == member) : null;
+            return entry == null ? fallback : DOTORIONPalette.Active.ResolveColor(entry.Slot);
+        }
         public void Apply(DOTORIONTheme theme)
         {
             foreach (var entry in Entries)
