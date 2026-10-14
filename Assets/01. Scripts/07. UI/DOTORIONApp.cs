@@ -94,6 +94,11 @@ namespace DOTORION.UI
         [Tooltip("프로필 아이콘 목록 에셋. 비워 두면 아이콘 대신 이름 첫 글자만 보입니다.")]
         [SerializeField] private TeamAvatarCatalog _avatarCatalog;
 
+        /// <summary>The largest picture file the crop editor will open.</summary>
+        private const long MaximumAvatarPhotoFileBytes = 20L * 1024 * 1024;
+
+        private AvatarPhotoCache _avatarPhotos;
+
         [Tooltip("색상 테마 에셋. 비워 두면 빌드에 들어 있는 기본 어두운 테마를 씁니다.")]
         [SerializeField] private DOTORIONTheme _theme;
 
@@ -722,6 +727,8 @@ namespace DOTORION.UI
             _view.AvatarPickerRequested += HandleAvatarPickerRequested;
             _view.AvatarPickerCloseRequested += CloseAvatarPicker;
             _view.AvatarPicked += HandleAvatarPicked;
+            _view.AvatarPhotoRequested += HandleAvatarPhotoRequested;
+            _view.AvatarPhotoCropped += HandleAvatarPhotoCropped;
             _view.MiniModeRequested += HandleMiniModeRequested;
             _view.DailyCheckInRequested += HandleDailyCheckInRequested;
             if (_view.Dashboard != null)
@@ -733,6 +740,9 @@ namespace DOTORION.UI
             }
             _view.MiniModeExitRequested += HandleMiniModeExitRequested;
             _view.SetAvatarCatalog(_avatarCatalog);
+            _avatarPhotos?.Dispose();
+            _avatarPhotos = _backend is ITeamAvatarPhotos photos ? new AvatarPhotoCache(photos) : null;
+            _view.SetAvatarPhotos(_avatarPhotos);
             _view.SetAlwaysOnTop(_window.IsAlwaysOnTop);
             _view.SetMuted(_tonePlayer.IsMuted);
             _view.SetAutoStart(WindowsStartupRegistration.IsEnabled());
@@ -790,6 +800,8 @@ namespace DOTORION.UI
 
             _eventSubscription?.Dispose();
             _eventSubscription = null;
+            _avatarPhotos?.Dispose();
+            _avatarPhotos = null;
             (_backend as IDisposable)?.Dispose();
             _backend = null;
             _mockControls = null;
@@ -830,6 +842,8 @@ namespace DOTORION.UI
             _view.AvatarPickerRequested -= HandleAvatarPickerRequested;
             _view.AvatarPickerCloseRequested -= CloseAvatarPicker;
             _view.AvatarPicked -= HandleAvatarPicked;
+            _view.AvatarPhotoRequested -= HandleAvatarPhotoRequested;
+            _view.AvatarPhotoCropped -= HandleAvatarPhotoCropped;
             _view.MiniModeRequested -= HandleMiniModeRequested;
             _view.DailyCheckInRequested -= HandleDailyCheckInRequested;
             if (_view.Dashboard != null)
@@ -1768,6 +1782,73 @@ namespace DOTORION.UI
         }
 
         /// <summary>
+        /// 내 사진: the file dialog is modal, so the overlay simply waits on it.
+        /// The file is decoded here and handed to the picker's crop editor;
+        /// nothing leaves the machine until the person presses 적용.
+        /// </summary>
+        private void HandleAvatarPhotoRequested()
+        {
+            if (_view == null || _window == null || !(_backend is ITeamAvatarPhotos))
+            {
+                _view?.ShowFeedback("이 연결에서는 사진을 쓸 수 없습니다.", true);
+                return;
+            }
+
+            var path = _window.PickImageFile();
+            if (string.IsNullOrEmpty(path))
+            {
+                return;
+            }
+
+            Texture2D picture = null;
+            try
+            {
+                var info = new System.IO.FileInfo(path);
+                if (info.Length > MaximumAvatarPhotoFileBytes)
+                {
+                    _view.ShowFeedback("사진 파일이 너무 큽니다. 20MB 이하로 골라 주세요.", true);
+                    return;
+                }
+
+                picture = AvatarPhotoImage.LoadForEditing(System.IO.File.ReadAllBytes(path));
+            }
+            catch (Exception exception)
+            {
+                Debug.LogWarning("Could not read the picked photo: " + exception.Message);
+            }
+
+            if (picture == null)
+            {
+                _view.ShowFeedback("사진을 읽지 못했습니다. PNG나 JPG 파일을 골라 주세요.", true);
+                return;
+            }
+
+            _view.BeginAvatarPhotoCrop(picture);
+        }
+
+        private void HandleAvatarPhotoCropped(byte[] png)
+        {
+            if (!(_backend is ITeamAvatarPhotos photos))
+            {
+                return;
+            }
+
+            RunMutation(
+                token => photos.UploadAvatarPhotoAsync(png, token),
+                "프로필 사진을 바꿨습니다.",
+                () =>
+                {
+                    // This machine already has the picture; seeding the cache
+                    // saves the download the new key would otherwise trigger.
+                    var local = LocalMember();
+                    if (local != null && AvatarPhotoKey.TryParse(local.AvatarKey, out var version))
+                    {
+                        _avatarPhotos?.Put(local.MemberId, version, png);
+                    }
+                });
+        }
+
+        /// <summary>
         /// Windows is signing out. The shell is holding the shutdown open for us,
         /// so the last checkout gets a real attempt and is recorded as
         /// <see cref="CheckoutReason.OsShutdown"/> instead of being swept up three
@@ -2022,6 +2103,8 @@ namespace DOTORION.UI
             {
                 case "member_already_clocked_in":
                     return "이미 출근 상태입니다.";
+                case "invalid_avatar_photo":
+                    return "사진을 저장하지 못했습니다. 다른 사진으로 다시 시도해 주세요.";
                 case "member_not_clocked_in":
                     return "출근 상태가 아닙니다.";
                 case "attendance_session_not_open":

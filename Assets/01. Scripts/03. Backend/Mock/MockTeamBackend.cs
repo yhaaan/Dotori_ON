@@ -12,7 +12,7 @@ namespace DOTORION.Backend.Mock
     /// stable across runs, while all mutations follow the same async contract that
     /// the later Supabase implementation will use.
     /// </summary>
-    public sealed class MockTeamBackend : ITeamBackend, IMockTeamBackendControls, IDisposable
+    public sealed class MockTeamBackend : ITeamBackend, ITeamAvatarPhotos, IMockTeamBackendControls, IDisposable
     {
         public const string DefaultLocalMemberId = "member-01";
 
@@ -20,6 +20,7 @@ namespace DOTORION.Backend.Mock
         private readonly Func<DateTimeOffset> _utcNow;
         private readonly List<MemberState> _members;
         private readonly ObservableStream<TeamEvent> _events = new ObservableStream<TeamEvent>();
+        private readonly Dictionary<string, AvatarPhoto> _photos = new Dictionary<string, AvatarPhoto>(StringComparer.Ordinal);
         private bool _isDisposed;
 
         public MockTeamBackend()
@@ -225,6 +226,35 @@ namespace DOTORION.Backend.Mock
         /// clocked out. It publishes no event: the picture is not something a
         /// teammate should be told about, only something they see next refresh.
         /// </summary>
+        public Task UploadAvatarPhotoAsync(byte[] png, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (png == null || png.Length == 0)
+            {
+                throw new ArgumentException("A photo is required.", nameof(png));
+            }
+
+            int version;
+            lock (_gate)
+            {
+                ThrowIfDisposed();
+                version = _photos.TryGetValue(LocalMemberId, out var previous) ? previous.Version + 1 : 1;
+                _photos[LocalMemberId] = new AvatarPhoto(version, (byte[])png.Clone());
+            }
+
+            return SetAvatarKeyAsync(AvatarPhotoKey.For(version), cancellationToken);
+        }
+
+        public Task<AvatarPhoto> GetAvatarPhotoAsync(string memberId, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            lock (_gate)
+            {
+                ThrowIfDisposed();
+                return Task.FromResult(memberId != null && _photos.TryGetValue(memberId, out var photo) ? photo : null);
+            }
+        }
+
         public Task SetAvatarKeyAsync(string avatarKey, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();

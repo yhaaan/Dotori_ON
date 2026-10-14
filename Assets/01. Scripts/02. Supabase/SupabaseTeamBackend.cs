@@ -20,7 +20,7 @@ namespace DOTORION.Supabase
     /// a Realtime subscription later only has to replace <see cref="Poll"/>.
     /// </summary>
     public sealed class SupabaseTeamBackend
-        : ITeamBackend, ITeamStatistics, ITeamNudges, ITeamCheckIn, ITeamMemberRename, ITeamAdmin, IDisposable
+        : ITeamBackend, ITeamStatistics, ITeamNudges, ITeamCheckIn, ITeamMemberRename, ITeamAdmin, ITeamAvatarPhotos, IDisposable
     {
         private const string NudgeSelect = "id,actor_member_id,target_member_id,created_at";
 
@@ -393,6 +393,58 @@ namespace DOTORION.Supabase
                 p_avatar_key = string.IsNullOrWhiteSpace(avatarKey) ? string.Empty : avatarKey.Trim()
             });
             await CallRpcAsync("set_avatar_key", body, cancellationToken);
+        }
+
+        public async Task UploadAvatarPhotoAsync(byte[] png, CancellationToken cancellationToken)
+        {
+            if (png == null || png.Length == 0)
+            {
+                throw new ArgumentException("A photo is required.", nameof(png));
+            }
+
+            var body = JsonUtility.ToJson(new AvatarPhotoRequest
+            {
+                p_member_id = _memberId.ToString("D"),
+                p_png_base64 = Convert.ToBase64String(png)
+            });
+            await CallRpcAsync("set_avatar_photo", body, cancellationToken);
+        }
+
+        public async Task<AvatarPhoto> GetAvatarPhotoAsync(string memberId, CancellationToken cancellationToken)
+        {
+            if (!Guid.TryParse(memberId, out var id))
+            {
+                return null;
+            }
+
+            var query = _projectUrl + "/rest/v1/member_avatar_photos?select=version,png_base64&member_id=eq." +
+                        id.ToString("D");
+            var response = await SendAuthorizedAsync("GET", query, null, cancellationToken);
+
+            AvatarPhotoArrayDocument document;
+            try
+            {
+                document = JsonUtility.FromJson<AvatarPhotoArrayDocument>("{\"items\":" + response.Body + "}");
+            }
+            catch (ArgumentException exception)
+            {
+                throw new InvalidOperationException("Could not read the profile photo: " + exception.Message);
+            }
+
+            var row = document?.items != null && document.items.Length > 0 ? document.items[0] : null;
+            if (row == null || string.IsNullOrEmpty(row.png_base64))
+            {
+                return null;
+            }
+
+            try
+            {
+                return new AvatarPhoto(row.version, Convert.FromBase64String(row.png_base64));
+            }
+            catch (FormatException exception)
+            {
+                throw new InvalidOperationException("Could not read the profile photo: " + exception.Message);
+            }
         }
 
         public async Task<IReadOnlyList<AdminMemberSummary>> GetMemberOverviewAsync(
@@ -1097,6 +1149,26 @@ namespace DOTORION.Supabase
         {
             public string p_member_id;
             public string p_avatar_key;
+        }
+
+        [Serializable]
+        private sealed class AvatarPhotoRequest
+        {
+            public string p_member_id;
+            public string p_png_base64;
+        }
+
+        [Serializable]
+        private sealed class AvatarPhotoDocument
+        {
+            public int version;
+            public string png_base64;
+        }
+
+        [Serializable]
+        private sealed class AvatarPhotoArrayDocument
+        {
+            public AvatarPhotoDocument[] items;
         }
 
         [Serializable]

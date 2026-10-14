@@ -239,6 +239,58 @@ namespace DOTORION.Platform.Windows
         }
 
         /// <summary>
+        /// Asks for a picture file with the standard Windows open dialog, starting
+        /// on the desktop. Returns the chosen path, or null when cancelled. The
+        /// dialog is owned by the overlay so it opens in front of it, and it is
+        /// modal: the overlay waits while the person browses.
+        /// </summary>
+        public string PickImageFile()
+        {
+#if UNITY_EDITOR
+            var editorPath = UnityEditor.EditorUtility.OpenFilePanelWithFilters(
+                "프로필 사진 고르기",
+                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                new[] { "이미지", "png,jpg,jpeg" });
+            return string.IsNullOrEmpty(editorPath) ? null : editorPath;
+#elif UNITY_STANDALONE_WIN
+            const int bufferCharacters = 1024;
+            var filter = Marshal.StringToHGlobalUni("이미지 (*.png, *.jpg)\0*.png;*.jpg;*.jpeg\0\0");
+            var buffer = Marshal.AllocHGlobal(bufferCharacters * 2);
+            try
+            {
+                Marshal.WriteInt16(buffer, 0);
+                var request = new WindowsNativeMethods.OpenFileName
+                {
+                    lStructSize = Marshal.SizeOf(typeof(WindowsNativeMethods.OpenFileName)),
+                    hwndOwner = EnsureWindowHandle() ? _windowHandle : IntPtr.Zero,
+                    lpstrFilter = filter,
+                    nFilterIndex = 1,
+                    lpstrFile = buffer,
+                    nMaxFile = bufferCharacters,
+                    lpstrInitialDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    lpstrTitle = "프로필 사진 고르기",
+                    Flags = WindowsNativeMethods.OfnExplorer | WindowsNativeMethods.OfnFileMustExist |
+                            WindowsNativeMethods.OfnPathMustExist | WindowsNativeMethods.OfnNoChangeDir
+                };
+                if (!WindowsNativeMethods.GetOpenFileNameW(ref request))
+                {
+                    return null;
+                }
+
+                var path = Marshal.PtrToStringUni(buffer);
+                return string.IsNullOrEmpty(path) ? null : path;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(filter);
+                Marshal.FreeHGlobal(buffer);
+            }
+#else
+            return null;
+#endif
+        }
+
+        /// <summary>
         /// Blinks the taskbar button until the person looks at the window. A nudge
         /// that only plays a sound is missed whenever the overlay is behind
         /// something, and stealing focus instead would interrupt whatever they are

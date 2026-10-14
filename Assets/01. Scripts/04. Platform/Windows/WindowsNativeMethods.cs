@@ -83,6 +83,44 @@ namespace DOTORION.Platform.Windows
         internal const uint FlashwTray = 0x00000002;
         internal const uint FlashwTimerNoFg = 0x0000000C;
 
+        internal const int OfnNoChangeDir = 0x00000008;
+        internal const int OfnPathMustExist = 0x00000800;
+        internal const int OfnFileMustExist = 0x00001000;
+        internal const int OfnExplorer = 0x00080000;
+
+        /// <summary>OPENFILENAMEW. The filter and the result buffer are raw memory because both hold embedded nulls.</summary>
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        internal struct OpenFileName
+        {
+            internal int lStructSize;
+            internal IntPtr hwndOwner;
+            internal IntPtr hInstance;
+            internal IntPtr lpstrFilter;
+            internal IntPtr lpstrCustomFilter;
+            internal int nMaxCustFilter;
+            internal int nFilterIndex;
+            internal IntPtr lpstrFile;
+            internal int nMaxFile;
+            internal IntPtr lpstrFileTitle;
+            internal int nMaxFileTitle;
+            internal string lpstrInitialDir;
+            internal string lpstrTitle;
+            internal int Flags;
+            internal short nFileOffset;
+            internal short nFileExtension;
+            internal string lpstrDefExt;
+            internal IntPtr lCustData;
+            internal IntPtr lpfnHook;
+            internal string lpTemplateName;
+            internal IntPtr pvReserved;
+            internal int dwReserved;
+            internal int FlagsEx;
+        }
+
+        [DllImport("comdlg32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetOpenFileNameW(ref OpenFileName openFileName);
+
         [StructLayout(LayoutKind.Sequential)]
         internal struct FlashWindowInfo
         {

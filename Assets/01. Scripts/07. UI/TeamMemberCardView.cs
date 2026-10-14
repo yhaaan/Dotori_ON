@@ -55,6 +55,7 @@ namespace DOTORION.UI
 
         private string _memberId;
         private TeamAvatarCatalog _avatarCatalog;
+        private AvatarPhotoCache _avatarPhotos;
 
         /// <summary>Raised with the bound member's id when the poke button is used.</summary>
         public event Action<string> NudgeRequested;
@@ -90,6 +91,12 @@ namespace DOTORION.UI
         public void SetAvatarCatalog(TeamAvatarCatalog catalog)
         {
             _avatarCatalog = catalog;
+        }
+
+        /// <summary>Supplies the members' own photos, for avatar keys that name one.</summary>
+        public void SetAvatarPhotos(AvatarPhotoCache photos)
+        {
+            _avatarPhotos = photos;
         }
 
         /// <summary>
@@ -186,7 +193,9 @@ namespace DOTORION.UI
         /// </summary>
         private void BindAvatar(MemberState member, bool isOnline)
         {
-            var sprite = _avatarCatalog != null ? _avatarCatalog.Find(member.AvatarKey) : null;
+            var sprite = AvatarPhotoKey.TryParse(member.AvatarKey, out _)
+                ? _avatarPhotos?.Find(member.MemberId, member.AvatarKey)
+                : _avatarCatalog != null ? _avatarCatalog.Find(member.AvatarKey) : null;
             if (_avatarIcon != null)
             {
                 _avatarIcon.sprite = sprite;

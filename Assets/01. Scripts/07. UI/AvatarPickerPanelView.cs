@@ -34,12 +34,26 @@ namespace DOTORION.UI
         private TeamAvatarCatalog _catalog;
         private string _selectedKey;
         private bool _initialized;
+        private Button _photoButton;
+        private Text _photoButtonLabel;
+        private Text _confirmLabel;
+        private Text _heading;
+        private string _headingText;
+        private AvatarCropEditor _cropEditor;
 
         /// <summary>Raised with the catalog key the person clicked.</summary>
         public event Action<string> AvatarPicked;
 
         /// <summary>Raised by 확인; the panel itself never decides to close.</summary>
         public event Action CloseRequested;
+
+        /// <summary>Raised by 내 사진. The app owns the file dialog and hands the picture back.</summary>
+        public event Action PhotoRequested;
+
+        /// <summary>Raised by 적용 with the cropped square, already encoded as the stored PNG.</summary>
+        public event Action<byte[]> PhotoCropped;
+
+        public bool IsCropping => _cropEditor != null && _cropEditor.gameObject.activeSelf;
 
         public void Initialize()
         {
@@ -56,8 +70,40 @@ namespace DOTORION.UI
 
             if (_confirmButton != null)
             {
-                _confirmButton.onClick.AddListener(() => CloseRequested?.Invoke());
+                _confirmButton.onClick.AddListener(Confirm);
+                _confirmLabel = _confirmButton.GetComponentInChildren<Text>(true);
+                BuildPhotoControls();
             }
+        }
+
+        /// <summary>
+        /// Opens the crop editor on a picture the app loaded. The panel's own
+        /// buttons turn into 취소 / 적용 for as long as it is open.
+        /// </summary>
+        public void BeginPhotoCrop(Texture2D picture)
+        {
+            Initialize();
+            if (_cropEditor == null || picture == null)
+            {
+                return;
+            }
+
+            SetGridVisible(false);
+            _cropEditor.Begin(picture);
+            SetLabels("사진 자르기", "취소", "적용");
+        }
+
+        /// <summary>Leaves the crop editor without saving anything.</summary>
+        public void EndPhotoCrop()
+        {
+            if (!IsCropping)
+            {
+                return;
+            }
+
+            _cropEditor.End();
+            SetGridVisible(true);
+            SetLabels(_headingText, "내 사진", "확인");
         }
 
         /// <summary>
@@ -91,6 +137,100 @@ namespace DOTORION.UI
             {
                 option.interactable = !busy;
             }
+
+            if (_photoButton != null)
+            {
+                _photoButton.interactable = !busy;
+            }
+        }
+
+        private void OnDisable()
+        {
+            // Closing the picker mid-crop drops the picture; reopening starts from the grid.
+            EndPhotoCrop();
+        }
+
+        private void Confirm()
+        {
+            if (!IsCropping)
+            {
+                CloseRequested?.Invoke();
+                return;
+            }
+
+            var png = _cropEditor.Export();
+            EndPhotoCrop();
+            if (png != null)
+            {
+                PhotoCropped?.Invoke(png);
+            }
+        }
+
+        private void PhotoButtonClicked()
+        {
+            if (IsCropping)
+            {
+                EndPhotoCrop();
+            }
+            else
+            {
+                PhotoRequested?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// 내 사진 is a clone of 확인 placed to its left, and the crop editor takes
+        /// the grid's rect. Both borrow the prefab's own art, so every skin draws
+        /// them without new theme slots.
+        /// </summary>
+        private void BuildPhotoControls()
+        {
+            _heading = transform.Find("Heading")?.GetComponent<Text>();
+            _headingText = _heading != null ? _heading.text : string.Empty;
+
+            _photoButton = Instantiate(_confirmButton, _confirmButton.transform.parent);
+            _photoButton.name = "Photo";
+            _photoButton.onClick = new Button.ButtonClickedEvent();
+            _photoButton.onClick.AddListener(PhotoButtonClicked);
+            var confirmRect = (RectTransform)_confirmButton.transform;
+            var photoRect = (RectTransform)_photoButton.transform;
+            photoRect.anchoredPosition = confirmRect.anchoredPosition - new Vector2(confirmRect.sizeDelta.x + 6f, 0f);
+            _photoButtonLabel = _photoButton.GetComponentInChildren<Text>(true);
+            if (_photoButtonLabel != null)
+            {
+                _photoButtonLabel.text = "내 사진";
+            }
+
+            var area = _grid != null ? _grid.parent as RectTransform : null;
+            if (area != null && _heading != null)
+            {
+                _cropEditor = AvatarCropEditor.Create((RectTransform)transform, area, _heading, _confirmButton);
+            }
+        }
+
+        private void SetGridVisible(bool visible)
+        {
+            var area = _grid != null ? _grid.parent : null;
+            if (area != null)
+            {
+                area.gameObject.SetActive(visible);
+            }
+
+            if (_feedbackText != null && !visible)
+            {
+                _feedbackText.gameObject.SetActive(false);
+            }
+            else if (visible)
+            {
+                ShowEmptyHint(_options.Count == 0);
+            }
+        }
+
+        private void SetLabels(string heading, string photo, string confirm)
+        {
+            if (_heading != null) _heading.text = heading;
+            if (_photoButtonLabel != null) _photoButtonLabel.text = photo;
+            if (_confirmLabel != null) _confirmLabel.text = confirm;
         }
 
         private void BuildOptions()

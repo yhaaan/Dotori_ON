@@ -12,7 +12,7 @@ namespace DOTORION.Backend.Mock
     /// the serverless mock backend. The production backend will use the Supabase
     /// Auth UUID as LocalMemberId; the mock keeps its deterministic roster ids.
     /// </summary>
-    public sealed class ProfiledMockTeamBackend : ITeamBackend, IMockTeamBackendControls, IDisposable
+    public sealed class ProfiledMockTeamBackend : ITeamBackend, ITeamAvatarPhotos, IMockTeamBackendControls, IDisposable
     {
         private readonly MockTeamBackend _inner;
         private readonly string _displayName;
@@ -79,6 +79,16 @@ namespace DOTORION.Backend.Mock
         public Task SetAvatarKeyAsync(string avatarKey, CancellationToken cancellationToken)
         {
             return _inner.SetAvatarKeyAsync(avatarKey, cancellationToken);
+        }
+
+        public Task UploadAvatarPhotoAsync(byte[] png, CancellationToken cancellationToken)
+        {
+            return _inner.UploadAvatarPhotoAsync(png, cancellationToken);
+        }
+
+        public Task<AvatarPhoto> GetAvatarPhotoAsync(string memberId, CancellationToken cancellationToken)
+        {
+            return _inner.GetAvatarPhotoAsync(memberId, cancellationToken);
         }
 
         public Task SendHeartbeatAsync(CancellationToken cancellationToken)

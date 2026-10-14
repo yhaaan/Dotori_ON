@@ -123,6 +123,12 @@ namespace DOTORION.UI
         /// <summary>Carries the catalog key the local member picked.</summary>
         public event Action<string> AvatarPicked;
 
+        /// <summary>Raised by the picker's 내 사진 button.</summary>
+        public event Action AvatarPhotoRequested;
+
+        /// <summary>Raised with the cropped photo, encoded as the PNG to upload.</summary>
+        public event Action<byte[]> AvatarPhotoCropped;
+
         public bool IsStatisticsVisible => _statisticsPanel != null && _statisticsPanel.gameObject.activeSelf;
 
         public bool IsSettingsVisible => _settingsPanel != null && _settingsPanel.gameObject.activeSelf;
@@ -233,6 +239,8 @@ namespace DOTORION.UI
             {
                 _avatarPickerPanel.Initialize();
                 _avatarPickerPanel.AvatarPicked += key => AvatarPicked?.Invoke(key);
+                _avatarPickerPanel.PhotoRequested += () => AvatarPhotoRequested?.Invoke();
+                _avatarPickerPanel.PhotoCropped += png => AvatarPhotoCropped?.Invoke(png);
                 _avatarPickerPanel.CloseRequested += () => AvatarPickerCloseRequested?.Invoke();
                 SetAvatarPickerVisible(false);
             }
@@ -428,6 +436,21 @@ namespace DOTORION.UI
             }
 
             _avatarPickerPanel?.SetCatalog(catalog);
+        }
+
+        /// <summary>Hands the members' own photos to the cards.</summary>
+        public void SetAvatarPhotos(AvatarPhotoCache photos)
+        {
+            foreach (var card in _cards)
+            {
+                if (card != null) card.SetAvatarPhotos(photos);
+            }
+        }
+
+        /// <summary>Opens the picker's crop editor on a picture the app loaded.</summary>
+        public void BeginAvatarPhotoCrop(Texture2D picture)
+        {
+            _avatarPickerPanel?.BeginPhotoCrop(picture);
         }
 
         /// <summary>
