@@ -1287,6 +1287,16 @@ namespace DOTORION.UI
                 }
 
                 _offeredUpdate = manifest;
+                // The prompt is laid out for the full window. Started in mini
+                // mode - which is how an auto-started overlay usually comes up -
+                // it would be drawn into the 75 pixel strip and never be seen,
+                // so the overlay leaves mini mode for it. Only the screen
+                // changes; the saved preference stays, and 나중에 goes back.
+                if (_window != null && _window.IsMiniMode)
+                {
+                    ApplyMiniMode(false);
+                }
+
                 _updatePrompt.Show(offered.ToString());
             }
             catch (Exception exception) when (!(exception is OperationCanceledException))
@@ -1350,6 +1360,12 @@ namespace DOTORION.UI
         private void HandleUpdateDismissed()
         {
             _updatePrompt?.Hide();
+            // Back to mini mode if that is how the person keeps the overlay; the
+            // prompt only borrowed the full window.
+            if (_view != null && PlayerPrefs.GetInt(MiniModePreferenceKey, 0) == 1)
+            {
+                ApplyMiniMode(true);
+            }
         }
 
         private void HandleMinimizeRequested()
@@ -1639,6 +1655,15 @@ namespace DOTORION.UI
         /// </summary>
         private void ApplyMiniMode(bool enabled)
         {
+            // Nothing may shrink the window under the update prompt: the saved
+            // mini mode that start-up applies can land after the prompt is
+            // already up, and so can a click on 소형. HandleUpdateDismissed puts
+            // mini mode back once the prompt is gone.
+            if (enabled && _updatePrompt != null && _updatePrompt.IsVisible)
+            {
+                return;
+            }
+
             if (enabled)
             {
                 CloseStatisticsPanel();
