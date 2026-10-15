@@ -92,7 +92,7 @@ namespace DOTORION.Platform.Windows
         /// mirrors the panel's own height in the prefab, so the two have to change
         /// together.
         /// </summary>
-        public const int StatisticsPanelHeight = 424;
+        public const int StatisticsPanelHeight = 444;
 
         /// <summary>
         /// Extra height the avatar picker needs. Unlike the statistics panel this

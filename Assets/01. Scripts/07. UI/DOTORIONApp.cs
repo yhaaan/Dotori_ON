@@ -161,6 +161,13 @@ namespace DOTORION.UI
         private DOTORIONTheme _activeTheme;
         private int _statisticsRequestId;
         private StatisticsPeriod _statisticsPeriod = StatisticsPeriod.LastSevenDays;
+
+        /// <summary>
+        /// Which month the 월간 calendar is showing. It starts on the current
+        /// month every time the panel or the period is opened, and only the
+        /// arrows under the calendar move it.
+        /// </summary>
+        private DateTime _statisticsMonth = StatisticsRange.MonthOf(DateTime.Today);
         private bool _quitting;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -743,6 +750,7 @@ namespace DOTORION.UI
             _view.SwitchAccountRequested += HandleSwitchAccountRequested;
             _view.StatsToggleRequested += HandleStatsToggleRequested;
             _view.StatisticsPeriodChangeRequested += HandleStatisticsPeriodChangeRequested;
+            _view.StatisticsMonthStepRequested += HandleStatisticsMonthStepRequested;
             _view.NudgeRequested += HandleNudgeRequested;
             _view.StatusNoteSubmitted += HandleStatusNoteSubmitted;
             _view.AvatarPickerRequested += HandleAvatarPickerRequested;
@@ -864,6 +872,7 @@ namespace DOTORION.UI
             _view.SwitchAccountRequested -= HandleSwitchAccountRequested;
             _view.StatsToggleRequested -= HandleStatsToggleRequested;
             _view.StatisticsPeriodChangeRequested -= HandleStatisticsPeriodChangeRequested;
+            _view.StatisticsMonthStepRequested -= HandleStatisticsMonthStepRequested;
             _view.NudgeRequested -= HandleNudgeRequested;
             _view.StatusNoteSubmitted -= HandleStatusNoteSubmitted;
             _view.AvatarPickerRequested -= HandleAvatarPickerRequested;
@@ -1704,6 +1713,7 @@ namespace DOTORION.UI
             CloseSettingsPanel();
             _view.SetStatisticsVisible(true);
             _window.ExpandForStatistics();
+            _statisticsMonth = StatisticsRange.MonthOf(TeamDay.Today);
             LoadStatistics(_statisticsPeriod);
         }
 
@@ -1728,15 +1738,44 @@ namespace DOTORION.UI
                 return;
             }
 
+            if (period == StatisticsPeriod.ThisMonth)
+            {
+                _statisticsMonth = StatisticsRange.MonthOf(TeamDay.Today);
+            }
+
             LoadStatistics(period);
+        }
+
+        /// <summary>
+        /// The calendar's arrows. Back stops at the month the app shipped in,
+        /// since nothing before it was recorded; forward is not limited, and a
+        /// month still to come is simply an empty calendar.
+        /// </summary>
+        private void HandleStatisticsMonthStepRequested(int step)
+        {
+            if (_view == null || _backend == null || !_view.IsStatisticsVisible)
+            {
+                return;
+            }
+
+            var current = StatisticsRange.MonthOf(TeamDay.Today);
+            var month = step == 0 ? current : _statisticsMonth.AddMonths(step);
+            _statisticsMonth = month < StatisticsRange.FirstMonth ? StatisticsRange.FirstMonth : month;
+            LoadStatistics(StatisticsPeriod.ThisMonth);
         }
 
         private async void LoadStatistics(StatisticsPeriod period)
         {
             _statisticsPeriod = period;
             _view.SetStatisticsPeriod(period);
-            var range = StatisticsRange.Resolve(period, TeamDay.Today);
+            var today = TeamDay.Today;
+            var range = period == StatisticsPeriod.ThisMonth
+                ? StatisticsRange.ForMonth(_statisticsMonth, today)
+                : StatisticsRange.Resolve(period, today);
             _view.ShowStatisticsLoading(range);
+            _view.SetStatisticsMonthNavigation(
+                _statisticsMonth > StatisticsRange.FirstMonth,
+                _statisticsMonth == StatisticsRange.MonthOf(today));
 
             var requestedBackend = _backend;
             var statistics = requestedBackend as ITeamStatistics;

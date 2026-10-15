@@ -658,7 +658,7 @@ namespace DOTORION.Editor
             panelRect.anchoredPosition = new Vector2(0f, -220f);
             // WindowsOverlayWindow.StatisticsPanelHeight와 맞춰야 합니다. 패널이 열릴 때 창이
             // 정확히 이만큼 늘어납니다.
-            panelRect.sizeDelta = new Vector2(0f, 424f);
+            panelRect.sizeDelta = new Vector2(0f, 444f);
             var panelView = panel.gameObject.AddComponent<TeamStatisticsPanelView>();
 
             var heading = UiFactory.CreateText("Heading", panel.transform, font, 14,

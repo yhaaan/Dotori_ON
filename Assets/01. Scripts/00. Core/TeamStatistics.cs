@@ -61,6 +61,31 @@ namespace DOTORION.Core
 
         public StatisticsBucket Bucket { get; }
 
+        /// <summary>
+        /// The first month the calendar can go back to. The app shipped in
+        /// September 2026, so nothing before it has ever been recorded.
+        /// </summary>
+        public static readonly DateTime FirstMonth = new DateTime(2026, 9, 1);
+
+        /// <summary>The first day of the month <paramref name="date"/> falls in.</summary>
+        public static DateTime MonthOf(DateTime date) => new DateTime(date.Year, date.Month, 1);
+
+        /// <summary>
+        /// One whole calendar month, by day, as <see cref="StatisticsPeriod.ThisMonth"/>
+        /// so the panel draws it as the calendar. The month that holds today stops
+        /// at today, exactly like <see cref="Resolve"/>; a past month runs to its
+        /// last day; a month still to come is asked for whole and simply comes
+        /// back empty.
+        /// </summary>
+        public static StatisticsRange ForMonth(DateTime month, DateTime todayLocal)
+        {
+            var first = MonthOf(month);
+            var last = first.AddMonths(1).AddDays(-1);
+            var today = todayLocal.Date;
+            var to = first == MonthOf(today) ? today : last;
+            return new StatisticsRange(StatisticsPeriod.ThisMonth, first, to, StatisticsBucket.Day);
+        }
+
         public static StatisticsRange Resolve(StatisticsPeriod period, DateTime todayLocal)
         {
             var today = todayLocal.Date;

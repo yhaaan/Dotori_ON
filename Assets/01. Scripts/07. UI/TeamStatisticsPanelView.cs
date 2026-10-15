@@ -46,12 +46,22 @@ namespace DOTORION.UI
         private string _localMemberId;
         private bool _selectionDirty = true;
         private readonly Dictionary<Button, ColorBlock> _authoredButtonColors = new Dictionary<Button, ColorBlock>();
+        private Button _previousMonthButton;
+        private Button _currentMonthButton;
+        private Button _nextMonthButton;
 
         /// <summary>
         /// Raised when the person picks a different period. Only the app can serve
         /// it, because a new period is a new request.
         /// </summary>
         public event Action<StatisticsPeriod> PeriodChangeRequested;
+
+        /// <summary>
+        /// Raised by the buttons under the calendar: -1 for the month before,
+        /// +1 for the month after, 0 for back to the current month. Like a
+        /// period, a month is a new request, so the app serves it.
+        /// </summary>
+        public event Action<int> MonthStepRequested;
 
         public StatisticsPeriod Period => _period;
 
@@ -64,6 +74,7 @@ namespace DOTORION.UI
 
             _initialized = true;
             _calendar?.Initialize();
+            BuildMonthNavigation();
             _dailyTabButton?.onClick.AddListener(() => SelectTab(false));
             _rankingTabButton?.onClick.AddListener(() => SelectTab(true));
 
@@ -94,6 +105,72 @@ namespace DOTORION.UI
         {
             _period = period;
             _selectionDirty = true;
+            SetMonthNavigationVisible(period == StatisticsPeriod.ThisMonth);
+        }
+
+        /// <summary>
+        /// Greys out what cannot be pressed: 이전 달 at the first recorded month,
+        /// and 이번 달 while the current month is already showing.
+        /// </summary>
+        public void SetMonthNavigation(bool canGoBack, bool showingCurrentMonth)
+        {
+            if (_previousMonthButton != null) _previousMonthButton.interactable = canGoBack;
+            if (_currentMonthButton != null) _currentMonthButton.interactable = !showingCurrentMonth;
+        }
+
+        /// <summary>
+        /// &lt; 이번 달 &gt; along the bottom of the panel. They are clones of the
+        /// 월간 period button so every skin draws them with its own button art.
+        /// They belong to the panel rather than the calendar so the ranking tab
+        /// gets them too: a month is one choice for both tabs, and the ranking
+        /// has to be able to make it without a trip back to the calendar.
+        /// </summary>
+        private void BuildMonthNavigation()
+        {
+            var template = _periodButtons.Length > 1 ? _periodButtons[1] : null;
+            if (template == null)
+            {
+                return;
+            }
+
+            var height = ((RectTransform)template.transform).sizeDelta.y;
+            var width = ((RectTransform)template.transform).sizeDelta.x;
+            _previousMonthButton = CloneMonthButton(template, "PreviousMonth", "<", -1, 0f, 32f, height);
+            _currentMonthButton = CloneMonthButton(template, "CurrentMonth", "이번 달", 0, 0.5f, width, height);
+            _nextMonthButton = CloneMonthButton(template, "NextMonth", ">", 1, 1f, 32f, height);
+            SetMonthNavigationVisible(_period == StatisticsPeriod.ThisMonth);
+        }
+
+        /// <summary>Only 월간 is a month; 7일 and 누적 have nothing to step through.</summary>
+        private void SetMonthNavigationVisible(bool visible)
+        {
+            foreach (var button in new[] { _previousMonthButton, _currentMonthButton, _nextMonthButton })
+            {
+                if (button != null) button.gameObject.SetActive(visible);
+            }
+        }
+
+        private Button CloneMonthButton(Button template, string name, string label, int step, float anchorX, float width, float height)
+        {
+            var button = Instantiate(template, transform);
+            button.name = name;
+            button.onClick = new Button.ButtonClickedEvent();
+            button.onClick.AddListener(() => MonthStepRequested?.Invoke(step));
+            var text = button.GetComponentInChildren<Text>(true);
+            if (text != null)
+            {
+                text.text = label;
+            }
+
+            var rect = (RectTransform)button.transform;
+            rect.anchorMin = rect.anchorMax = new Vector2(anchorX, 0f);
+            rect.pivot = new Vector2(anchorX, 0f);
+            // Inset like the calendar's squares and the ranking rows, so the
+            // arrows line up under either; 10 up from the panel's bottom edge
+            // is just below the calendar's sixth row.
+            rect.anchoredPosition = new Vector2((0.5f - anchorX) * 18f, 10f);
+            rect.sizeDelta = new Vector2(width, height);
+            return button;
         }
 
         public void ShowLoading(StatisticsRange range)

@@ -112,6 +112,9 @@ namespace DOTORION.UI
         public event Action StatsToggleRequested;
         public event Action<StatisticsPeriod> StatisticsPeriodChangeRequested;
 
+        /// <summary>Raised by the statistics panel's &lt; 이번 달 &gt; buttons: -1, +1, or 0 for the current month.</summary>
+        public event Action<int> StatisticsMonthStepRequested;
+
         /// <summary>Carries the member id to poke, or null for the whole team.</summary>
         public event Action<string> NudgeRequested;
 
@@ -222,6 +225,8 @@ namespace DOTORION.UI
                 _statisticsPanel.Initialize();
                 _statisticsPanel.PeriodChangeRequested +=
                     period => StatisticsPeriodChangeRequested?.Invoke(period);
+                _statisticsPanel.MonthStepRequested +=
+                    step => StatisticsMonthStepRequested?.Invoke(step);
                 _statisticsPanel.gameObject.SetActive(false);
             }
 
@@ -661,6 +666,11 @@ namespace DOTORION.UI
         public void SetStatisticsPeriod(StatisticsPeriod period)
         {
             _statisticsPanel?.SetPeriod(period);
+        }
+
+        public void SetStatisticsMonthNavigation(bool canGoBack, bool showingCurrentMonth)
+        {
+            _statisticsPanel?.SetMonthNavigation(canGoBack, showingCurrentMonth);
         }
 
         public void ShowStatisticsLoading(StatisticsRange range)
