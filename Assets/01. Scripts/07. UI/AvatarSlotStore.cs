@@ -197,14 +197,17 @@ namespace DOTORION.UI
 
         private static Sprite CreateSprite(byte[] png, string slotId)
         {
-            var texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            // Mipmapped: the card shows a 96 pixel photo at 48 or 72 pixels below
+            // 200 % UI scale, and without mips that shrink samples only some of
+            // the pixels and looks grainy.
+            var texture = new Texture2D(2, 2, TextureFormat.RGBA32, true);
             if (!texture.LoadImage(png))
             {
                 UnityEngine.Object.Destroy(texture);
                 return null;
             }
 
-            texture.filterMode = FilterMode.Bilinear;
+            texture.filterMode = FilterMode.Trilinear;
             texture.wrapMode = TextureWrapMode.Clamp;
             var sprite = Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
             sprite.name = "Slot_" + slotId;

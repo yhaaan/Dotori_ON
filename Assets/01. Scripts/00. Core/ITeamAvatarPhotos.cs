@@ -14,8 +14,9 @@ namespace DOTORION.Core
     {
         /// <summary>
         /// Stores <paramref name="png"/> as the local member's photo and switches
-        /// their avatar to it. The PNG must be exactly
-        /// <see cref="AvatarPhotoKey.Size"/> square; the server rejects anything else.
+        /// their avatar to it. The PNG must be <see cref="AvatarPhotoKey.Size"/>
+        /// square (the server also still takes 64x64 from older clients) and is
+        /// rejected otherwise.
         /// </summary>
         Task UploadAvatarPhotoAsync(byte[] png, CancellationToken cancellationToken);
 
@@ -41,8 +42,13 @@ namespace DOTORION.Core
     {
         public const string Prefix = "photo.";
 
-        /// <summary>Width and height of the stored PNG. The server checks it too.</summary>
-        public const int Size = 64;
+        /// <summary>
+        /// Width and height of the stored PNG. The card draws the avatar at 48
+        /// units, which is 48 / 72 / 96 pixels at the 100 / 150 / 200 % UI
+        /// scales, so 96 is drawn 1:1 at the largest and halved exactly at the
+        /// smallest. The server checks it too.
+        /// </summary>
+        public const int Size = 96;
 
         public static string For(int version) => Prefix + version;
 

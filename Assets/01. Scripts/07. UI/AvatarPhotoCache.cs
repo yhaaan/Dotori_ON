@@ -146,14 +146,17 @@ namespace DOTORION.UI
                 return false;
             }
 
-            var texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            // Mipmapped: the card shows a 96 pixel photo at 48 or 72 pixels below
+            // 200 % UI scale, and without mips that shrink samples only some of
+            // the pixels and looks grainy.
+            var texture = new Texture2D(2, 2, TextureFormat.RGBA32, true);
             if (!texture.LoadImage(png))
             {
                 UnityEngine.Object.Destroy(texture);
                 return false;
             }
 
-            texture.filterMode = FilterMode.Bilinear;
+            texture.filterMode = FilterMode.Trilinear;
             texture.wrapMode = TextureWrapMode.Clamp;
             var sprite = Sprite.Create(
                 texture,
