@@ -139,10 +139,10 @@ logs, or a shipped build.
 
 ## Profile photos
 
-`member_avatar_photos` holds at most one cropped 64x64 PNG per member, as base64
-text (a few KB each; the column is capped at 32 KiB of PNG). It is written only
+`member_avatar_photos` holds at most one cropped 96x96 PNG per member, as base64
+text (20-30 KB each; the column is capped at 64 KiB of PNG). It is written only
 through `set_avatar_photo(p_member_id, p_png_base64)`, which checks the PNG
-signature and that the IHDR says 64x64, bumps `version`, and sets
+signature and that the IHDR says 96x96 (or 64x64 from clients before 1.3.2), bumps `version`, and sets
 `members.avatar_key = 'photo.<version>'`. Members of the same team can `select`
 the row (RLS mirrors `members`); clients fetch it only when the roster shows a
 version they have not cached.
