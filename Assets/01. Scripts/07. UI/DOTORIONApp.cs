@@ -253,25 +253,12 @@ namespace DOTORION.UI
             _firstRunNameView.Submitted += HandleFirstRunNameSubmitted;
             _firstRunNameView.Cancelled += HandleRenameCancelled;
 
-            // The modals cover the whole window, top bar included, so their own
-            // drag strip is the only place left to grab it by. It was in the
-            // prefabs but never given the drag action, which left the window
-            // stuck in place for as long as an update was downloading.
-            WireWindowDrag(_firstRunNameView);
-            WireWindowDrag(_updatePrompt);
-        }
-
-        private void WireWindowDrag(Component modal)
-        {
-            if (modal == null || _window == null)
-            {
-                return;
-            }
-
-            foreach (var handle in modal.GetComponentsInChildren<WindowDragHandle>(true))
-            {
-                handle.Initialize(_window.BeginWindowDrag);
-            }
+            // The modals cover the whole window, top bar included, so the window
+            // has to be draggable by the modal itself, or it is stuck in place
+            // for as long as an update downloads. See WireModal for why the
+            // prefabs' own drag strips are not enough.
+            WindowDragHandle.WireModal(_firstRunNameView, _window.BeginWindowDrag);
+            WindowDragHandle.WireModal(_updatePrompt, _window.BeginWindowDrag);
         }
 
         private async void Start()
