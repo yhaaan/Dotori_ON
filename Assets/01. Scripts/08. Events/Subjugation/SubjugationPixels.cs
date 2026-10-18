@@ -257,38 +257,33 @@ namespace DOTORION.Events.Subjugation
             }
         }
         // Chiikawa's pink sasumata: a U fork with white teeth on one pink shaft. Fill only, top row first;
-        // the dark outline is derived around it.
+        // the dark outline is derived around it. One dot per UI pixel (see SubjugationEvent.BuildToggle),
+        // and the shaft runs off the bottom edge, uncapped.
+        public const int WeaponIconSize = 17;
         private static readonly string[] SasumataRows =
         {
-            "........................",
-            "....PP............PP....",
-            "...W.PP..........PP.W...",
-            "...WWPP..........PPWW...",
-            ".....PP.W......W.PP.....",
-            ".....PPWW......WWPP.....",
-            "...W.PP..........PP.W...",
-            "...WWPP..........PPWW...",
-            ".....PP..........PP.....",
-            "...W.PP..........PP.W...",
-            "...WWPP..........PPWW...",
-            ".....PPP........PPP.....",
-            "......PPP......PPP......",
-            ".......PPPPPPPPPP.......",
-            ".........PPPPPP.........",
-            "..........PPPP..........",
-            "...........PP...........",
-            "...........PP...........",
-            "...........PP...........",
-            "...........PP...........",
-            "...........PP...........",
-            "...........PP...........",
-            "...........PP...........",
-            "...........PP...........", // The shaft runs off the bottom edge, uncapped.
+            ".................",
+            "..PP.........PP..",
+            ".W.PP.......PP.W.",
+            ".WWPP.......PPWW.",
+            "...PP.W...W.PP...",
+            "...PPWW...WWPP...",
+            ".W.PP.......PP.W.",
+            ".WWPP.......PPWW.",
+            "...PP.......PP...",
+            "...PPP.....PPP...",
+            "....PPP...PPP....",
+            ".....PPPPPPP.....",
+            ".......PPP.......",
+            ".......PPP.......",
+            ".......PPP.......",
+            ".......PPP.......",
+            ".......PPP.......",
         };
 
         public static Sprite WeaponIcon()
         {
-            const int size = 24;
+            const int size = WeaponIconSize;
             bool Filled(int x, int y) => x >= 0 && y >= 0 && x < size && y < size && SasumataRows[y][x] != '.';
             var outline = new Color32(74, 40, 44, 255);
             var pink = new Color32(247, 158, 181, 255); var pinkShade = new Color32(222, 118, 150, 255);

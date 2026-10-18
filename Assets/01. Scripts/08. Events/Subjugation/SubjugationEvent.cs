@@ -128,9 +128,13 @@ namespace DOTORION.Events.Subjugation
             _toggle.image.color = Color.white;
             var icon = UiFactory.CreateImage("Sasumata", _toggle.transform, Color.white);
             _weapon = SubjugationPixels.WeaponIcon();
-            icon.sprite = _weapon; icon.raycastTarget = false; icon.preserveAspect = true;
-            // One step down so the uncapped shaft meets the frame's bottom border instead of stopping short of it.
-            UiFactory.Stretch(icon.rectTransform, 4, 2, 4, 6);
+            icon.sprite = _weapon; icon.raycastTarget = false;
+            // Exactly one UI pixel per dot, never stretched: crisp at 100% and 200%. Bottom-centred one pixel up
+            // so the uncapped shaft meets the frame's 1px border.
+            var iconRect = icon.rectTransform;
+            iconRect.anchorMin = iconRect.anchorMax = new Vector2(.5f, 0); iconRect.pivot = new Vector2(.5f, 0);
+            iconRect.sizeDelta = new Vector2(SubjugationPixels.WeaponIconSize, SubjugationPixels.WeaponIconSize);
+            iconRect.anchoredPosition = new Vector2(0, 1);
         }
 
         private static Sprite CopyButtonFrame(Image image)
