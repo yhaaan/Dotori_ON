@@ -53,7 +53,8 @@ namespace DOTORION.Events.Subjugation
         private SubjugationArt _art;
         private SubjugationNativeWindow _native;
         private Button _toggle;
-        private Sprite _frame, _weapon;
+        private Sprite _frame, _frameBorder, _weapon;
+        private Image _toggleBorder;
         private GameObject _shop, _stripRoot, _debugCoins, _debugReset;
         private SubjugationBalance _balance;
         private float _resetArmedUntil;
@@ -123,23 +124,33 @@ namespace DOTORION.Events.Subjugation
             rect.anchorMin = neighbor.anchorMin; rect.anchorMax = neighbor.anchorMax; rect.pivot = neighbor.pivot;
             rect.sizeDelta = t.sizeDelta;
             rect.anchoredPosition = neighbor.anchoredPosition - new Vector2(neighbor.rect.width + 2, 0);
-            _frame = CopyButtonFrame(template.image);
+            _frame = CopyButtonFrame(template.image, out _frameBorder);
             _toggle.image.sprite = _frame;
             _toggle.image.color = Color.white;
             var icon = UiFactory.CreateImage("Sasumata", _toggle.transform, Color.white);
             _weapon = SubjugationPixels.WeaponIcon();
             icon.sprite = _weapon; icon.raycastTarget = false;
-            // Exactly one UI pixel per dot, never stretched: crisp at 100% and 200%. Bottom-centred one pixel up
-            // so the uncapped shaft meets the frame's 1px border.
+            // Exactly one UI pixel per dot, never stretched: crisp at 100% and 200%. The frame's own rim is
+            // drawn again on top, so the shaft runs under it.
             var iconRect = icon.rectTransform;
             iconRect.anchorMin = iconRect.anchorMax = new Vector2(.5f, 0); iconRect.pivot = new Vector2(.5f, 0);
             iconRect.sizeDelta = new Vector2(SubjugationPixels.WeaponIconSize, SubjugationPixels.WeaponIconSize);
-            iconRect.anchoredPosition = new Vector2(0, 1);
+            iconRect.anchoredPosition = new Vector2(0, 2); // Ends under the rim; below it the frame is transparent.
+            if (_frameBorder != null)
+            {
+                _toggleBorder = UiFactory.CreateImage("FrameBorder", _toggle.transform, Color.white);
+                _toggleBorder.sprite = _frameBorder; _toggleBorder.raycastTarget = false;
+                _toggleBorder.type = _toggle.image.type;
+                UiFactory.Stretch(_toggleBorder.rectTransform);
+            }
         }
 
-        private static Sprite CopyButtonFrame(Image image)
+        /// <summary>The skin's button frame with its baked-in icon painted out, plus the rim alone
+        /// (every pixel that is not the inner fill) for drawing over the icon.</summary>
+        private static Sprite CopyButtonFrame(Image image, out Sprite border)
         {
             // Retain the exact outer frame from the existing skin, replacing only its baked-in icon.
+            border = null;
             if (image == null || image.sprite == null) return null;
             var source = image.sprite;
             var texture = source.texture;
@@ -158,6 +169,17 @@ namespace DOTORION.Events.Subjugation
                 for (var y = 3; y < h - 3; y++) for (var x = 3; x < w - 3; x++) colors[y * w + x] = fill;
                 var frame = new Texture2D(w, h, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point };
                 frame.SetPixels(colors); frame.Apply();
+                var rim = new Color[colors.Length];
+                for (var i = 0; i < colors.Length; i++)
+                {
+                    var c = colors[i];
+                    var isFill = Mathf.Abs(c.r - fill.r) + Mathf.Abs(c.g - fill.g) + Mathf.Abs(c.b - fill.b) < .02f && Mathf.Abs(c.a - fill.a) < .02f;
+                    rim[i] = isFill ? Color.clear : c;
+                }
+                var rimTexture = new Texture2D(w, h, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point };
+                rimTexture.SetPixels(rim); rimTexture.Apply();
+                // Same sprite settings as the frame, so the rim lands on exactly the same pixels.
+                border = Sprite.Create(rimTexture, new Rect(0, 0, w, h), new Vector2(.5f, .5f));
                 return Sprite.Create(frame, new Rect(0, 0, w, h), new Vector2(.5f, .5f));
             }
             finally { RenderTexture.active = old; RenderTexture.ReleaseTemporary(rt); SubjugationPixels.Release(readable); }
@@ -492,6 +514,7 @@ namespace DOTORION.Events.Subjugation
             {
                 _toggle.gameObject.SetActive(online);
                 _toggle.image.color = _visible ? Color.white : new Color(.6f, .65f, .75f);
+                if (_toggleBorder != null) _toggleBorder.color = _toggle.image.color;
             }
             if (_shop.activeSelf && (!online || _view.IsMiniModeVisible || _view.IsSettingsVisible || _view.IsStatisticsVisible || _view.IsAvatarPickerVisible || _view.IsDashboardVisible)) SetShop(false);
             var mini = _view.IsMiniModeVisible;
@@ -582,6 +605,7 @@ namespace DOTORION.Events.Subjugation
             if (_window != null) { _window.SetEventPanelHeight(0); _window.SetEventStripHeight(0); }
             if (_view != null) _view.SetEventStripInset(0);
             if (_frame != null) { SubjugationPixels.Release(_frame.texture); SubjugationPixels.Release(_frame); }
+            if (_frameBorder != null) { SubjugationPixels.Release(_frameBorder.texture); SubjugationPixels.Release(_frameBorder); }
             if (_weapon != null) { SubjugationPixels.Release(_weapon.texture); SubjugationPixels.Release(_weapon); }
             if (_toggle != null) SubjugationPixels.Release(_toggle.gameObject);
             if (_shop != null) SubjugationPixels.Release(_shop);
