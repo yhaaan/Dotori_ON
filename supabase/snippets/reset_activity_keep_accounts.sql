@@ -36,6 +36,14 @@ delete from public.activity_intervals;
 delete from public.attendance_sessions;
 delete from public.team_events;
 delete from public.member_check_ins;
+-- Non check-in points (event rewards) reset with them; the ledger may not exist on older schemas.
+do $$
+begin
+  if pg_catalog.to_regclass('public.member_point_awards') is not null then
+    delete from public.member_point_awards;
+  end if;
+end;
+$$;
 
 -- What is left, so the result can be read rather than assumed.
 select
