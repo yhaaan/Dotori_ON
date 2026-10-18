@@ -1,0 +1,6 @@
+{
+  "name": "DOTORION.EventTests",
+  "references": ["DOTORION.Runtime", "Unity.ugui"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}
