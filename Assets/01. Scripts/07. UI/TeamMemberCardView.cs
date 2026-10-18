@@ -54,6 +54,38 @@ namespace DOTORION.UI
         [SerializeField] private Color _offlineCardColor = new Color(0.65f, 0.65f, 0.65f, 1f);
 
         private string _memberId;
+        private Text _eventRound;
+
+        public void SetEventRound(System.Collections.Generic.IReadOnlyDictionary<string, int> rounds,
+            System.Collections.Generic.IReadOnlyDictionary<string, int> bestRounds, bool visible)
+        {
+            var round = 0;
+            var show = visible && _timerText != null && _memberId != null && rounds != null && rounds.TryGetValue(_memberId, out round);
+            if (_eventRound == null && show)
+            {
+                _eventRound = UiFactory.CreateText("EventRound", _timerText.transform.parent, _timerText.font,
+                    _timerText.fontSize, _timerText.alignment, _timerText.color, _timerText.fontStyle);
+                _eventRound.raycastTarget = false;
+            }
+            if (_eventRound == null) return;
+            _eventRound.gameObject.SetActive(show);
+            if (!show) return;
+            var anchor = _timerText.rectTransform;
+            var rect = _eventRound.rectTransform;
+            rect.anchorMin = anchor.anchorMin; rect.anchorMax = anchor.anchorMax; rect.pivot = anchor.pivot;
+            rect.sizeDelta = anchor.sizeDelta;
+            rect.anchoredPosition = anchor.anchoredPosition + new Vector2(0, _timerText.fontSize + 2);
+            _eventRound.font = _timerText.font; _eventRound.fontSize = _timerText.fontSize;
+            _eventRound.fontStyle = FontStyle.Normal; _eventRound.color = _timerText.color;
+            _eventRound.alignment = _timerText.alignment; _eventRound.lineSpacing = _timerText.lineSpacing;
+            _eventRound.supportRichText = _timerText.supportRichText;
+            _eventRound.horizontalOverflow = HorizontalWrapMode.Wrap; _eventRound.verticalOverflow = _timerText.verticalOverflow;
+            _eventRound.resizeTextForBestFit = true;
+            _eventRound.resizeTextMinSize = 8; _eventRound.resizeTextMaxSize = _timerText.fontSize;
+            _eventRound.material = _timerText.material;
+            var best = bestRounds != null && bestRounds.TryGetValue(_memberId, out var reached) ? reached : round;
+            _eventRound.text = "R" + round + "(" + Math.Max(round, best) + ")";
+        }
         private TeamAvatarCatalog _avatarCatalog;
         private AvatarPhotoCache _avatarPhotos;
 

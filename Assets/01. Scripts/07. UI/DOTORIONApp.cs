@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DOTORION.Audio;
 using DOTORION.Backend.Mock;
 using DOTORION.Core;
+using DOTORION.Events.Subjugation;
 using DOTORION.Identity;
 using DOTORION.Platform.Windows;
 using DOTORION.Supabase;
@@ -111,6 +112,11 @@ namespace DOTORION.UI
         [Header("Development")]
         [Tooltip("Runs the overlay against the in-memory roster instead of Supabase. Identity still uses the real project.")]
         [SerializeField] private bool _useMockBackend;
+
+        [Header("Seasonal events")]
+        [SerializeField] private bool _enableChiikawaEvent = true;
+        private SubjugationEvent _chiikawaEvent;
+        private float _nextChiikawaCheck;
 
         private static DOTORIONApp _instance;
 
@@ -326,6 +332,13 @@ namespace DOTORION.UI
             if (_backend == null || _view == null)
             {
                 return;
+            }
+
+            // A build shipped before the event opens mounts it the moment SubjugationEvent.StartsAt passes.
+            if (_chiikawaEvent == null && Time.unscaledTime >= _nextChiikawaCheck)
+            {
+                _nextChiikawaCheck = Time.unscaledTime + 1f;
+                MountChiikawaEvent();
             }
 
             while (_pendingEvents.TryDequeue(out var teamEvent))
@@ -721,6 +734,7 @@ namespace DOTORION.UI
             _view = Instantiate(_mainViewPrefab, transform);
             _view.name = _mainViewPrefab.name;
             _view.Initialize(_window.BeginWindowDrag);
+            MountChiikawaEvent();
             _view.CheckInRequested += HandleCheckInRequested;
             _view.CheckOutRequested += HandleCheckOutRequested;
             _view.ActivityChangeRequested += HandleActivityChangeRequested;
@@ -841,8 +855,36 @@ namespace DOTORION.UI
             }
         }
 
+        /// <summary>Mounts the seasonal event while it runs (SubjugationEvent.StartsAt to EndsAt). It removes itself after.</summary>
+        private void MountChiikawaEvent()
+        {
+            if (!_enableChiikawaEvent || _chiikawaEvent != null || _view == null || _backend == null
+                || !SubjugationEvent.IsRunning(DateTimeOffset.UtcNow)) return;
+            _chiikawaEvent = _view.gameObject.AddComponent<SubjugationEvent>();
+            var eventBackend = _backend as SupabaseTeamBackend;
+            var remote = eventBackend == null ? null : new SubjugationRemote
+            {
+                ReadRounds = eventBackend.GetSubjugationRoundsAsync,
+                WriteRound = eventBackend.SetSubjugationRoundAsync,
+                ReadClaims = eventBackend.GetSubjugationClaimedRewardsAsync,
+                ClaimReward = eventBackend.ClaimSubjugationRewardAsync,
+                ResetAll = eventBackend.ResetSubjugationAsync,
+                PointsChanged = LoadDailyCheckIn
+            };
+            _chiikawaEvent.Initialize(_view, _window, _backend.LocalMemberId, LocalMember,
+                () => !_mutationInProgress && !_quitting && !_signOutInProgress && !_renameInProgress,
+                () => { CloseStatisticsPanel(); CloseSettingsPanel(); CloseAvatarPicker(); CloseDashboard(); },
+                remote);
+        }
+
         private void DetachView()
         {
+            if (_chiikawaEvent != null)
+            {
+                _chiikawaEvent.enabled = false;
+                Destroy(_chiikawaEvent);
+                _chiikawaEvent = null;
+            }
             _view.CheckInRequested -= HandleCheckInRequested;
             _view.CheckOutRequested -= HandleCheckOutRequested;
             _view.ActivityChangeRequested -= HandleActivityChangeRequested;

@@ -31,6 +31,42 @@ namespace DOTORION.Platform.Windows
 
         public bool IsInitialized { get; private set; }
 
+        /// <summary>Owner for optional companion windows; the main overlay keeps ownership of its own styles.</summary>
+        public IntPtr NativeHandle
+        {
+            get
+            {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+                return _windowHandle;
+#else
+                return IntPtr.Zero;
+#endif
+            }
+        }
+
+        private int _eventPanelHeight;
+        public int EventStripHeight { get; private set; }
+        public void SetEventStripHeight(int height)
+        {
+            height = Math.Max(0, height);
+            if (EventStripHeight == height) return;
+            var delta = height - EventStripHeight; EventStripHeight = height;
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            if (!IsMiniMode && !_growsUpward && EnsureWindowHandle() && WindowsNativeMethods.GetWindowRect(_windowHandle, out var rect))
+                WindowsNativeMethods.SetWindowPos(_windowHandle, IntPtr.Zero, rect.Left, rect.Top - Mathf.RoundToInt(delta * UiScale), 0, 0,
+                    WindowsNativeMethods.SwpNoSize | WindowsNativeMethods.SwpNoZOrder | WindowsNativeMethods.SwpNoActivate);
+            ApplyWindowOpacity(); ApplyContentSize();
+#endif
+        }
+
+        public void SetEventPanelHeight(int height)
+        {
+            _eventPanelHeight = Math.Max(0, height);
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+            ApplyContentSize();
+#endif
+        }
+
         /// <summary>
         /// Seconds since this desktop last saw keyboard or mouse input. Zero
         /// wherever that cannot be asked - the Editor, and any non-Windows
@@ -380,7 +416,7 @@ namespace DOTORION.Platform.Windows
             var baseContentWidth = IsMiniMode ? MiniWindowWidth : OverlayWindowWidth;
             var baseContentHeight = IsMiniMode
                 ? MiniWindowHeight
-                : CompactWindowHeight +
+                : CompactWindowHeight + EventStripHeight + _eventPanelHeight +
                   (_statisticsExpanded ? StatisticsPanelHeight : 0) +
                   (_avatarPickerExpanded ? AvatarPickerPanelHeight : 0) +
                   (_dashboardExpanded ? DashboardPanelHeight : 0) +
@@ -471,6 +507,15 @@ namespace DOTORION.Platform.Windows
                 return;
             }
 
+            if (EventStripHeight > 0)
+            {
+                if (!isLayered) WindowsNativeMethods.SetWindowLongPointer(_windowHandle, WindowsNativeMethods.GwlExStyle,
+                    new IntPtr(exStyle | WindowsNativeMethods.WsExLayered));
+                // The integrated top strip reserves magenta exclusively as its transparent key.
+                // Main content is rendered by the same Unity window and follows native dragging exactly.
+                WindowsNativeMethods.SetLayeredWindowAttributes(_windowHandle, 0x00ff00ff, 255, 1);
+                return;
+            }
             if (!isLayered)
             {
                 return;

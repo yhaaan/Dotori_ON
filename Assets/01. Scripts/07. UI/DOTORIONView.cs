@@ -148,6 +148,27 @@ namespace DOTORION.UI
         /// <summary>The dashboard itself, so the app can wire its buttons directly.</summary>
         public DeveloperDashboardView Dashboard => _dashboardPanel;
 
+        // Small extension points keep seasonal UI out of attendance and profile binding.
+        private float _eventStripInset;
+        public void SetEventStripInset(float height)
+        {
+            if (Mathf.Approximately(_eventStripInset, height)) return;
+            _eventStripInset = height;
+            if (_windowBackground != null)
+                _windowBackground.offsetMax = new Vector2(_windowBackground.offsetMax.x, -(height + (IsAvatarPickerVisible ? AvatarPickerHeight : 0)));
+        }
+        public void ExitMiniModeForEvent() { if (IsMiniModeVisible) MiniModeExitRequested?.Invoke(); }
+        public Transform EventPanelParent => _windowBackground != null ? _windowBackground : transform;
+        public Button EventButtonTemplate => _settingsButton;
+        public Button EventButtonNeighbor => _teamNudgeButton;
+        public Font EventFont => _feedbackText != null ? _feedbackText.font : GetComponentInChildren<Text>(true)?.font;
+
+        /// <summary>Shows each member's current round with their best in brackets above the timer.</summary>
+        public void BindEventRounds(IReadOnlyDictionary<string, int> rounds, IReadOnlyDictionary<string, int> bestRounds, bool visible)
+        {
+            foreach (var card in _cards) if (card != null) card.SetEventRound(rounds, bestRounds, visible);
+        }
+
         /// <summary>
         /// How much taller the window has to be while the picker is open. Read
         /// from the prefab rather than repeated as a constant, so moving the panel
@@ -492,7 +513,7 @@ namespace DOTORION.UI
             _avatarPickerPanel.gameObject.SetActive(visible);
             if (_windowBackground != null)
             {
-                var inset = visible ? AvatarPickerHeight : 0f;
+                var inset = _eventStripInset + (visible ? AvatarPickerHeight : 0f);
                 _windowBackground.offsetMax = new Vector2(_windowBackground.offsetMax.x, -inset);
             }
         }

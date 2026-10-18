@@ -19,7 +19,7 @@ namespace DOTORION.Supabase
     /// a missed poll degrades into a late event instead of a lost one. Swapping in
     /// a Realtime subscription later only has to replace <see cref="Poll"/>.
     /// </summary>
-    public sealed class SupabaseTeamBackend
+    public sealed partial class SupabaseTeamBackend
         : ITeamBackend, ITeamStatistics, ITeamNudges, ITeamCheckIn, ITeamMemberRename, ITeamAdmin, ITeamAvatarPhotos, IDisposable
     {
         private const string NudgeSelect = "id,actor_member_id,target_member_id,created_at";
