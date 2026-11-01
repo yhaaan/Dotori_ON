@@ -41,7 +41,7 @@ namespace DOTORION.Events.Subjugation
             + " ~ " + EndsAt.AddMinutes(-1).ToString("yyyy/MM/dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
 
         private const string VisibleKey = "DOTORION.Chiikawa.Visible";
-        /// <summary>Clearing this round unlocks the Chiikawa main background, kept after the event ends.</summary>
+        /// <summary>Clearing this round lets the reward tab hand out the Chiikawa main background, kept after the event ends.</summary>
         public const int BackgroundRewardRound = 200;
         private const int ShopHeight = 338;
         private DOTORIONView _view;
@@ -89,6 +89,8 @@ namespace DOTORION.Events.Subjugation
         private readonly HashSet<int> _claimed = new HashSet<int>();
         private readonly Text[] _rewardNames = new Text[10];
         private Text _rewardEarned;
+        private Text _backgroundRewardName;
+        private Button _backgroundRewardButton;
         private readonly Button[] _rewardButtons = new Button[10];
         private readonly CancellationTokenSource _lifetime = new CancellationTokenSource();
         private string _memberId;
@@ -115,8 +117,8 @@ namespace DOTORION.Events.Subjugation
             BuildToggle();
             BuildShop();
             BuildDebugCoins();
+            MainBackground.Changed += OnBackgroundChanged;
             LoadClaims();
-            GrantBackground();
             _nextSave = Time.unscaledTime + 10;
             _dirty = true;
         }
@@ -247,7 +249,16 @@ namespace DOTORION.Events.Subjugation
                 _rewardButtons[i] = UiFactory.CreateButton("Claim" + milestone, _rewardPage.transform, _view.EventFont, "", () => ClaimReward(milestone));
                 UiFactory.AnchorTop((RectTransform)_rewardButtons[i].transform, x + 128, y + 6, 92, 28);
             }
-            _rewardEarned = Label("RewardEarned", _rewardPage.transform, "", 12, 296, 456, 24, 12);
+            // The background reward sits under the milestones as a full-width row, and the earned line moves below it.
+            var backgroundFrame = UiFactory.CreateImage("BackgroundRewardFrame", _rewardPage.transform, Color.white);
+            UiFactory.AnchorTop(backgroundFrame.rectTransform, 12, 282, 32, 32);
+            var backgroundIcon = UiFactory.CreateRect("BackgroundRewardIcon", backgroundFrame.transform).AddComponent<RawImage>();
+            UiFactory.AnchorTop(backgroundIcon.rectTransform, 1, 1, 30, 30);
+            backgroundIcon.texture = MainBackground.Icon(MainBackground.Chiikawa);
+            _backgroundRewardName = Label("BackgroundReward", _rewardPage.transform, "R" + BackgroundRewardRound + " 클리어\n치이카와 메인 배경 (설정의 배경에서 선택)", 52, 278, 316, 40, 12);
+            _backgroundRewardButton = UiFactory.CreateButton("ClaimBackground", _rewardPage.transform, _view.EventFont, "", ClaimBackground);
+            UiFactory.AnchorTop((RectTransform)_backgroundRewardButton.transform, 374, 284, 92, 28);
+            _rewardEarned = Label("RewardEarned", _rewardPage.transform, "", 12, 318, 456, 18, 12);
             _rewardPage.SetActive(false);
             BuildRoundPage();
             BuildWeaponPage();
@@ -295,7 +306,6 @@ namespace DOTORION.Events.Subjugation
             _debugBackgroundLabel = background.GetComponentInChildren<Text>();
             _debugBackgroundLabel.fontSize = 10;
             PaintDebugBackground();
-            MainBackground.Changed += PaintDebugBackground;
         }
 
         /// <summary>Testing aid: unlocks and shows the Chiikawa background without clearing R200, or takes it back.</summary>
@@ -312,6 +322,8 @@ namespace DOTORION.Events.Subjugation
             MainBackground.Select(MainBackground.Chiikawa);
             _view.Dashboard.ShowFeedback("치이카와 배경 적용", false);
         }
+
+        private void OnBackgroundChanged() { PaintDebugBackground(); RefreshShop(); }
 
         private void PaintDebugBackground()
         {
@@ -546,12 +558,15 @@ namespace DOTORION.Events.Subjugation
             if (_storageBlocked) return;
             if (operation()) { Persist(); RefreshShop(); }
         }
-        private void MarkDirty() { _dirty = true; RefreshShop(); GrantBackground(); }
+        private void MarkDirty() { _dirty = true; RefreshShop(); }
 
-        private void GrantBackground()
+        private bool BackgroundClaimable => _game.HasCleared(BackgroundRewardRound) && !MainBackground.IsUnlocked(MainBackground.Chiikawa);
+
+        /// <summary>The background is kept on this PC, not on the point server, so it can be taken without a connection.</summary>
+        private void ClaimBackground()
         {
-            if (_game.HasCleared(BackgroundRewardRound) && MainBackground.Unlock(MainBackground.Chiikawa))
-                _view.ShowFeedback("R" + BackgroundRewardRound + " 클리어 보상: 치이카와 배경이 열렸습니다. 설정의 배경에서 바꿀 수 있습니다.");
+            if (!BackgroundClaimable || !MainBackground.Unlock(MainBackground.Chiikawa)) return;
+            _view.ShowFeedback("치이카와 메인 배경을 받았습니다. 설정의 배경에서 고를 수 있습니다.");
         }
 
         private void SetTab(int tab)
@@ -606,7 +621,12 @@ namespace DOTORION.Events.Subjugation
 
         private int ClaimableRewards
         {
-            get { var n = 0; if (_claimsLoaded) foreach (var m in SubjugationGame.RewardMilestones) if (_game.HasCleared(m) && !_claimed.Contains(m)) n++; return n; }
+            get
+            {
+                var n = BackgroundClaimable ? 1 : 0;
+                if (_claimsLoaded) foreach (var m in SubjugationGame.RewardMilestones) if (_game.HasCleared(m) && !_claimed.Contains(m)) n++;
+                return n;
+            }
         }
 
         private void RefreshRewards()
@@ -627,6 +647,11 @@ namespace DOTORION.Events.Subjugation
                 _rewardButtons[i].interactable = !offline && _claimsLoaded && _claiming == 0 && cleared && !claimed;
                 _rewardNames[i].color = cleared || claimed ? new Color(.18f, .24f, .34f) : new Color(.5f, .55f, .62f);
             }
+            var owned = MainBackground.IsUnlocked(MainBackground.Chiikawa);
+            var reached = _game.HasCleared(BackgroundRewardRound);
+            _backgroundRewardButton.GetComponentInChildren<Text>().text = owned ? "받음" : reached ? "보상받기" : "미달성";
+            _backgroundRewardButton.interactable = reached && !owned;
+            _backgroundRewardName.color = reached || owned ? new Color(.18f, .24f, .34f) : new Color(.5f, .55f, .62f);
         }
 
         private void RefreshShop()
@@ -785,7 +810,7 @@ namespace DOTORION.Events.Subjugation
             if (_stripRoot != null) SubjugationPixels.Release(_stripRoot);
             if (_debugCoins != null) SubjugationPixels.Release(_debugCoins);
             if (_debugReset != null) SubjugationPixels.Release(_debugReset);
-            MainBackground.Changed -= PaintDebugBackground;
+            MainBackground.Changed -= OnBackgroundChanged;
             if (_debugBackgroundLabel != null) SubjugationPixels.Release(_debugBackgroundLabel.transform.parent.gameObject);
             if (_view != null) _view.BindEventRounds(_rounds, _bestRounds, false);
         }

@@ -725,7 +725,7 @@ namespace DOTORION.UI
         {
             if (!MainBackground.IsUnlocked(id))
             {
-                ShowFeedback("치이카와 배경은 치이카와 토벌 대작전 R200 클리어 보상입니다.");
+                ShowFeedback("치이카와 배경은 토벌 대작전 보상 탭에서 받을 수 있습니다.");
                 return;
             }
 

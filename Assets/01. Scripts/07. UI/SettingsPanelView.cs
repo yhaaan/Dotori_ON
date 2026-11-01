@@ -35,6 +35,7 @@ namespace DOTORION.UI
         }
 
         private readonly List<BackgroundIcon> _backgroundIcons = new List<BackgroundIcon>();
+        private RectTransform _backgroundLabel;
         private DOTORIONTheme _activeTheme;
         private string _background = MainBackground.Default;
 
@@ -164,7 +165,7 @@ namespace DOTORION.UI
             }
         }
 
-        /// <summary>Rings the main background in use. A locked picture stays visible but dimmed.</summary>
+        /// <summary>Rings the main background in use. Pictures not yet owned have no button at all.</summary>
         public void SetBackground(string selected)
         {
             _background = selected;
@@ -251,7 +252,8 @@ namespace DOTORION.UI
         /// Round main background buttons at the right end of the title row,
         /// drawn like the theme buttons on the left: a disk showing the picture,
         /// and the theme's ring around the one in use. The default disk is a
-        /// tiny window in the theme's swatch colour.
+        /// tiny window in the theme's swatch colour. Only owned pictures show,
+        /// so without a reward the row holds the default alone.
         /// </summary>
         private void EnsureBackgroundPicker()
         {
@@ -264,10 +266,9 @@ namespace DOTORION.UI
             var source = transform.Find("HideFromTaskbarLabel");
             if (source != null)
             {
-                var label = (RectTransform)Clone(source, "BackgroundPickerLabel");
+                var label = _backgroundLabel = (RectTransform)Clone(source, "BackgroundPickerLabel");
                 label.anchorMin = label.anchorMax = label.pivot = Vector2.one;
                 label.sizeDelta = new Vector2(48f, IconSize);
-                label.anchoredPosition = new Vector2(-(IconRight + ids.Length * IconStep + 2f), IconTop);
                 var text = label.GetComponent<Text>() ?? label.GetComponentInChildren<Text>();
                 if (text != null)
                 {
@@ -287,7 +288,6 @@ namespace DOTORION.UI
                 var rect = (RectTransform)root.transform;
                 rect.anchorMin = rect.anchorMax = rect.pivot = Vector2.one;
                 rect.sizeDelta = new Vector2(IconSize, IconSize);
-                rect.anchoredPosition = new Vector2(-(IconRight + (ids.Length - 1 - index) * IconStep), IconTop);
                 var ring = root.GetComponent<Image>();
                 ring.sprite = _swatchSprite;
 
@@ -345,8 +345,19 @@ namespace DOTORION.UI
         private void PaintBackgrounds()
         {
             var ringColor = _activeTheme != null ? _activeTheme.Swatch : Color.gray;
+            var owned = _backgroundIcons.FindAll(icon => MainBackground.IsUnlocked(icon.Id));
             foreach (var icon in _backgroundIcons)
             {
+                var slot = owned.IndexOf(icon);
+                icon.Button.gameObject.SetActive(slot >= 0);
+                if (slot < 0)
+                {
+                    continue;
+                }
+
+                // Packed against the right edge, the last owned picture outermost.
+                ((RectTransform)icon.Button.transform).anchoredPosition =
+                    new Vector2(-(IconRight + (owned.Count - 1 - slot) * IconStep), IconTop);
                 var selected = icon.Id == _background;
                 icon.Ring.sprite = selected && _swatchSelectedSprite != null ? _swatchSelectedSprite : _swatchSprite;
                 icon.Ring.color = selected ? ringColor : Color.clear;
@@ -356,10 +367,11 @@ namespace DOTORION.UI
                     icon.Picture.color = Color.Lerp(ringColor, Color.white, .55f);
                     icon.Band.color = ringColor;
                 }
-                else
-                {
-                    icon.Picture.color = MainBackground.IsUnlocked(icon.Id) ? Color.white : new Color(.4f, .4f, .4f, 1f);
-                }
+            }
+
+            if (_backgroundLabel != null)
+            {
+                _backgroundLabel.anchoredPosition = new Vector2(-(IconRight + owned.Count * IconStep + 2f), IconTop);
             }
         }
 
