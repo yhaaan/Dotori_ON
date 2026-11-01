@@ -21,7 +21,8 @@ namespace DOTORION.Events.Subjugation
         private int _width, _height, _shopRequested, _roundRequested, _autoRequested;
         public bool AutoHovered { get; private set; }
         private volatile bool _dragging, _docked = true;
-        private bool _moved, _placed;
+        private bool _moved, _placed, _wasIntegrated, _hasFree;
+        private Point _free;
         private volatile bool _integrated;
         private Thread _thread;
         private IntPtr _ownerHandle;
@@ -74,7 +75,12 @@ namespace DOTORION.Events.Subjugation
             {
                 _docked = false; position = new Point { x = mini.left, y = Math.Max(0, mini.top - height) };
             }
-            _placed = true;
+            // The result screen borrows this window and moves it onto the main window. Remember where the
+            // user left it on its own, so coming back from the result does not lose a dragged position.
+            if (!_integrated && _wasIntegrated && _hasFree) position = _free;
+            else if (!_integrated) { _free = position; _hasFree = true; }
+            _wasIntegrated = _integrated;
+            if (!_integrated) _placed = true;
             if ((_integrated || _docked) && !_dragging && GetWindowRect(main, out var parent))
                 position = new Point { x = parent.left, y = _integrated ? parent.top : parent.top - height };
             var size = new Point { x = width, y = height };
