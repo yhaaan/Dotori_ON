@@ -560,19 +560,19 @@ namespace DOTORION.Tests
         [Test]
         public void WeaponUpgradeSpendsCoinsAndNeverDropsALevelOnFailure()
         {
-            var game = new SubjugationGame(new SubjugationSave { bestClear = 100, round = 101, maxRound = 101, coins = 100000 });
+            var game = new SubjugationGame(new SubjugationSave { bestClear = 100, round = 101, maxRound = 101, coins = 10000000 });
             game.BuyWeapon(0);
-            Assert.That(game.WeaponUpgradeCost(0), Is.EqualTo(400));
-            Assert.That(game.WeaponChance(0), Is.EqualTo(.9).Within(1e-9));
+            var cost = game.WeaponUpgradeCost(0);
+            Assert.That(game.WeaponChance(0), Is.EqualTo(90));
             var coins = game.Save.coins;
             game.Roll = () => .95; // Above 90%: fails.
             Assert.That(game.UpgradeWeapon(0), Is.EqualTo(WeaponUpgrade.Failed));
             Assert.That(game.WeaponLevel(0), Is.EqualTo(1));
-            Assert.That(game.Save.coins, Is.EqualTo(coins - 400));
-            game.Roll = () => .1;
+            Assert.That(game.Save.coins, Is.EqualTo(coins - cost));
+            game.Roll = () => .89;
             Assert.That(game.UpgradeWeapon(0), Is.EqualTo(WeaponUpgrade.Success));
             Assert.That(game.WeaponLevel(0), Is.EqualTo(2));
-            Assert.That(game.WeaponChance(0), Is.LessThan(.9));
+            Assert.That(game.WeaponChance(0), Is.LessThan(90));
             game.Save.coins = 0;
             Assert.That(game.UpgradeWeapon(0), Is.EqualTo(WeaponUpgrade.Refused));
             Assert.That(game.WeaponLevel(0), Is.EqualTo(2));
@@ -583,7 +583,7 @@ namespace DOTORION.Tests
         [Test]
         public void WeaponAddsHealthAndAttackOnTopOfTheMember()
         {
-            var game = new SubjugationGame(new SubjugationSave { bestClear = 100, round = 101, maxRound = 101, coins = 100000 });
+            var game = new SubjugationGame(new SubjugationSave { bestClear = 100, round = 101, maxRound = 101, coins = 10000000 });
             var health = game.MaxHealth(0); var power = game.Power(0);
             game.BuyWeapon(0);
             Assert.That(game.BaseMaxHealth(0), Is.EqualTo(health));
@@ -592,6 +592,54 @@ namespace DOTORION.Tests
             Assert.That(game.Power(0), Is.EqualTo(power + game.Balance.weaponAttack));
             var legacy = new SubjugationGame(new SubjugationSave { weapons = null });
             Assert.That(legacy.Save.weapons, Is.EqualTo(new int[6])); // Saves from before weapons own none.
+        }
+
+        [Test]
+        public void WeaponChanceIsAWholePercentHyperbolaDownToTen()
+        {
+            var game = new SubjugationGame(null, LoadBalance());
+            Assert.That(game.WeaponChanceAt(1), Is.EqualTo(90));
+            Assert.That(game.WeaponChanceAt(10), Is.EqualTo(52));
+            Assert.That(game.WeaponChanceAt(50), Is.EqualTo(18));
+            Assert.That(game.WeaponChanceAt(99), Is.EqualTo(10));
+            for (var level = 2; level < 100; level++)
+            {
+                Assert.That(game.WeaponChanceAt(level), Is.LessThanOrEqualTo(game.WeaponChanceAt(level - 1)));
+                Assert.That(game.WeaponChanceAt(level), Is.GreaterThanOrEqualTo(10));
+            }
+            Assert.That(game.Balance.weaponMaxLevel, Is.EqualTo(100));
+        }
+
+        private static int Fight(int round, int[] members, int level, int weapon)
+        {
+            var save = new SubjugationSave { round = round, levels = new[] { 1, 1, 1, 10, 10, 40 }, party = new bool[6] };
+            foreach (var m in members) { save.levels[m] = level; save.party[m] = true; save.weapons[m] = weapon; }
+            var game = new SubjugationGame(save, LoadBalance());
+            for (var beat = 0; beat < 3600 && game.Outcome == 0; beat++) game.Tick(1, true);
+            return game.Outcome;
+        }
+
+        // Without weapons every Lv100 party clears R109 and none clears the R110 boss, Shisa's healing included.
+        [Test]
+        public void NoLv100PartyClearsR110WithoutWeapons()
+        {
+            for (var a = 0; a < 6; a++) for (var b = a + 1; b < 6; b++) for (var c = b + 1; c < 6; c++)
+            {
+                var party = new[] { a, b, c };
+                Assert.That(Fight(109, party, 100, 0), Is.EqualTo(1), string.Join(",", party));
+                Assert.That(Fight(110, party, 100, 0), Is.EqualTo(-1), string.Join(",", party));
+            }
+        }
+
+        // Lv100 attackers need weapon Lv14 at R110 and about Lv82 at R200; a Shisa party about Lv8 and Lv66.
+        [TestCase(110, new[] { 0, 3, 5 }, 14, 12)]
+        [TestCase(200, new[] { 0, 3, 5 }, 82, 78)]
+        [TestCase(110, new[] { 3, 4, 5 }, 8, 6)]
+        [TestCase(200, new[] { 3, 4, 5 }, 66, 62)]
+        public void WeaponLevelsCarryPastR100(int round, int[] party, int clears, int fails)
+        {
+            Assert.That(Fight(round, party, 100, clears), Is.EqualTo(1));
+            Assert.That(Fight(round, party, 100, fails), Is.EqualTo(-1));
         }
 
         [Test]
