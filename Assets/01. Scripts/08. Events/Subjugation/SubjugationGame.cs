@@ -5,7 +5,7 @@ namespace DOTORION.Events.Subjugation
     // Pure game rules: no attendance mutations, rendering, network or Unity dependency.
     // Tuned so 15 days of 6 working hours barely reach and clear R100 with Lv100 x2 + Lv70 (Documentation/ChiikawaBalance.md).
     // Past R100 enemies have 1.4x health and hit 3.4x as hard: even six Lv100 members, substituting as they fall, cannot clear R110
-    // without weapons. With them R150 takes about 15 more days, R200 far longer.
+    // without weapons. They also pay 9x, so with weapons R200 takes about 90 more hours (15 days).
     [Serializable]
     public sealed class SubjugationBalance
     {
@@ -30,6 +30,8 @@ namespace DOTORION.Events.Subjugation
         public int hardRound = 100;
         public double hardHealth = 1.4;
         public double hardAttack = 3.4;
+        // Rounds above hardRound also pay this many times the coins: six members and six weapons to raise by R200.
+        public double hardReward = 9;
         // Every member shares one curve; Shisa heals each living member by healRatio of it instead of attacking.
         // healRatio keeps a Shisa party as fast to R100 as three attackers: it survives more but kills slower.
         public double attack = 10;
@@ -105,7 +107,7 @@ namespace DOTORION.Events.Subjugation
         public bool IsHard(int round) => round > Balance.hardRound;
         public double EnemyMaxHp => Balance.enemyHealth * Math.Pow(Save.round, Balance.enemyGrowth) * (IsBossRound ? Balance.bossHealth : 1) * (IsHard(Save.round) ? Balance.hardHealth : 1);
         public double EnemyAttack => Balance.enemyAttack * Math.Pow(Save.round, Balance.enemyAttackGrowth) * (IsBossRound ? Balance.bossAttack : 1) * (IsHard(Save.round) ? Balance.hardAttack : 1);
-        public long Reward(int round) => (long)Math.Round(Balance.baseReward * Math.Pow(round, Balance.rewardGrowth) * (IsBoss(round) ? Balance.bossReward : 1));
+        public long Reward(int round) => (long)Math.Round(Balance.baseReward * Math.Pow(round, Balance.rewardGrowth) * (IsBoss(round) ? Balance.bossReward : 1) * (IsHard(round) ? Balance.hardReward : 1));
         public double PartyMaxHp { get { double hp = 0; for (var i = 0; i < 6; i++) if (Save.party[i]) hp += MaxHealth(i); return hp; } }
         // Unhired members preview the level they join at.
         public int Level(int id) => Save.levels[id] > 0 ? Save.levels[id] : StartLevel(id);

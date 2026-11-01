@@ -18,6 +18,7 @@
   "hardRound": 100,
   "hardHealth": 1.4,
   "hardAttack": 3.4,
+  "hardReward": 9,
   "attack": 10,
   "attackPerLevel": 3,
   "health": 100,
