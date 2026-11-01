@@ -261,8 +261,13 @@ namespace DOTORION.UI
                     () => HideFromTaskbarToggleRequested?.Invoke();
                 _settingsPanel.UiScaleChangeRequested += () => UiScaleChangeRequested?.Invoke();
                 _settingsPanel.ThemeSelectRequested += index => ThemeSelectRequested?.Invoke(index);
+                _settingsPanel.BackgroundChangeRequested += CycleMainBackground;
                 _settingsPanel.gameObject.SetActive(false);
             }
+
+            BuildMainBackground();
+            MainBackground.Changed += ApplyMainBackground;
+            ApplyMainBackground();
 
             if (_avatarPickerPanel != null)
             {
@@ -665,6 +670,76 @@ namespace DOTORION.UI
             }
 
             RefreshTextRenderingSoon();
+        }
+
+        private RawImage _mainBackground;
+        private const float CardAlphaOverPicture = .88f;
+
+        /// <summary>
+        /// The picture layer: right above the theme's window art and under the
+        /// cards, over the content area below the title bar (the same rectangle
+        /// the offline shade covers).
+        /// </summary>
+        private void BuildMainBackground()
+        {
+            if (_windowBackground == null || _mainBackground != null)
+            {
+                return;
+            }
+
+            var art = _windowBackground.Find("IMG_Background");
+            var layer = UiFactory.CreateRect("MainBackgroundPicture", _windowBackground);
+            layer.transform.SetSiblingIndex(art != null ? art.GetSiblingIndex() + 1 : 0);
+            var rect = (RectTransform)layer.transform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(.5f, 1f);
+            rect.sizeDelta = new Vector2(478f, 192f);
+            rect.anchoredPosition = new Vector2(0f, -27f);
+            _mainBackground = layer.AddComponent<RawImage>();
+            _mainBackground.raycastTarget = false;
+        }
+
+        private void ApplyMainBackground()
+        {
+            if (this == null)
+            {
+                return;
+            }
+
+            var id = MainBackground.Selected;
+            var texture = MainBackground.Texture(id);
+            if (_mainBackground != null)
+            {
+                _mainBackground.texture = texture;
+                _mainBackground.enabled = texture != null;
+            }
+
+            foreach (var card in _cards)
+            {
+                card?.SetBackdropAlpha(texture != null ? CardAlphaOverPicture : 1f);
+            }
+
+            var locked = Array.Find(MainBackground.Ids, other => !MainBackground.IsUnlocked(other));
+            _settingsPanel?.SetBackground(MainBackground.Label(id), locked == MainBackground.Chiikawa
+                ? "치이카와 배경: 토벌 대작전 R200 클리어 보상"
+                : "메인 화면 배경을 고릅니다. 테마와 따로 바뀝니다.");
+        }
+
+        private void CycleMainBackground()
+        {
+            var next = MainBackground.Next();
+            if (next == MainBackground.Selected)
+            {
+                ShowFeedback("치이카와 토벌 대작전 R200을 클리어하면 치이카와 배경이 열립니다.");
+                return;
+            }
+
+            MainBackground.Select(next);
+            ShowFeedback("배경을 " + MainBackground.Label(next) + "(으)로 바꿨습니다.");
+        }
+
+        private void OnDestroy()
+        {
+            MainBackground.Changed -= ApplyMainBackground;
         }
 
         /// <summary>Opens under the compact layout, the way the statistics panel does.</summary>

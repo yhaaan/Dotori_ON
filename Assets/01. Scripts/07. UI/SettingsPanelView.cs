@@ -25,6 +25,10 @@ namespace DOTORION.UI
         [SerializeField] private Text _uiScaleValue;
         [SerializeField] private Text _versionText;
 
+        private Button _backgroundButton;
+        private Text _backgroundValue;
+        private Text _backgroundHint;
+
         [Header("Theme buttons")]
         [Tooltip("제목 옆의 둥근 버튼들. 왼쪽부터 DOTORIONApp의 _themes 순서입니다.")]
         [SerializeField] private Image[] _themeSwatches;
@@ -48,6 +52,8 @@ namespace DOTORION.UI
 
         public event Action<int> ThemeSelectRequested;
 
+        public event Action BackgroundChangeRequested;
+
         public void Initialize()
         {
             if (_initialized)
@@ -56,7 +62,9 @@ namespace DOTORION.UI
             }
 
             EnsureUiScaleRow();
+            EnsureBackgroundRow();
             _initialized = true;
+            _backgroundButton?.onClick.AddListener(() => BackgroundChangeRequested?.Invoke());
             _alwaysOnTopButton?.onClick.AddListener(() => AlwaysOnTopToggleRequested?.Invoke());
             _muteButton?.onClick.AddListener(() => MuteToggleRequested?.Invoke());
             _autoStartButton?.onClick.AddListener(() => AutoStartToggleRequested?.Invoke());
@@ -145,6 +153,13 @@ namespace DOTORION.UI
             }
         }
 
+        /// <summary>The picture in use, and a hint that says what the locked one takes.</summary>
+        public void SetBackground(string value, string hint)
+        {
+            if (_backgroundValue != null) _backgroundValue.text = value;
+            if (_backgroundHint != null) _backgroundHint.text = hint;
+        }
+
         public void SetVersion(string version)
         {
             if (_versionText != null)
@@ -160,6 +175,7 @@ namespace DOTORION.UI
             if (_autoStartButton != null) _autoStartButton.interactable = !busy;
             if (_hideFromTaskbarButton != null) _hideFromTaskbarButton.interactable = !busy;
             if (_uiScaleButton != null) _uiScaleButton.interactable = !busy;
+            if (_backgroundButton != null) _backgroundButton.interactable = !busy;
             for (var index = 0; _themeSwatches != null && index < _themeSwatches.Length; index++)
             {
                 var button = _themeSwatches[index] != null ? _themeSwatches[index].GetComponent<Button>() : null;
@@ -213,6 +229,51 @@ namespace DOTORION.UI
             }
         }
 
+        /// <summary>
+        /// The main background row, built the same way as the UI size row: a
+        /// copy of the taskbar row placed under it, with the version line moved
+        /// down one more step.
+        /// </summary>
+        private void EnsureBackgroundRow()
+        {
+            var label = transform.Find("BackgroundLabel");
+            var hint = transform.Find("BackgroundHint");
+            var toggle = transform.Find("BackgroundToggle");
+            var sourceLabel = transform.Find("HideFromTaskbarLabel");
+            var sourceHint = transform.Find("HideFromTaskbarHint");
+            var sourceToggle = transform.Find("HideFromTaskbarToggle");
+            if ((label == null || hint == null || toggle == null) &&
+                sourceLabel != null && sourceHint != null && sourceToggle != null)
+            {
+                label = Clone(sourceLabel, "BackgroundLabel");
+                hint = Clone(sourceHint, "BackgroundHint");
+                toggle = Clone(sourceToggle, "BackgroundToggle");
+            }
+
+            var above = transform.Find("UiScaleToggle") as RectTransform;
+            if (label == null || hint == null || toggle == null || above == null)
+            {
+                return;
+            }
+
+            var top = above.anchoredPosition.y - RowStep;
+            SetAnchoredY(label, top);
+            SetAnchoredY(hint, top);
+            SetAnchoredY(toggle, top);
+            SetText(label, "배경");
+            _backgroundButton = toggle.GetComponent<Button>();
+            _backgroundValue = toggle.GetComponentInChildren<Text>();
+            _backgroundHint = hint.GetComponent<Text>() ?? hint.GetComponentInChildren<Text>();
+
+            SetAnchoredY(transform.Find("VersionLabel"), top - RowStep);
+            SetAnchoredY(transform.Find("VersionValue"), top - RowStep);
+            var panelRect = transform as RectTransform;
+            if (panelRect != null)
+            {
+                panelRect.sizeDelta = new Vector2(panelRect.sizeDelta.x, PanelHeight);
+            }
+        }
+
         private Transform Clone(Transform source, string name)
         {
             var copy = Instantiate(source.gameObject, transform);
@@ -241,7 +302,7 @@ namespace DOTORION.UI
         }
 
         private const float RowStep = 36f;
-        private const float PanelHeight = 268f;
+        private const float PanelHeight = 304f;
 
         /// <summary>
         /// The row says which way the switch is set in words. Only the words are

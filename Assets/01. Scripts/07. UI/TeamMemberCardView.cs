@@ -177,6 +177,30 @@ namespace DOTORION.UI
         }
 
         private bool _initialized;
+        private bool _isOnline;
+        private float _backdropAlpha = 1f;
+
+        /// <summary>
+        /// Lets a picture behind the cards show through. 1 is the theme's own
+        /// opaque card; the main background picks a lower value.
+        /// </summary>
+        public void SetBackdropAlpha(float alpha)
+        {
+            _backdropAlpha = Mathf.Clamp01(alpha);
+            PaintBackground();
+        }
+
+        private void PaintBackground()
+        {
+            if (_background == null)
+            {
+                return;
+            }
+
+            var color = _isOnline ? _onlineCardColor : _offlineCardColor;
+            color.a *= _backdropAlpha;
+            _background.color = color;
+        }
 
         public void Bind(MemberState member, DateTimeOffset nowUtc)
         {
@@ -184,10 +208,8 @@ namespace DOTORION.UI
             var isOnline = MemberStatusDisplay.IsOnline(member);
             var accent = AccentFor(member);
 
-            if (_background != null)
-            {
-                _background.color = isOnline ? _onlineCardColor : _offlineCardColor;
-            }
+            _isOnline = isOnline;
+            PaintBackground();
 
             // The avatar tile takes the status colour: that tile is what the
             // card is read by from across the room.

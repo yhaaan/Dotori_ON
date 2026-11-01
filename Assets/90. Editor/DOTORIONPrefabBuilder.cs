@@ -56,10 +56,10 @@ namespace DOTORION.Editor
 
         /// <summary>
         /// 프리팹 안에서 설정 패널 자체의 높이. 창이 정확히 이만큼 아래로 늘어나므로
-        /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>와 같아야 합니다. 제목과 여섯 줄이
+        /// <c>WindowsOverlayWindow.SettingsPanelHeight</c>와 같아야 합니다. 제목과 일곱 줄(배경 줄 포함)이
         /// 들어가는 높이입니다.
         /// </summary>
-        public const float SettingsPanelHeight = 268f;
+        public const float SettingsPanelHeight = 304f;
 
         public const string AutoStartRowLabel = "자동 시작";
 
