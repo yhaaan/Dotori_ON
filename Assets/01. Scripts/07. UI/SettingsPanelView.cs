@@ -25,9 +25,18 @@ namespace DOTORION.UI
         [SerializeField] private Text _uiScaleValue;
         [SerializeField] private Text _versionText;
 
-        private Button _backgroundButton;
-        private Text _backgroundValue;
-        private Text _backgroundHint;
+        private sealed class BackgroundIcon
+        {
+            public string Id;
+            public Button Button;
+            public Image Ring;
+            public Graphic Picture;
+            public Image Band;
+        }
+
+        private readonly List<BackgroundIcon> _backgroundIcons = new List<BackgroundIcon>();
+        private DOTORIONTheme _activeTheme;
+        private string _background = MainBackground.Default;
 
         [Header("Theme buttons")]
         [Tooltip("제목 옆의 둥근 버튼들. 왼쪽부터 DOTORIONApp의 _themes 순서입니다.")]
@@ -52,7 +61,7 @@ namespace DOTORION.UI
 
         public event Action<int> ThemeSelectRequested;
 
-        public event Action BackgroundChangeRequested;
+        public event Action<string> BackgroundSelectRequested;
 
         public void Initialize()
         {
@@ -62,9 +71,8 @@ namespace DOTORION.UI
             }
 
             EnsureUiScaleRow();
-            EnsureBackgroundRow();
+            EnsureBackgroundPicker();
             _initialized = true;
-            _backgroundButton?.onClick.AddListener(() => BackgroundChangeRequested?.Invoke());
             _alwaysOnTopButton?.onClick.AddListener(() => AlwaysOnTopToggleRequested?.Invoke());
             _muteButton?.onClick.AddListener(() => MuteToggleRequested?.Invoke());
             _autoStartButton?.onClick.AddListener(() => AutoStartToggleRequested?.Invoke());
@@ -108,6 +116,9 @@ namespace DOTORION.UI
                     swatch.sprite = sprite;
                 }
             }
+
+            _activeTheme = active;
+            PaintBackgrounds();
         }
 
         public void SetAlwaysOnTop(bool enabled)
@@ -153,11 +164,11 @@ namespace DOTORION.UI
             }
         }
 
-        /// <summary>The picture in use, and a hint that says what the locked one takes.</summary>
-        public void SetBackground(string value, string hint)
+        /// <summary>Rings the main background in use. A locked picture stays visible but dimmed.</summary>
+        public void SetBackground(string selected)
         {
-            if (_backgroundValue != null) _backgroundValue.text = value;
-            if (_backgroundHint != null) _backgroundHint.text = hint;
+            _background = selected;
+            PaintBackgrounds();
         }
 
         public void SetVersion(string version)
@@ -175,7 +186,7 @@ namespace DOTORION.UI
             if (_autoStartButton != null) _autoStartButton.interactable = !busy;
             if (_hideFromTaskbarButton != null) _hideFromTaskbarButton.interactable = !busy;
             if (_uiScaleButton != null) _uiScaleButton.interactable = !busy;
-            if (_backgroundButton != null) _backgroundButton.interactable = !busy;
+            foreach (var icon in _backgroundIcons) icon.Button.interactable = !busy;
             for (var index = 0; _themeSwatches != null && index < _themeSwatches.Length; index++)
             {
                 var button = _themeSwatches[index] != null ? _themeSwatches[index].GetComponent<Button>() : null;
@@ -229,48 +240,126 @@ namespace DOTORION.UI
             }
         }
 
-        /// <summary>
-        /// The main background row, built the same way as the UI size row: a
-        /// copy of the taskbar row placed under it, with the version line moved
-        /// down one more step.
-        /// </summary>
-        private void EnsureBackgroundRow()
-        {
-            var label = transform.Find("BackgroundLabel");
-            var hint = transform.Find("BackgroundHint");
-            var toggle = transform.Find("BackgroundToggle");
-            var sourceLabel = transform.Find("HideFromTaskbarLabel");
-            var sourceHint = transform.Find("HideFromTaskbarHint");
-            var sourceToggle = transform.Find("HideFromTaskbarToggle");
-            if ((label == null || hint == null || toggle == null) &&
-                sourceLabel != null && sourceHint != null && sourceToggle != null)
-            {
-                label = Clone(sourceLabel, "BackgroundLabel");
-                hint = Clone(sourceHint, "BackgroundHint");
-                toggle = Clone(sourceToggle, "BackgroundToggle");
-            }
+        private const float IconTop = -8f;
+        private const float IconSize = 23f;
+        private const float IconStep = 24f;
+        private const float IconRight = 12f;
+        // The swatch sprite's disk sits 4 pixels inside its 23 pixel square.
+        private const float DiskInset = 4f;
 
-            var above = transform.Find("UiScaleToggle") as RectTransform;
-            if (label == null || hint == null || toggle == null || above == null)
+        /// <summary>
+        /// Round main background buttons at the right end of the title row,
+        /// drawn like the theme buttons on the left: a disk showing the picture,
+        /// and the theme's ring around the one in use. The default disk is a
+        /// tiny window in the theme's swatch colour.
+        /// </summary>
+        private void EnsureBackgroundPicker()
+        {
+            if (_backgroundIcons.Count > 0 || _swatchSprite == null)
             {
                 return;
             }
 
-            var top = above.anchoredPosition.y - RowStep;
-            SetAnchoredY(label, top);
-            SetAnchoredY(hint, top);
-            SetAnchoredY(toggle, top);
-            SetText(label, "배경");
-            _backgroundButton = toggle.GetComponent<Button>();
-            _backgroundValue = toggle.GetComponentInChildren<Text>();
-            _backgroundHint = hint.GetComponent<Text>() ?? hint.GetComponentInChildren<Text>();
-
-            SetAnchoredY(transform.Find("VersionLabel"), top - RowStep);
-            SetAnchoredY(transform.Find("VersionValue"), top - RowStep);
-            var panelRect = transform as RectTransform;
-            if (panelRect != null)
+            var ids = MainBackground.Ids;
+            var source = transform.Find("HideFromTaskbarLabel");
+            if (source != null)
             {
-                panelRect.sizeDelta = new Vector2(panelRect.sizeDelta.x, PanelHeight);
+                var label = (RectTransform)Clone(source, "BackgroundPickerLabel");
+                label.anchorMin = label.anchorMax = label.pivot = Vector2.one;
+                label.sizeDelta = new Vector2(48f, IconSize);
+                label.anchoredPosition = new Vector2(-(IconRight + ids.Length * IconStep + 2f), IconTop);
+                var text = label.GetComponent<Text>() ?? label.GetComponentInChildren<Text>();
+                if (text != null)
+                {
+                    text.text = "배경";
+                    text.alignment = TextAnchor.MiddleRight;
+                }
+            }
+
+            var swatchButton = _themeSwatches != null && _themeSwatches.Length > 0 && _themeSwatches[0] != null
+                ? _themeSwatches[0].GetComponent<Button>()
+                : null;
+            for (var index = 0; index < ids.Length; index++)
+            {
+                var id = ids[index];
+                var root = new GameObject("Background_" + id, typeof(RectTransform), typeof(Image), typeof(Button));
+                root.transform.SetParent(transform, false);
+                var rect = (RectTransform)root.transform;
+                rect.anchorMin = rect.anchorMax = rect.pivot = Vector2.one;
+                rect.sizeDelta = new Vector2(IconSize, IconSize);
+                rect.anchoredPosition = new Vector2(-(IconRight + (ids.Length - 1 - index) * IconStep), IconTop);
+                var ring = root.GetComponent<Image>();
+                ring.sprite = _swatchSprite;
+
+                var mask = Fill(new GameObject("Mask", typeof(RectTransform), typeof(Image), typeof(Mask)), root.transform, 0f);
+                var maskImage = mask.GetComponent<Image>();
+                maskImage.sprite = _swatchSprite;
+                maskImage.raycastTarget = false;
+                mask.GetComponent<Mask>().showMaskGraphic = false;
+
+                var texture = MainBackground.Icon(id);
+                Graphic picture;
+                Image band = null;
+                if (texture != null)
+                {
+                    var raw = Fill(new GameObject("Picture", typeof(RectTransform), typeof(RawImage)), mask.transform, DiskInset).GetComponent<RawImage>();
+                    raw.texture = texture;
+                    picture = raw;
+                }
+                else
+                {
+                    picture = Fill(new GameObject("Picture", typeof(RectTransform), typeof(Image)), mask.transform, DiskInset).GetComponent<Image>();
+                    var bandRect = (RectTransform)Fill(new GameObject("TitleBar", typeof(RectTransform), typeof(Image)), picture.transform, 0f).transform;
+                    bandRect.anchorMin = new Vector2(0f, 1f);
+                    bandRect.sizeDelta = new Vector2(0f, 5f);
+                    bandRect.offsetMin = new Vector2(0f, -5f);
+                    band = bandRect.GetComponent<Image>();
+                    band.raycastTarget = false;
+                }
+
+                var button = root.GetComponent<Button>();
+                button.targetGraphic = picture;
+                if (swatchButton != null)
+                {
+                    button.colors = swatchButton.colors;
+                }
+
+                button.onClick.AddListener(() => BackgroundSelectRequested?.Invoke(id));
+                _backgroundIcons.Add(new BackgroundIcon { Id = id, Button = button, Ring = ring, Picture = picture, Band = band });
+            }
+
+            PaintBackgrounds();
+        }
+
+        private static GameObject Fill(GameObject child, Transform parent, float inset)
+        {
+            child.transform.SetParent(parent, false);
+            var rect = (RectTransform)child.transform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(inset, inset);
+            rect.offsetMax = new Vector2(-inset, -inset);
+            return child;
+        }
+
+        private void PaintBackgrounds()
+        {
+            var ringColor = _activeTheme != null ? _activeTheme.Swatch : Color.gray;
+            foreach (var icon in _backgroundIcons)
+            {
+                var selected = icon.Id == _background;
+                icon.Ring.sprite = selected && _swatchSelectedSprite != null ? _swatchSelectedSprite : _swatchSprite;
+                icon.Ring.color = selected ? ringColor : Color.clear;
+                if (icon.Band != null)
+                {
+                    // Skinned themes draw their window from sprites, so the swatch is the colour that matches what shows.
+                    icon.Picture.color = Color.Lerp(ringColor, Color.white, .55f);
+                    icon.Band.color = ringColor;
+                }
+                else
+                {
+                    icon.Picture.color = MainBackground.IsUnlocked(icon.Id) ? Color.white : new Color(.4f, .4f, .4f, 1f);
+                }
             }
         }
 
@@ -302,7 +391,7 @@ namespace DOTORION.UI
         }
 
         private const float RowStep = 36f;
-        private const float PanelHeight = 304f;
+        private const float PanelHeight = 268f;
 
         /// <summary>
         /// The row says which way the switch is set in words. Only the words are

@@ -35,19 +35,6 @@ namespace DOTORION.UI
             }
         }
 
-        /// <summary>The next unlocked picture after the one in use, wrapping round; the same one if nothing else is unlocked.</summary>
-        public static string Next()
-        {
-            var start = Array.IndexOf(Ids, Selected);
-            for (var step = 1; step <= Ids.Length; step++)
-            {
-                var id = Ids[(start + step) % Ids.Length];
-                if (IsUnlocked(id)) return id;
-            }
-
-            return Selected;
-        }
-
         public static void Select(string id)
         {
             if (Array.IndexOf(Ids, id) < 0 || !IsUnlocked(id) || id == Selected) return;
@@ -79,5 +66,9 @@ namespace DOTORION.UI
         /// <summary>The picture for an id, or null for the default (the theme's own window art shows through).</summary>
         public static Texture2D Texture(string id) =>
             id == Chiikawa ? Resources.Load<Texture2D>("DOTORION/Backgrounds/ChiikawaMain") : null;
+
+        /// <summary>The small picture for the round settings button, or null for the default (drawn from theme colours).</summary>
+        public static Texture2D Icon(string id) =>
+            id == Chiikawa ? Resources.Load<Texture2D>("DOTORION/Backgrounds/ChiikawaIcon") : null;
     }
 }

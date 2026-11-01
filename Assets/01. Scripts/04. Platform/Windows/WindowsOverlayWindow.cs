@@ -154,7 +154,7 @@ namespace DOTORION.Platform.Windows
         /// taken off the bottom, and it mirrors the panel's own height in the
         /// prefab, so the two have to change together.
         /// </summary>
-        public const int SettingsPanelHeight = 304;
+        public const int SettingsPanelHeight = 268;
 
         public const int MiniWindowWidth = 75;
 
