@@ -41,6 +41,8 @@ namespace DOTORION.Events.Subjugation
             + " ~ " + EndsAt.AddMinutes(-1).ToString("yyyy/MM/dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
 
         private const string VisibleKey = "DOTORION.Chiikawa.Visible";
+        /// <summary>Clearing this round unlocks the Chiikawa main background, kept after the event ends.</summary>
+        public const int BackgroundRewardRound = 200;
         private const int ShopHeight = 338;
         private DOTORIONView _view;
         private WindowsOverlayWindow _window;
@@ -113,6 +115,7 @@ namespace DOTORION.Events.Subjugation
             BuildShop();
             BuildDebugCoins();
             LoadClaims();
+            GrantBackground();
             _nextSave = Time.unscaledTime + 10;
             _dirty = true;
         }
@@ -297,7 +300,7 @@ namespace DOTORION.Events.Subjugation
             {
                 _resetArmedUntil = Time.unscaledTime + 4;
                 label.text = "다시 눌러 삭제";
-                _view.Dashboard.ShowFeedback("이벤트 기록(라운드·코인·대원·무기·보상 포인트)을 모두 지웁니다. 4초 안에 한 번 더 누르세요.", true);
+                _view.Dashboard.ShowFeedback("이벤트 기록(라운드·코인·대원·무기·보상 포인트·배경)을 모두 지웁니다. 4초 안에 한 번 더 누르세요.", true);
                 return;
             }
             _resetting = true; _resetArmedUntil = 0; label.text = "삭제 중";
@@ -306,6 +309,7 @@ namespace DOTORION.Events.Subjugation
                 if (_remote.ResetAll != null) await _remote.ResetAll(_lifetime.Token);
                 if (_disposed) return;
                 _store.Delete();
+                MainBackground.Lock(MainBackground.Chiikawa);
                 _game.Changed -= MarkDirty;
                 _game = new SubjugationGame(null, _balance);
                 _game.Changed += MarkDirty;
@@ -514,7 +518,13 @@ namespace DOTORION.Events.Subjugation
             if (_storageBlocked) return;
             if (operation()) { Persist(); RefreshShop(); }
         }
-        private void MarkDirty() { _dirty = true; RefreshShop(); }
+        private void MarkDirty() { _dirty = true; RefreshShop(); GrantBackground(); }
+
+        private void GrantBackground()
+        {
+            if (_game.HasCleared(BackgroundRewardRound) && MainBackground.Unlock(MainBackground.Chiikawa))
+                _view.ShowFeedback("R" + BackgroundRewardRound + " 클리어 보상: 치이카와 배경이 열렸습니다. 설정의 배경에서 바꿀 수 있습니다.");
+        }
 
         private void SetTab(int tab)
         {
