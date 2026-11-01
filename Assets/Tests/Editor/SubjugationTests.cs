@@ -377,13 +377,40 @@ namespace DOTORION.Tests
         {
             var game = new SubjugationGame(new SubjugationSave { coins = 1000000 }, new SubjugationBalance { enemyHealth = 100000, enemyAttack = 100000 });
             for (var i = 1; i < 6; i++) game.Hire(i);
-            game.ToggleParty(1); game.ToggleParty(2); game.ToggleParty(4); game.ToggleParty(5);
-            game.Tick(1, true); // Rakko falls; Shisa must not resurrect him.
-            game.Tick(1, true); // Shisa falls next.
-            Assert.That(game.IsDown(5), Is.True); Assert.That(game.IsDown(4), Is.True);
-            Assert.That(game.Numbers.Exists(n => n.healing), Is.False);
-            game.Tick(1, true); // Chiikawa falls and the attempt ends.
+            game.ToggleParty(1); game.ToggleParty(2); game.ToggleParty(4); game.ToggleParty(5); // Lineup 0, 4, 5.
+            game.Roll = () => 0;
+            for (var beat = 0; beat < 10 && game.Outcome == 0; beat++)
+            {
+                game.Tick(1, true);
+                // Whoever fell stays at zero: Shisa never heals or revives a fallen member, benched or not.
+                Assert.That(game.MemberHealth(5), Is.Zero);
+                Assert.That(game.Numbers.Exists(n => n.healing && game.MemberHealth(n.target) == 0), Is.False);
+            }
             Assert.That(game.Outcome, Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void FallenFighterIsReplacedFromTheBenchAndTheLineupReturnsNextFight()
+        {
+            var game = new SubjugationGame(new SubjugationSave { coins = 1000000 }, new SubjugationBalance { enemyHealth = 100000, enemyAttack = 100000 });
+            for (var i = 1; i < 6; i++) game.Hire(i);
+            game.ToggleParty(1); game.ToggleParty(2); game.ToggleParty(4); game.ToggleParty(5); // Lineup 0, 4, 5.
+            game.Roll = () => 0; // Always the first benched member.
+            game.Tick(1, true); // Rakko falls; Hachiware comes in at full health.
+            Assert.That(game.Save.party[5], Is.False); Assert.That(game.Save.party[1], Is.True);
+            Assert.That(game.LastSubstitute, Is.EqualTo(1));
+            Assert.That(game.MemberHealth(1), Is.EqualTo(game.MaxHealth(1)));
+            Assert.That(game.PartyCount, Is.EqualTo(3));
+            Assert.That(game.Outcome, Is.Zero);
+            Assert.That(game.Save.lineup, Is.EqualTo(new[] { true, false, false, false, true, true }));
+            for (var beat = 0; beat < 10 && game.Outcome == 0; beat++) game.Tick(1, true);
+            Assert.That(game.Outcome, Is.EqualTo(-1)); // All six fell, one after another.
+            for (var i = 0; i < 3; i++) game.Tick(1, true);
+            Assert.That(game.Save.party, Is.EqualTo(new[] { true, false, false, false, true, true })); // Back to the chosen three.
+            var restored = new SubjugationGame(JsonUtility.FromJson<SubjugationSave>(JsonUtility.ToJson(game.Save)), game.Balance);
+            Assert.That(restored.Save.lineup, Is.EqualTo(game.Save.lineup));
+            var legacy = new SubjugationGame(new SubjugationSave { lineup = null });
+            Assert.That(legacy.Save.lineup, Is.EqualTo(legacy.Save.party)); // Saves from before substitution.
         }
 
         [Test]
@@ -452,6 +479,7 @@ namespace DOTORION.Tests
             var save = new SubjugationSave { round = 100, levels = new[] { 1, 1, 1, 10, 10, 40 }, party = new bool[6] };
             for (var i = 0; i < members.Length; i++) { save.levels[members[i]] = levels[i]; save.party[members[i]] = true; }
             var game = new SubjugationGame(save, LoadBalance());
+            game.Roll = () => 0; // The bench, still at start levels, comes in as substitutes in a fixed order.
             for (var beat = 0; beat < 600 && game.Outcome == 0; beat++) game.Tick(1, true);
             Assert.That(game.Outcome, Is.EqualTo(clears ? 1 : -1));
         }
@@ -610,36 +638,44 @@ namespace DOTORION.Tests
             Assert.That(game.Balance.weaponMaxLevel, Is.EqualTo(100));
         }
 
-        private static int Fight(int round, int[] members, int level, int weapon)
+        private static readonly double[] Rolls = { 0, .5, .99 }; // First, middle and last benched member comes in.
+
+        /// <summary>All six hired at the same level and weapon level; the lineup fights, the rest substitute.</summary>
+        private static int Fight(int round, int[] lineup, int level, int weapon, double roll)
         {
-            var save = new SubjugationSave { round = round, levels = new[] { 1, 1, 1, 10, 10, 40 }, party = new bool[6] };
-            foreach (var m in members) { save.levels[m] = level; save.party[m] = true; save.weapons[m] = weapon; }
-            var game = new SubjugationGame(save, LoadBalance());
+            var save = new SubjugationSave { round = round, levels = new int[6], party = new bool[6] };
+            for (var m = 0; m < 6; m++) { save.levels[m] = level; save.weapons[m] = weapon; }
+            foreach (var m in lineup) save.party[m] = true;
+            var game = new SubjugationGame(save, LoadBalance()) { Roll = () => roll };
             for (var beat = 0; beat < 3600 && game.Outcome == 0; beat++) game.Tick(1, true);
             return game.Outcome;
         }
 
-        // Without weapons every Lv100 party clears R109 and none clears the R110 boss, Shisa's healing included.
+        // Without weapons six Lv100 members, substituting in any order, clear R109 and never the R110 boss.
         [Test]
         public void NoLv100PartyClearsR110WithoutWeapons()
         {
             for (var a = 0; a < 6; a++) for (var b = a + 1; b < 6; b++) for (var c = b + 1; c < 6; c++)
+            foreach (var roll in Rolls)
             {
-                var party = new[] { a, b, c };
-                Assert.That(Fight(109, party, 100, 0), Is.EqualTo(1), string.Join(",", party));
-                Assert.That(Fight(110, party, 100, 0), Is.EqualTo(-1), string.Join(",", party));
+                var lineup = new[] { a, b, c };
+                Assert.That(Fight(109, lineup, 100, 0, roll), Is.EqualTo(1), string.Join(",", lineup) + " roll " + roll);
+                Assert.That(Fight(110, lineup, 100, 0, roll), Is.EqualTo(-1), string.Join(",", lineup) + " roll " + roll);
             }
         }
 
-        // Lv100 attackers need weapon Lv14 at R110 and about Lv82 at R200; a Shisa party about Lv8 and Lv66.
-        [TestCase(110, new[] { 0, 3, 5 }, 14, 12)]
-        [TestCase(200, new[] { 0, 3, 5 }, 82, 78)]
-        [TestCase(110, new[] { 3, 4, 5 }, 8, 6)]
-        [TestCase(200, new[] { 3, 4, 5 }, 66, 62)]
-        public void WeaponLevelsCarryPastR100(int round, int[] party, int clears, int fails)
+        // With all six armed, R110 needs about weapon Lv16 and R200 about Lv84, attackers or Shisa alike.
+        [TestCase(110, new[] { 0, 3, 5 }, 20, 10)]
+        [TestCase(200, new[] { 0, 3, 5 }, 88, 78)]
+        [TestCase(110, new[] { 3, 4, 5 }, 20, 10)]
+        [TestCase(200, new[] { 3, 4, 5 }, 88, 78)]
+        public void WeaponLevelsCarryPastR100(int round, int[] lineup, int clears, int fails)
         {
-            Assert.That(Fight(round, party, 100, clears), Is.EqualTo(1));
-            Assert.That(Fight(round, party, 100, fails), Is.EqualTo(-1));
+            foreach (var roll in Rolls)
+            {
+                Assert.That(Fight(round, lineup, 100, clears, roll), Is.EqualTo(1), "roll " + roll);
+                Assert.That(Fight(round, lineup, 100, fails, roll), Is.EqualTo(-1), "roll " + roll);
+            }
         }
 
         [Test]
