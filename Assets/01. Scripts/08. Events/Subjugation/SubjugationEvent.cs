@@ -75,8 +75,9 @@ namespace DOTORION.Events.Subjugation
         private const int RosterTab = 0, RewardTab = 1, RoundTab = 2, WeaponTab = 3;
         private GameObject _roundPage, _weaponPage, _weaponLock;
         private Button _rosterTab, _rewardTab, _roundTab, _weaponTab;
-        private readonly Text[] _weaponNames = new Text[6];
-        private readonly Image[] _weaponFaces = new Image[6];
+        private readonly Text[] _weaponNames = new Text[6], _weaponChance = new Text[6], _weaponChanceCaption = new Text[6];
+        private readonly Image[] _weaponIcons = new Image[6], _weaponRows = new Image[6];
+        private readonly Sprite[] _weaponSprites = new Sprite[6];
         private readonly Button[] _weaponBuy = new Button[6];
         private Text _weaponLockText;
         private int _tab;
@@ -227,11 +228,11 @@ namespace DOTORION.Events.Subjugation
                 _faces[i].preserveAspect = true;
                 _faces[i].raycastTarget = false;
                 UiFactory.Stretch(_faces[i].rectTransform);
-                _names[i] = Label("Member" + i, _rosterPage.transform, "", 50, y, 172, 40, 12);
+                _names[i] = Label("Member" + i, _rosterPage.transform, "", 50, y, 220, 40, 12);
                 _party[i] = UiFactory.CreateButton("Party" + i, _rosterPage.transform, _view.EventFont, "", () => Purchase(() => _game.ToggleParty(index)));
-                UiFactory.AnchorTop((RectTransform)_party[i].transform, 224, y + 6, 82, 28);
+                UiFactory.AnchorTop((RectTransform)_party[i].transform, 274, y + 6, 64, 28);
                 _buy[i] = UiFactory.CreateButton("Upgrade" + i, _rosterPage.transform, _view.EventFont, "", () => Purchase(() => _game.Save.levels[index] > 0 ? _game.LevelUp(index) : _game.Hire(index)));
-                UiFactory.AnchorTop((RectTransform)_buy[i].transform, 314, y + 6, 152, 28);
+                UiFactory.AnchorTop((RectTransform)_buy[i].transform, 342, y + 6, 124, 28);
             }
             // Two columns of five milestones, the same 44px rows as the roster.
             for (var i = 0; i < 10; i++)
@@ -344,7 +345,7 @@ namespace DOTORION.Events.Subjugation
             var hover = auto.gameObject.AddComponent<SubjugationHover>(); hover.Changed = value => { _uiAutoHovered = value; _pixels.AutoHovered = value; };
             _roundPage.SetActive(false);
         }
-        /// <summary>Same 44px rows as the roster: owner's face, weapon and stats, then buy or upgrade.</summary>
+        /// <summary>Same 44px rows as the roster: weapon icon, name and stats, a large success chance, then buy or upgrade.</summary>
         private void BuildWeaponPage()
         {
             var page = _weaponPage.transform;
@@ -352,16 +353,30 @@ namespace DOTORION.Events.Subjugation
             {
                 var index = i;
                 var y = 58 + i * 44;
-                var faceFrame = UiFactory.CreateImage("WeaponFaceFrame" + i, page, Color.white);
-                UiFactory.AnchorTop(faceFrame.rectTransform, 12, y, 32, 32);
-                _weaponFaces[i] = UiFactory.CreateImage("WeaponFace" + i, faceFrame.transform, Color.white);
-                _weaponFaces[i].sprite = _art.Portrait(i);
-                _weaponFaces[i].preserveAspect = true;
-                _weaponFaces[i].raycastTarget = false;
-                UiFactory.Stretch(_weaponFaces[i].rectTransform);
-                _weaponNames[i] = Label("Weapon" + i, page, "", 50, y, 256, 40, 12);
+                // A weapon not bought yet sits on a dark grey band so the row reads as locked.
+                _weaponRows[i] = UiFactory.CreateImage("WeaponRow" + i, page, new Color(.29f, .32f, .38f));
+                _weaponRows[i].raycastTarget = false;
+                UiFactory.AnchorTop(_weaponRows[i].rectTransform, 6, y - 1, 468, 42);
+                var iconFrame = UiFactory.CreateImage("WeaponIconFrame" + i, page, Color.white);
+                iconFrame.raycastTarget = false;
+                UiFactory.AnchorTop(iconFrame.rectTransform, 10, y + 2, 36, 36);
+                _weaponSprites[i] = SubjugationPixels.WeaponIcon(i);
+                _weaponIcons[i] = UiFactory.CreateImage("WeaponIcon" + i, iconFrame.transform, Color.white);
+                _weaponIcons[i].sprite = _weaponSprites[i];
+                _weaponIcons[i].raycastTarget = false;
+                // Exactly two UI pixels per dot, never a fractional stretch.
+                var iconRect = _weaponIcons[i].rectTransform;
+                iconRect.anchorMin = iconRect.anchorMax = iconRect.pivot = new Vector2(.5f, .5f);
+                iconRect.sizeDelta = new Vector2(SubjugationPixels.WeaponIconSize * 2, SubjugationPixels.WeaponIconSize * 2);
+                iconRect.anchoredPosition = Vector2.zero;
+                _weaponNames[i] = Label("Weapon" + i, page, "", 54, y, 204, 40, 12);
+                _weaponChanceCaption[i] = UiFactory.CreateText("ChanceCaption" + i, page, _view.EventFont, 10, TextAnchor.MiddleCenter, new Color(.4f, .46f, .56f));
+                UiFactory.AnchorTop(_weaponChanceCaption[i].rectTransform, 262, y + 1, 74, 13);
+                _weaponChance[i] = UiFactory.CreateText("Chance" + i, page, _view.EventFont, 20, TextAnchor.MiddleCenter, new Color(.18f, .24f, .34f));
+                _weaponChance[i].fontStyle = FontStyle.Bold;
+                UiFactory.AnchorTop(_weaponChance[i].rectTransform, 262, y + 13, 74, 26);
                 _weaponBuy[i] = UiFactory.CreateButton("WeaponUpgrade" + i, page, _view.EventFont, "", () => UpgradeWeapon(index));
-                UiFactory.AnchorTop((RectTransform)_weaponBuy[i].transform, 314, y + 6, 152, 28);
+                UiFactory.AnchorTop((RectTransform)_weaponBuy[i].transform, 342, y + 6, 124, 28);
             }
             // Until the unlock round is cleared a dark veil covers the rows (not the tabs) and swallows clicks.
             var veil = UiFactory.CreateImage("WeaponLock", page, new Color(0, 0, 0, .7f));
@@ -410,13 +425,21 @@ namespace DOTORION.Events.Subjugation
                 var owned = _game.HasWeapon(i);
                 var maxed = owned && _game.IsWeaponMaxLevel(i);
                 var stat = i == 4 ? "  회복량 +" : "  공격력 +";
-                _weaponFaces[i].color = hired ? Color.white : new Color(.72f, .77f, .85f, .85f);
+                _weaponRows[i].enabled = !owned;
+                _weaponIcons[i].color = owned ? Color.white : new Color(.38f, .4f, .45f);
+                _weaponNames[i].color = owned ? new Color(.18f, .24f, .34f) : new Color(.78f, .81f, .86f);
                 _weaponNames[i].text = FitWidth(_weaponNames[i], !owned
                     ? SubjugationGame.WeaponNames[i] + "  미보유\n구입 시 체력 +" + _game.Balance.weaponHealth.ToString("0")
                         + stat + (_game.Balance.weaponAttack * (i == 4 ? _game.Balance.healRatio : 1)).ToString("0.#")
                     : SubjugationGame.WeaponNames[i] + "  Lv." + _game.WeaponLevel(i) + (maxed ? " (최대)" : "")
-                        + "\n체력 +" + _game.WeaponHealth(i).ToString("0") + stat + _game.WeaponPower(i).ToString("0.#")
-                        + (maxed ? "" : "  ·  성공 " + Math.Round(_game.WeaponChance(i) * 100) + "%"));
+                        + "\n체력 +" + _game.WeaponHealth(i).ToString("0") + stat + _game.WeaponPower(i).ToString("0.#"));
+                // The chance is a read-out beside the button, coloured from safe (green) to risky (red).
+                var chance = _game.WeaponChance(i);
+                _weaponChanceCaption[i].text = owned && !maxed ? "성공 확률" : "";
+                _weaponChance[i].text = !owned ? "잠김" : maxed ? "MAX" : Math.Round(chance * 100) + "%";
+                _weaponChance[i].fontSize = owned ? 20 : 15;
+                _weaponChance[i].color = !owned ? new Color(.62f, .66f, .73f) : maxed ? new Color(.18f, .24f, .34f)
+                    : chance >= .7 ? new Color(.16f, .55f, .3f) : chance >= .45 ? new Color(.85f, .5f, .1f) : new Color(.8f, .2f, .24f);
                 var cost = owned ? _game.WeaponUpgradeCost(i) : _game.WeaponCost;
                 _weaponBuy[i].GetComponentInChildren<Text>().text = !unlocked ? "잠김" : maxed ? "최대 레벨" : !hired ? "대원 고용 필요"
                     : owned ? "강화  " + cost.ToString("N0") + " 코인" : "구입  " + cost.ToString("N0") + " 코인";
@@ -587,11 +610,13 @@ namespace DOTORION.Events.Subjugation
                 var hired = _game.Save.levels[i] > 0;
                 var next = i == _game.NextHire;
                 _faces[i].color = hired || next ? Color.white : new Color(.72f, .77f, .85f, .85f);
-                // With a weapon, the bonus is shown on its own: "최대체력 1480+100  공격력 217+200".
+                // With a weapon, the total comes first and its parts after: "최대체력 400(100+300)  공격력 100(50+50)".
                 var armed = _game.HasWeapon(i);
                 _names[i].text = FitWidth(_names[i], SubjugationGame.Names[i] + "  Lv." + _game.Level(i)
-                    + "\n최대체력 " + _game.BaseMaxHealth(i).ToString("0") + (armed ? "+" + _game.WeaponHealth(i).ToString("0") : "")
-                    + (i == 4 ? "  회복량 " : "  공격력 ") + _game.BasePower(i).ToString("0.#") + (armed ? "+" + _game.WeaponPower(i).ToString("0.#") : ""));
+                    + "\n최대체력 " + _game.MaxHealth(i).ToString("0")
+                    + (armed ? "(" + _game.BaseMaxHealth(i).ToString("0") + "+" + _game.WeaponHealth(i).ToString("0") + ")" : "")
+                    + (i == 4 ? "  회복량 " : "  공격력 ") + _game.Power(i).ToString("0.#")
+                    + (armed ? "(" + _game.BasePower(i).ToString("0.#") + "+" + _game.WeaponPower(i).ToString("0.#") + ")" : ""));
                 _party[i].gameObject.SetActive(hired);
                 _party[i].GetComponentInChildren<Text>().text = _game.Save.party[i] ? "출전중" : "출전";
                 _party[i].interactable = !_storageBlocked && (_game.Save.party[i] ? _game.PartyCount > 1 : _game.PartyCount < 3);
@@ -716,6 +741,7 @@ namespace DOTORION.Events.Subjugation
             if (_frame != null) { SubjugationPixels.Release(_frame.texture); SubjugationPixels.Release(_frame); }
             if (_frameBorder != null) { SubjugationPixels.Release(_frameBorder.texture); SubjugationPixels.Release(_frameBorder); }
             if (_weapon != null) { SubjugationPixels.Release(_weapon.texture); SubjugationPixels.Release(_weapon); }
+            foreach (var sprite in _weaponSprites) if (sprite != null) { SubjugationPixels.Release(sprite.texture); SubjugationPixels.Release(sprite); }
             if (_toggle != null) SubjugationPixels.Release(_toggle.gameObject);
             if (_shop != null) SubjugationPixels.Release(_shop);
             if (_stripRoot != null) SubjugationPixels.Release(_stripRoot);

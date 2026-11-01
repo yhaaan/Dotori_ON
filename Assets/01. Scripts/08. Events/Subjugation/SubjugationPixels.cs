@@ -281,26 +281,149 @@ namespace DOTORION.Events.Subjugation
             ".......PPP.......",
         };
 
-        public static Sprite WeaponIcon()
+        /// <summary>The sasumata in one colour: P on the right edge of each stroke becomes the shade letter.</summary>
+        private static string[] Sasumata(char primary)
+        {
+            var rows = new string[SasumataRows.Length];
+            for (var y = 0; y < rows.Length; y++)
+            {
+                var r = SasumataRows[y]; var chars = r.ToCharArray();
+                for (var x = 0; x < r.Length; x++)
+                    if (r[x] == 'P') chars[x] = r[Math.Min(r.Length - 1, x + 1)] != 'P' && x > 0 && r[x - 1] == 'P' ? char.ToLowerInvariant(primary) : primary;
+                rows[y] = new string(chars);
+            }
+            return rows;
+        }
+
+        // One icon per member's weapon, same 17x17 grid and outline as the event button's sasumata.
+        private static readonly string[][] WeaponRows =
+        {
+            Sasumata('P'), // Chiikawa: pink sasumata
+            Sasumata('L'), // Hachiware: blue sasumata
+            new[] // Usagi: staff
+            {
+                ".................",
+                "............YY...",
+                "...........YWYY..",
+                "...........YYYy..",
+                "............Yy...",
+                "...........Bb....",
+                "..........Bb.....",
+                ".........Bb......",
+                "........Bb.......",
+                ".......Bb........",
+                "......Bb.........",
+                ".....Bb..........",
+                "....Bb...........",
+                "...Bb............",
+                "..Bb.............",
+                ".Bb..............",
+                ".................",
+            },
+            new[] // Momonga: claw marks
+            {
+                ".................",
+                ".....R....R....R.",
+                ".....R....R....R.",
+                ".....R....R....R.",
+                "....rR...rR...rR.",
+                "...rR...rR...rR..",
+                "...rR...rR...rR..",
+                "...rR...rR...rR..",
+                "..rR...rR...rR...",
+                "..rR...rR...rR...",
+                "..rR...rR...rR...",
+                "..rR...rR...rR...",
+                ".rR...rR...rR....",
+                "..R....R....R....",
+                "..R....R....R....",
+                ".R....R....R.....",
+                ".................",
+            },
+            new[] // Shisa: ramen
+            {
+                ".................",
+                "..............B..",
+                ".............B..B",
+                "............B..B.",
+                "...........B..B..",
+                "..........B..B...",
+                "....NPPNNNWNN....",
+                "..NNNWPNNNYYNNN..",
+                ".RRRRRRRRRRRRRRR.",
+                "..RWRRWRRWRRWRR..",
+                "..RRRRRRRRRRRRR..",
+                "...RRRRRRRRRRR...",
+                "....rrrrrrrrr....",
+                "......rrrrr......",
+                "......KKKKK......",
+                ".................",
+                ".................",
+            },
+            new[] // Rakko: sword
+            {
+                ".................",
+                "...............W.",
+                "..............WG.",
+                ".............WG..",
+                "............WG...",
+                "...........WG....",
+                "..........WG.....",
+                ".........WG......",
+                "..Y.....WG.......",
+                "...Y...WG........",
+                "....Y.WG.........",
+                "....BY...........",
+                "...Bb.Y..........",
+                "..Bb...Y.........",
+                ".YY.....Y........",
+                ".Y...............",
+                ".................",
+            },
+        };
+
+        private static Color32 WeaponColor(char c)
+        {
+            switch (c)
+            {
+                case 'P': return new Color32(247, 158, 181, 255);
+                case 'p': return new Color32(222, 118, 150, 255);
+                case 'L': return new Color32(110, 160, 222, 255);
+                case 'l': return new Color32(78, 124, 190, 255);
+                case 'Y': return new Color32(246, 201, 52, 255);
+                case 'y': return new Color32(214, 160, 30, 255);
+                case 'B': return new Color32(176, 116, 70, 255);
+                case 'b': return new Color32(132, 84, 58, 255);
+                case 'R': return new Color32(232, 84, 96, 255);
+                case 'r': return new Color32(190, 56, 70, 255);
+                case 'N': return new Color32(255, 230, 160, 255);
+                case 'G': return new Color32(178, 191, 202, 255);
+                case 'K': return new Color32(150, 46, 56, 255);
+                default: return new Color32(255, 255, 255, 255);
+            }
+        }
+
+        /// <summary>The event button's pink sasumata.</summary>
+        public static Sprite WeaponIcon() => WeaponIcon(0);
+
+        /// <summary>Member id's weapon as a 17x17 point-filtered sprite. The caller releases its texture.</summary>
+        public static Sprite WeaponIcon(int id)
         {
             const int size = WeaponIconSize;
-            bool Filled(int x, int y) => x >= 0 && y >= 0 && x < size && y < size && SasumataRows[y][x] != '.';
+            var rows = WeaponRows[id];
+            bool Filled(int x, int y) => x >= 0 && y >= 0 && x < size && y < size && rows[y][x] != '.';
             var outline = new Color32(74, 40, 44, 255);
-            var pink = new Color32(247, 158, 181, 255); var pinkShade = new Color32(222, 118, 150, 255);
-            var white = new Color32(255, 255, 255, 255); var whiteShade = new Color32(214, 220, 232, 255);
             var p = new Color32[size * size];
             for (var y = 0; y < size; y++) for (var x = 0; x < size; x++)
             {
-                var c = SasumataRows[y][x];
+                var c = rows[y][x];
                 Color32 color;
-                if (c == 'P') color = SasumataRows[y][Math.Min(size - 1, x + 1)] != 'P' && x > 0 && SasumataRows[y][x - 1] == 'P' ? pinkShade : pink;
-                else if (c == 'W') color = white;
-                else if (c == 'G') color = Filled(x, y + 1) ? white : whiteShade;
+                if (c != '.') color = WeaponColor(c);
                 else if (Filled(x + 1, y) || Filled(x - 1, y) || Filled(x, y + 1) || Filled(x, y - 1)) color = outline;
                 else continue;
                 p[(size - 1 - y) * size + x] = color; // Texture rows run bottom-up.
             }
-            var t = new Texture2D(size, size, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, name = "Chiikawa sasumata" };
+            var t = new Texture2D(size, size, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, name = "Chiikawa weapon " + id };
             t.SetPixels32(p); t.Apply();
             return Sprite.Create(t, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 1);
         }
