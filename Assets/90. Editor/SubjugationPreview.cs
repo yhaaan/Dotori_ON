@@ -158,6 +158,27 @@ namespace DOTORION.Editor
             RenderTexture.active = rt;
             output.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0); output.Apply();
             File.WriteAllBytes("Logs/ChiikawaPreview/round-picker.png", output.EncodeToPNG());
+            // Weapon tab before R100 (veiled), then after it with two weapons, and the roster showing their bonuses.
+            var setTab = typeof(SubjugationEvent).GetMethod("SetTab", BindingFlags.Instance | BindingFlags.NonPublic);
+            var weaponTab = (int)typeof(SubjugationEvent).GetField("WeaponTab", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+            void Capture(string file)
+            {
+                Canvas.ForceUpdateCanvases(); camera.Render();
+                RenderTexture.active = rt;
+                output.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0); output.Apply();
+                File.WriteAllBytes("Logs/ChiikawaPreview/" + file, output.EncodeToPNG());
+            }
+            setTab.Invoke(module, new object[] { weaponTab });
+            Capture("weapons-locked.png");
+            previewGame.Save.bestClear = 100; previewGame.Save.coins = 9999999;
+            for (var i = 3; i < 6; i++) previewGame.Hire(i);
+            previewGame.BuyWeapon(0); previewGame.BuyWeapon(4);
+            previewGame.Roll = () => 0;
+            for (var i = 0; i < 4; i++) previewGame.UpgradeWeapon(0);
+            setTab.Invoke(module, new object[] { weaponTab });
+            Capture("weapons.png");
+            setTab.Invoke(module, new object[] { 0 });
+            Capture("roster-armed.png");
             RenderTexture.active = old; camera.targetTexture = null; RenderTexture.ReleaseTemporary(rt);
             UnityEngine.Object.DestroyImmediate(view.gameObject);
             UnityEngine.Object.DestroyImmediate(host);

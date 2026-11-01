@@ -71,10 +71,14 @@ namespace DOTORION.Events.Subjugation
         private readonly Dictionary<string, int> _rounds = new Dictionary<string, int>(), _bestRounds = new Dictionary<string, int>();
         private SubjugationRemote _remote;
         private GameObject _rosterPage, _rewardPage;
-        // One window, three tabs: roster, rewards, round selection.
-        private const int RosterTab = 0, RewardTab = 1, RoundTab = 2;
-        private GameObject _roundPage;
-        private Button _rosterTab, _rewardTab, _roundTab;
+        // One window, four tabs: weapons, roster, rewards, round selection.
+        private const int RosterTab = 0, RewardTab = 1, RoundTab = 2, WeaponTab = 3;
+        private GameObject _roundPage, _weaponPage, _weaponLock;
+        private Button _rosterTab, _rewardTab, _roundTab, _weaponTab;
+        private readonly Text[] _weaponNames = new Text[6];
+        private readonly Image[] _weaponFaces = new Image[6];
+        private readonly Button[] _weaponBuy = new Button[6];
+        private Text _weaponLockText;
         private int _tab;
         private bool _claimsLoaded, _claimsFailed, _claimsLoading;
         private int _claiming;
@@ -194,8 +198,10 @@ namespace DOTORION.Events.Subjugation
             _heading.fontStyle = FontStyle.Bold;
             var close = UiFactory.CreateButton("Close", panel.transform, _view.EventFont, "닫기", () => SetShop(false));
             UiFactory.AnchorTop((RectTransform)close.transform, 426, 8, 42, 24);
-            _status = Label("Status", panel.transform, "", 12, 32, 300, 20, 12);
+            _status = Label("Status", panel.transform, "", 12, 32, 250, 20, 12);
             _status.resizeTextForBestFit = true; _status.resizeTextMinSize = 9; _status.resizeTextMaxSize = 12;
+            _weaponTab = UiFactory.CreateButton("WeaponTab", panel.transform, _view.EventFont, "무기", () => SetTab(WeaponTab));
+            UiFactory.AnchorTop((RectTransform)_weaponTab.transform, 266, 31, 48, 22);
             _rosterTab = UiFactory.CreateButton("RosterTab", panel.transform, _view.EventFont, "대원", () => SetTab(RosterTab));
             UiFactory.AnchorTop((RectTransform)_rosterTab.transform, 318, 31, 48, 22);
             _rewardTab = UiFactory.CreateButton("RewardTab", panel.transform, _view.EventFont, "보상", () => SetTab(RewardTab));
@@ -208,6 +214,8 @@ namespace DOTORION.Events.Subjugation
             UiFactory.Stretch((RectTransform)_rewardPage.transform);
             _roundPage = UiFactory.CreateRect("RoundPage", panel.transform);
             UiFactory.Stretch((RectTransform)_roundPage.transform);
+            _weaponPage = UiFactory.CreateRect("WeaponPage", panel.transform);
+            UiFactory.Stretch((RectTransform)_weaponPage.transform);
             for (var i = 0; i < 6; i++)
             {
                 var index = i;
@@ -237,6 +245,7 @@ namespace DOTORION.Events.Subjugation
             _rewardEarned = Label("RewardEarned", _rewardPage.transform, "", 12, 296, 456, 24, 12);
             _rewardPage.SetActive(false);
             BuildRoundPage();
+            BuildWeaponPage();
             _shop.SetActive(false);
 
             // Full mode is one Unity window: the strip cannot be detached and moves in the native drag loop.
@@ -287,7 +296,7 @@ namespace DOTORION.Events.Subjugation
             {
                 _resetArmedUntil = Time.unscaledTime + 4;
                 label.text = "다시 눌러 삭제";
-                _view.Dashboard.ShowFeedback("이벤트 기록(라운드·코인·대원·보상 포인트)을 모두 지웁니다. 4초 안에 한 번 더 누르세요.", true);
+                _view.Dashboard.ShowFeedback("이벤트 기록(라운드·코인·대원·무기·보상 포인트)을 모두 지웁니다. 4초 안에 한 번 더 누르세요.", true);
                 return;
             }
             _resetting = true; _resetArmedUntil = 0; label.text = "삭제 중";
@@ -335,6 +344,98 @@ namespace DOTORION.Events.Subjugation
             var hover = auto.gameObject.AddComponent<SubjugationHover>(); hover.Changed = value => { _uiAutoHovered = value; _pixels.AutoHovered = value; };
             _roundPage.SetActive(false);
         }
+        /// <summary>Same 44px rows as the roster: owner's face, weapon and stats, then buy or upgrade.</summary>
+        private void BuildWeaponPage()
+        {
+            var page = _weaponPage.transform;
+            for (var i = 0; i < 6; i++)
+            {
+                var index = i;
+                var y = 58 + i * 44;
+                var faceFrame = UiFactory.CreateImage("WeaponFaceFrame" + i, page, Color.white);
+                UiFactory.AnchorTop(faceFrame.rectTransform, 12, y, 32, 32);
+                _weaponFaces[i] = UiFactory.CreateImage("WeaponFace" + i, faceFrame.transform, Color.white);
+                _weaponFaces[i].sprite = _art.Portrait(i);
+                _weaponFaces[i].preserveAspect = true;
+                _weaponFaces[i].raycastTarget = false;
+                UiFactory.Stretch(_weaponFaces[i].rectTransform);
+                _weaponNames[i] = Label("Weapon" + i, page, "", 50, y, 256, 40, 12);
+                _weaponBuy[i] = UiFactory.CreateButton("WeaponUpgrade" + i, page, _view.EventFont, "", () => UpgradeWeapon(index));
+                UiFactory.AnchorTop((RectTransform)_weaponBuy[i].transform, 314, y + 6, 152, 28);
+            }
+            // Until the unlock round is cleared a dark veil covers the rows (not the tabs) and swallows clicks.
+            var veil = UiFactory.CreateImage("WeaponLock", page, new Color(0, 0, 0, .7f));
+            veil.raycastTarget = true;
+            UiFactory.AnchorTop(veil.rectTransform, 0, 56, 480, ShopHeight - 56);
+            var plate = UiFactory.CreateImage("MessagePlate", veil.transform, new Color(0, 0, 0, .75f));
+            plate.raycastTarget = false;
+            var plateRect = plate.rectTransform;
+            plateRect.anchorMin = plateRect.anchorMax = plateRect.pivot = new Vector2(.5f, .5f);
+            plateRect.sizeDelta = new Vector2(300, 48); plateRect.anchoredPosition = Vector2.zero;
+            _weaponLockText = UiFactory.CreateText("Message", plate.transform, _view.EventFont, 14, TextAnchor.MiddleCenter, Color.white);
+            _weaponLockText.fontStyle = FontStyle.Bold;
+            UiFactory.Stretch(_weaponLockText.rectTransform);
+            _weaponLock = veil.gameObject;
+            _weaponPage.SetActive(false);
+        }
+
+        private void UpgradeWeapon(int index)
+        {
+            if (_storageBlocked) return;
+            var name = SubjugationGame.WeaponNames[index];
+            if (!_game.HasWeapon(index))
+            {
+                if (!_game.BuyWeapon(index)) return;
+                Persist(); RefreshShop();
+                _view.ShowFeedback(name + " 구입 완료 (Lv.1)");
+                return;
+            }
+            var result = _game.UpgradeWeapon(index);
+            if (result == WeaponUpgrade.Refused) return;
+            Persist(); RefreshShop();
+            _view.ShowFeedback(result == WeaponUpgrade.Success
+                ? "강화 성공! " + name + " Lv." + _game.WeaponLevel(index)
+                : "강화 실패… " + name + " Lv." + _game.WeaponLevel(index) + " 유지", result == WeaponUpgrade.Failed);
+        }
+
+        private void RefreshWeapons()
+        {
+            var unlocked = _game.WeaponsUnlocked;
+            _status.text = _storageBlocked ? "저장 오류: 진행이 일시 중지되었습니다." : "강화에 실패해도 레벨은 내려가지 않습니다.";
+            _weaponLock.SetActive(!unlocked);
+            _weaponLockText.text = _game.Balance.weaponUnlockRound + "라운드를 클리어해야 합니다.";
+            for (var i = 0; i < 6; i++)
+            {
+                var hired = _game.Save.levels[i] > 0;
+                var owned = _game.HasWeapon(i);
+                var maxed = owned && _game.IsWeaponMaxLevel(i);
+                var stat = i == 4 ? "  회복량 +" : "  공격력 +";
+                _weaponFaces[i].color = hired ? Color.white : new Color(.72f, .77f, .85f, .85f);
+                _weaponNames[i].text = FitWidth(_weaponNames[i], !owned
+                    ? SubjugationGame.WeaponNames[i] + "  미보유\n구입 시 체력 +" + _game.Balance.weaponHealth.ToString("0")
+                        + stat + (_game.Balance.weaponAttack * (i == 4 ? _game.Balance.healRatio : 1)).ToString("0.#")
+                    : SubjugationGame.WeaponNames[i] + "  Lv." + _game.WeaponLevel(i) + (maxed ? " (최대)" : "")
+                        + "\n체력 +" + _game.WeaponHealth(i).ToString("0") + stat + _game.WeaponPower(i).ToString("0.#")
+                        + (maxed ? "" : "  ·  성공 " + Math.Round(_game.WeaponChance(i) * 100) + "%"));
+                var cost = owned ? _game.WeaponUpgradeCost(i) : _game.WeaponCost;
+                _weaponBuy[i].GetComponentInChildren<Text>().text = !unlocked ? "잠김" : maxed ? "최대 레벨" : !hired ? "대원 고용 필요"
+                    : owned ? "강화  " + cost.ToString("N0") + " 코인" : "구입  " + cost.ToString("N0") + " 코인";
+                _weaponBuy[i].interactable = unlocked && !_storageBlocked && hired && !maxed && _game.Save.coins >= cost;
+            }
+        }
+
+        /// <summary>Shrinks the label (12 down to 8) until its widest line fits, so long stat lines never run under the buttons.</summary>
+        private static string FitWidth(Text label, string text)
+        {
+            label.text = text;
+            for (var size = 12; size >= 8; size--)
+            {
+                label.fontSize = size;
+                if (label.preferredWidth <= label.rectTransform.rect.width) break;
+            }
+            return text;
+        }
+
         private void MoveRound(int delta)
         {
             if (!int.TryParse(_roundInput.text, out var round)) round = _game.Save.round;
@@ -425,7 +526,9 @@ namespace DOTORION.Events.Subjugation
             _claiming = milestone; RefreshShop();
             try
             {
-                var awarded = await _remote.ClaimReward(milestone, _game.Save.bestClear, _lifetime.Token);
+                // A clear past the last milestone proves nothing more, and servers without the R200 migration refuse it.
+                var cleared = Math.Min(_game.Save.bestClear, SubjugationGame.RewardMilestones[SubjugationGame.RewardMilestones.Length - 1]);
+                var awarded = await _remote.ClaimReward(milestone, cleared, _lifetime.Token);
                 if (_disposed) return;
                 _claimed.Add(milestone);
                 _view.ShowFeedback(awarded > 0 ? "R" + milestone + " 클리어 보상: 도토리온 포인트 +" + awarded + "P" : "이미 받은 보상입니다.");
@@ -472,7 +575,10 @@ namespace DOTORION.Events.Subjugation
             var claimable = ClaimableRewards;
             _rewardTab.GetComponentInChildren<Text>().text = claimable > 0 ? "보상 " + claimable : "보상";
             _rosterTab.interactable = _tab != RosterTab; _rewardTab.interactable = _tab != RewardTab; _roundTab.interactable = _tab != RoundTab;
+            _weaponTab.interactable = _tab != WeaponTab;
             _rosterPage.SetActive(_tab == RosterTab); _rewardPage.SetActive(_tab == RewardTab); _roundPage.SetActive(_tab == RoundTab);
+            _weaponPage.SetActive(_tab == WeaponTab);
+            if (_tab == WeaponTab) { RefreshWeapons(); return; }
             if (_tab == RewardTab) { RefreshRewards(); return; }
             if (_tab == RoundTab) { RefreshRounds(); return; }
             _status.text = _storageBlocked ? "저장 오류: 진행이 일시 중지되었습니다." : "출전 " + _game.PartyCount + "/3";
@@ -481,8 +587,11 @@ namespace DOTORION.Events.Subjugation
                 var hired = _game.Save.levels[i] > 0;
                 var next = i == _game.NextHire;
                 _faces[i].color = hired || next ? Color.white : new Color(.72f, .77f, .85f, .85f);
-                _names[i].text = SubjugationGame.Names[i] + "  Lv." + _game.Level(i)
-                    + "\n최대체력 " + _game.MaxHealth(i).ToString("0") + (i == 4 ? "  회복량 " : "  공격력 ") + _game.Power(i).ToString("0.#");
+                // With a weapon, the bonus is shown on its own: "최대체력 1480+100  공격력 217+200".
+                var armed = _game.HasWeapon(i);
+                _names[i].text = FitWidth(_names[i], SubjugationGame.Names[i] + "  Lv." + _game.Level(i)
+                    + "\n최대체력 " + _game.BaseMaxHealth(i).ToString("0") + (armed ? "+" + _game.WeaponHealth(i).ToString("0") : "")
+                    + (i == 4 ? "  회복량 " : "  공격력 ") + _game.BasePower(i).ToString("0.#") + (armed ? "+" + _game.WeaponPower(i).ToString("0.#") : ""));
                 _party[i].gameObject.SetActive(hired);
                 _party[i].GetComponentInChildren<Text>().text = _game.Save.party[i] ? "출전중" : "출전";
                 _party[i].interactable = !_storageBlocked && (_game.Save.party[i] ? _game.PartyCount > 1 : _game.PartyCount < 3);

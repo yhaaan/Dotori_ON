@@ -2,7 +2,7 @@
   "hireCosts": [0, 1500, 7500, 75000, 150000, 700000],
   "startLevels": [1, 1, 1, 10, 10, 40],
   "maxLevel": 100,
-  "maxRound": 100,
+  "maxRound": 200,
   "levelCost": 940,
   "levelCostGrowth": 1.4,
   "baseReward": 10,
@@ -20,5 +20,17 @@
   "health": 100,
   "healthPerLevel": 20,
   "healRatio": 0.37,
-  "retrySeconds": 3
+  "retrySeconds": 3,
+  "weaponUnlockRound": 100,
+  "weaponCost": 5000,
+  "weaponMaxLevel": 20,
+  "weaponUpgradeCost": 400,
+  "weaponUpgradeCostGrowth": 1.5,
+  "weaponChance": 0.9,
+  "weaponChanceStep": 0.04,
+  "weaponMinChance": 0.3,
+  "weaponHealth": 100,
+  "weaponHealthPerLevel": 50,
+  "weaponAttack": 20,
+  "weaponAttackPerLevel": 10
 }

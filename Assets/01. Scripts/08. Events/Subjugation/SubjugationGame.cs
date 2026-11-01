@@ -4,13 +4,14 @@ namespace DOTORION.Events.Subjugation
 {
     // Pure game rules: no attendance mutations, rendering, network or Unity dependency.
     // Tuned so 15 days of 6 working hours barely reach and clear R100 with Lv100 x2 + Lv70 (Documentation/ChiikawaBalance.md).
+    // R101~R200 and the weapons that unlock after R100 are not balanced yet.
     [Serializable]
     public sealed class SubjugationBalance
     {
         public int[] hireCosts = { 0, 1500, 7500, 75000, 150000, 700000 };
         public int[] startLevels = { 1, 1, 1, 10, 10, 40 };
         public int maxLevel = 100;
-        public int maxRound = 100;
+        public int maxRound = 200;
         public double levelCost = 940;
         public double levelCostGrowth = 1.4;
         public double baseReward = 10;
@@ -32,6 +33,20 @@ namespace DOTORION.Events.Subjugation
         public double healthPerLevel = 20;
         public double healRatio = .37;
         public double retrySeconds = 3;
+        // Weapons: bought after clearing weaponUnlockRound, then upgraded for coins with a chance to fail.
+        // A failed upgrade spends the coins but never lowers the level.
+        public int weaponUnlockRound = 100;
+        public double weaponCost = 5000;
+        public int weaponMaxLevel = 20;
+        public double weaponUpgradeCost = 400;
+        public double weaponUpgradeCostGrowth = 1.5;
+        public double weaponChance = .9;
+        public double weaponChanceStep = .04;
+        public double weaponMinChance = .3;
+        public double weaponHealth = 100;
+        public double weaponHealthPerLevel = 50;
+        public double weaponAttack = 20;
+        public double weaponAttackPerLevel = 10;
     }
 
     [Serializable]
@@ -40,17 +55,22 @@ namespace DOTORION.Events.Subjugation
         public int version = 2;
         public int round = 1;
         public int maxRound = 1;
-        // Highest round actually won; maxRound cannot say it once R100 repeats.
+        // Highest round actually won; maxRound cannot say it once the final round repeats.
         public int bestClear;
         public bool autoAdvance = true;
         public long coins;
         public int[] levels = { 1, 0, 0, 0, 0, 0 };
         public bool[] party = { true, false, false, false, false, false };
+        // Weapon level per member, 0 = not bought. Saves from before weapons have none.
+        public int[] weapons = { 0, 0, 0, 0, 0, 0 };
     }
+
+    public enum WeaponUpgrade { Refused, Success, Failed }
 
     public sealed class SubjugationGame
     {
         public static readonly string[] Names = { "치이카와", "하치와레", "우사기", "모몽가", "시사", "랏코" };
+        public static readonly string[] WeaponNames = { "치이카와의 사스마타", "하치와레의 사스마타", "우사기의 지팡이", "모몽가의 할퀴기", "시사의 라멘", "랏코의 검" };
         public readonly SubjugationSave Save;
         public readonly SubjugationBalance Balance;
         public double EnemyHp { get; private set; }
@@ -79,8 +99,25 @@ namespace DOTORION.Events.Subjugation
         public int Level(int id) => Save.levels[id] > 0 ? Save.levels[id] : StartLevel(id);
         public int StartLevel(int id) => Math.Max(1, Math.Min(Balance.maxLevel, Balance.startLevels[id]));
         public bool IsMaxLevel(int id) => Save.levels[id] >= Balance.maxLevel;
-        public double MaxHealth(int id) => Balance.health + Balance.healthPerLevel * (Level(id) - 1);
-        public double Power(int id) => (Balance.attack + Balance.attackPerLevel * (Level(id) - 1)) * (id == 4 ? Balance.healRatio : 1);
+        public double MaxHealth(int id) => BaseMaxHealth(id) + WeaponHealth(id);
+        public double Power(int id) => BasePower(id) + WeaponPower(id);
+        public double BaseMaxHealth(int id) => Balance.health + Balance.healthPerLevel * (Level(id) - 1);
+        public double BasePower(int id) => (Balance.attack + Balance.attackPerLevel * (Level(id) - 1)) * (id == 4 ? Balance.healRatio : 1);
+
+        // Weapons add to a member's health and attack. Shisa's weapon raises her healing through the same ratio.
+        public bool WeaponsUnlocked => HasCleared(Balance.weaponUnlockRound);
+        public int WeaponLevel(int id) => Save.weapons[id];
+        public bool HasWeapon(int id) => Save.weapons[id] > 0;
+        public bool IsWeaponMaxLevel(int id) => Save.weapons[id] >= Balance.weaponMaxLevel;
+        public double WeaponHealth(int id) => HasWeapon(id) ? Balance.weaponHealth + Balance.weaponHealthPerLevel * (Save.weapons[id] - 1) : 0;
+        public double WeaponPower(int id) => HasWeapon(id) ? (Balance.weaponAttack + Balance.weaponAttackPerLevel * (Save.weapons[id] - 1)) * (id == 4 ? Balance.healRatio : 1) : 0;
+        public long WeaponCost => (long)Math.Round(Balance.weaponCost);
+        public long WeaponUpgradeCost(int id) => (long)Math.Round(Balance.weaponUpgradeCost * Math.Pow(Math.Max(1, Save.weapons[id]), Balance.weaponUpgradeCostGrowth));
+        /// <summary>Chance that the next upgrade succeeds, 0..1.</summary>
+        public double WeaponChance(int id) => Math.Max(Balance.weaponMinChance, Math.Min(1, Balance.weaponChance - Balance.weaponChanceStep * (Math.Max(1, Save.weapons[id]) - 1)));
+        /// <summary>Returns 0 (inclusive) to 1 (exclusive). Tests replace it to force an outcome.</summary>
+        public Func<double> Roll;
+        private readonly Random _random = new Random();
         public int Outcome { get; private set; } // 1 success, -1 defeat
         public double OutcomeRemaining { get; private set; }
         public long LastClearReward { get; private set; }
@@ -123,6 +160,13 @@ namespace DOTORION.Events.Subjugation
                     throw new ArgumentException("Invalid event party");
             }
             if (Save.levels[0] < 1 || count == 0) throw new ArgumentException("Missing starter");
+            if (Save.weapons == null || Save.weapons.Length != 6) Save.weapons = new int[6];
+            for (var i = 0; i < 6; i++)
+            {
+                if (Save.weapons[i] < 0) throw new ArgumentException("Invalid event weapon");
+                Save.weapons[i] = Math.Min(Save.weapons[i], Balance.weaponMaxLevel);
+            }
+            Roll = _random.NextDouble;
             ResetBattle();
         }
 
@@ -149,6 +193,30 @@ namespace DOTORION.Events.Subjugation
             Save.levels[index]++;
             RosterChanged();
             return true;
+        }
+
+        /// <summary>Buys this member's weapon at Lv.1. Needs the unlock round cleared and the member hired.</summary>
+        public bool BuyWeapon(int index)
+        {
+            if (index < 0 || index >= 6 || !WeaponsUnlocked || Save.levels[index] == 0 || HasWeapon(index) || Save.coins < WeaponCost) return false;
+            Save.coins -= WeaponCost;
+            Save.weapons[index] = 1;
+            RosterChanged();
+            return true;
+        }
+
+        /// <summary>Spends the upgrade cost, then rolls. A failure keeps the current level.</summary>
+        public WeaponUpgrade UpgradeWeapon(int index)
+        {
+            if (index < 0 || index >= 6 || !WeaponsUnlocked || !HasWeapon(index) || IsWeaponMaxLevel(index)) return WeaponUpgrade.Refused;
+            var cost = WeaponUpgradeCost(index);
+            if (Save.coins < cost) return WeaponUpgrade.Refused;
+            var chance = WeaponChance(index);
+            Save.coins -= cost;
+            var success = Roll() < chance;
+            if (success) Save.weapons[index]++;
+            RosterChanged();
+            return success ? WeaponUpgrade.Success : WeaponUpgrade.Failed;
         }
 
         public bool ToggleParty(int index)
