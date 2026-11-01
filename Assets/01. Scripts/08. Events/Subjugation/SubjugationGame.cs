@@ -4,7 +4,7 @@ namespace DOTORION.Events.Subjugation
 {
     // Pure game rules: no attendance mutations, rendering, network or Unity dependency.
     // Tuned so 15 days of 6 working hours barely reach and clear R100 with Lv100 x2 + Lv70 (Documentation/ChiikawaBalance.md).
-    // R101~R200 and the weapons that unlock after R100 are not balanced yet.
+    // Past R100 enemies hit 1.8x as hard: no Lv100 party clears R110 without weapons, and R200 takes another ~15 days with them.
     [Serializable]
     public sealed class SubjugationBalance
     {
@@ -25,6 +25,10 @@ namespace DOTORION.Events.Subjugation
         public double bossHealth = 2.5;
         public double bossAttack = 1.4;
         public double bossReward = 2.5;
+        // Rounds above hardRound multiply enemy health and attack. Attack, not health, so Shisa's healing cannot carry past R110.
+        public int hardRound = 100;
+        public double hardHealth = 1;
+        public double hardAttack = 1.8;
         // Every member shares one curve; Shisa heals each living member by healRatio of it instead of attacking.
         // healRatio keeps a Shisa party as fast to R100 as three attackers: it survives more but kills slower.
         public double attack = 10;
@@ -34,19 +38,22 @@ namespace DOTORION.Events.Subjugation
         public double healRatio = .37;
         public double retrySeconds = 3;
         // Weapons: bought after clearing weaponUnlockRound, then upgraded for coins with a chance to fail.
-        // A failed upgrade spends the coins but never lowers the level.
+        // A failed upgrade spends the coins but never lowers the level. A weapon level is worth two member levels.
+        // The chance is a whole percent on a hyperbola, chance x (1 + offset) / (level + offset): 90% at Lv1, the 10% floor by Lv99.
+        // On a hyperbola the expected number of tries grows in a straight line with the level.
         public int weaponUnlockRound = 100;
-        public double weaponCost = 5000;
-        public int weaponMaxLevel = 20;
-        public double weaponUpgradeCost = 400;
-        public double weaponUpgradeCostGrowth = 1.5;
-        public double weaponChance = .9;
-        public double weaponChanceStep = .04;
-        public double weaponMinChance = .3;
-        public double weaponHealth = 100;
-        public double weaponHealthPerLevel = 50;
-        public double weaponAttack = 20;
-        public double weaponAttackPerLevel = 10;
+        public double weaponCost = 500000;
+        public int weaponMaxLevel = 100;
+        // A try costs 3,600 x level; with the hyperbolic chance the expected cost per level grows about with level squared.
+        public double weaponUpgradeCost = 3600;
+        public double weaponUpgradeCostGrowth = 1;
+        public int weaponChance = 90;
+        public double weaponChanceOffset = 11.375;
+        public int weaponMinChance = 10;
+        public double weaponHealth = 200;
+        public double weaponHealthPerLevel = 40;
+        public double weaponAttack = 30;
+        public double weaponAttackPerLevel = 6;
     }
 
     [Serializable]
@@ -91,8 +98,9 @@ namespace DOTORION.Events.Subjugation
         private bool _announce;
         public bool IsBoss(int round) => Balance.bossInterval > 0 && round % Balance.bossInterval == 0;
         public bool IsBossRound => IsBoss(Save.round);
-        public double EnemyMaxHp => Balance.enemyHealth * Math.Pow(Save.round, Balance.enemyGrowth) * (IsBossRound ? Balance.bossHealth : 1);
-        public double EnemyAttack => Balance.enemyAttack * Math.Pow(Save.round, Balance.enemyAttackGrowth) * (IsBossRound ? Balance.bossAttack : 1);
+        public bool IsHard(int round) => round > Balance.hardRound;
+        public double EnemyMaxHp => Balance.enemyHealth * Math.Pow(Save.round, Balance.enemyGrowth) * (IsBossRound ? Balance.bossHealth : 1) * (IsHard(Save.round) ? Balance.hardHealth : 1);
+        public double EnemyAttack => Balance.enemyAttack * Math.Pow(Save.round, Balance.enemyAttackGrowth) * (IsBossRound ? Balance.bossAttack : 1) * (IsHard(Save.round) ? Balance.hardAttack : 1);
         public long Reward(int round) => (long)Math.Round(Balance.baseReward * Math.Pow(round, Balance.rewardGrowth) * (IsBoss(round) ? Balance.bossReward : 1));
         public double PartyMaxHp { get { double hp = 0; for (var i = 0; i < 6; i++) if (Save.party[i]) hp += MaxHealth(i); return hp; } }
         // Unhired members preview the level they join at.
@@ -113,8 +121,10 @@ namespace DOTORION.Events.Subjugation
         public double WeaponPower(int id) => HasWeapon(id) ? (Balance.weaponAttack + Balance.weaponAttackPerLevel * (Save.weapons[id] - 1)) * (id == 4 ? Balance.healRatio : 1) : 0;
         public long WeaponCost => (long)Math.Round(Balance.weaponCost);
         public long WeaponUpgradeCost(int id) => (long)Math.Round(Balance.weaponUpgradeCost * Math.Pow(Math.Max(1, Save.weapons[id]), Balance.weaponUpgradeCostGrowth));
-        /// <summary>Chance that the next upgrade succeeds, 0..1.</summary>
-        public double WeaponChance(int id) => Math.Max(Balance.weaponMinChance, Math.Min(1, Balance.weaponChance - Balance.weaponChanceStep * (Math.Max(1, Save.weapons[id]) - 1)));
+        /// <summary>Whole-percent chance that the next upgrade of this member's weapon succeeds.</summary>
+        public int WeaponChance(int id) => WeaponChanceAt(Math.Max(1, Save.weapons[id]));
+        public int WeaponChanceAt(int level) => Math.Max(Balance.weaponMinChance, Math.Min(100,
+            (int)Math.Round(Balance.weaponChance * (1 + Balance.weaponChanceOffset) / (level + Balance.weaponChanceOffset), MidpointRounding.AwayFromZero)));
         /// <summary>Returns 0 (inclusive) to 1 (exclusive). Tests replace it to force an outcome.</summary>
         public Func<double> Roll;
         private readonly Random _random = new Random();
@@ -213,7 +223,7 @@ namespace DOTORION.Events.Subjugation
             if (Save.coins < cost) return WeaponUpgrade.Refused;
             var chance = WeaponChance(index);
             Save.coins -= cost;
-            var success = Roll() < chance;
+            var success = Roll() * 100 < chance;
             if (success) Save.weapons[index]++;
             RosterChanged();
             return success ? WeaponUpgrade.Success : WeaponUpgrade.Failed;

@@ -436,10 +436,10 @@ namespace DOTORION.Events.Subjugation
                 // The chance is a read-out beside the button, coloured from safe (green) to risky (red).
                 var chance = _game.WeaponChance(i);
                 _weaponChanceCaption[i].text = owned && !maxed ? "성공 확률" : "";
-                _weaponChance[i].text = !owned ? "잠김" : maxed ? "MAX" : Math.Round(chance * 100) + "%";
+                _weaponChance[i].text = !owned ? "잠김" : maxed ? "MAX" : chance + "%";
                 _weaponChance[i].fontSize = owned ? 20 : 15;
                 _weaponChance[i].color = !owned ? new Color(.62f, .66f, .73f) : maxed ? new Color(.18f, .24f, .34f)
-                    : chance >= .7 ? new Color(.16f, .55f, .3f) : chance >= .45 ? new Color(.85f, .5f, .1f) : new Color(.8f, .2f, .24f);
+                    : chance >= 50 ? new Color(.16f, .55f, .3f) : chance >= 20 ? new Color(.85f, .5f, .1f) : new Color(.8f, .2f, .24f);
                 var cost = owned ? _game.WeaponUpgradeCost(i) : _game.WeaponCost;
                 _weaponBuy[i].GetComponentInChildren<Text>().text = !unlocked ? "잠김" : maxed ? "최대 레벨" : !hired ? "대원 고용 필요"
                     : owned ? "강화  " + cost.ToString("N0") + " 코인" : "구입  " + cost.ToString("N0") + " 코인";
