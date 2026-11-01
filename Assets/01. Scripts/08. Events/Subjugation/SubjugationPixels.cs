@@ -98,6 +98,8 @@ namespace DOTORION.Events.Subjugation
                 for (var i = 0; i < 6; i++) if (game.Save.party[i]) slots[i] = slot++;
                 foreach (var number in game.Numbers)
                 {
+                    // A fighter who fell and went to the bench has no slot left to show the hit on.
+                    if ((number.enemy || number.healing) && !game.Save.party[number.target]) continue;
                     var x = number.enemy ? PartyX(game.PartyCount, slots[number.target]) + 20 : number.healing ? PartyX(game.PartyCount, slots[number.target]) + 15 : 269 + number.actor * 4;
                     var y = 28 + (int)(number.age * 23) + (number.enemy ? 0 : number.actor * 3);
                     Digits((number.healing ? "+" : "") + Math.Ceiling(number.amount), x, y, number.healing ? new Color32(27, 137, 72, 255) : number.enemy ? new Color32(202, 55, 63, 255) : _ink);

@@ -4,7 +4,8 @@ namespace DOTORION.Events.Subjugation
 {
     // Pure game rules: no attendance mutations, rendering, network or Unity dependency.
     // Tuned so 15 days of 6 working hours barely reach and clear R100 with Lv100 x2 + Lv70 (Documentation/ChiikawaBalance.md).
-    // Past R100 enemies hit 1.8x as hard: no Lv100 party clears R110 without weapons. With them R150 takes about 15 more days, R200 far longer.
+    // Past R100 enemies have 1.4x health and hit 3.4x as hard: even six Lv100 members, substituting as they fall, cannot clear R110
+    // without weapons. With them R150 takes about 15 more days, R200 far longer.
     [Serializable]
     public sealed class SubjugationBalance
     {
@@ -25,10 +26,10 @@ namespace DOTORION.Events.Subjugation
         public double bossHealth = 2.5;
         public double bossAttack = 1.4;
         public double bossReward = 2.5;
-        // Rounds above hardRound multiply enemy health and attack. Attack, not health, so Shisa's healing cannot carry past R110.
+        // Rounds above hardRound multiply enemy health and attack, so substitutes from the bench cannot carry past R110.
         public int hardRound = 100;
-        public double hardHealth = 1;
-        public double hardAttack = 1.8;
+        public double hardHealth = 1.4;
+        public double hardAttack = 3.4;
         // Every member shares one curve; Shisa heals each living member by healRatio of it instead of attacking.
         // healRatio keeps a Shisa party as fast to R100 as three attackers: it survives more but kills slower.
         public double attack = 10;
@@ -67,7 +68,10 @@ namespace DOTORION.Events.Subjugation
         public bool autoAdvance = true;
         public long coins;
         public int[] levels = { 1, 0, 0, 0, 0, 0 };
+        // Who is fighting now. A fallen fighter is swapped for a benched member mid-fight, so it can differ from lineup.
         public bool[] party = { true, false, false, false, false, false };
+        // The player's chosen members. Every fight starts from it; saves from before substitution copy party.
+        public bool[] lineup;
         // Weapon level per member, 0 = not bought. Saves from before weapons have none.
         public int[] weapons = { 0, 0, 0, 0, 0, 0 };
     }
@@ -170,6 +174,7 @@ namespace DOTORION.Events.Subjugation
                     throw new ArgumentException("Invalid event party");
             }
             if (Save.levels[0] < 1 || count == 0) throw new ArgumentException("Missing starter");
+            if (!IsValidLineup(Save.lineup)) Save.lineup = (bool[])Save.party.Clone();
             if (Save.weapons == null || Save.weapons.Length != 6) Save.weapons = new int[6];
             for (var i = 0; i < 6; i++)
             {
@@ -181,6 +186,21 @@ namespace DOTORION.Events.Subjugation
         }
 
         public int PartyCount { get { var n = 0; foreach (var active in Save.party) if (active) n++; return n; } }
+        private int LineupCount { get { var n = 0; foreach (var active in Save.lineup) if (active) n++; return n; } }
+        private bool IsValidLineup(bool[] lineup)
+        {
+            if (lineup == null || lineup.Length != 6) return false;
+            var count = 0; var attacker = false;
+            for (var i = 0; i < 6; i++)
+            {
+                if (!lineup[i]) continue;
+                if (Save.levels[i] == 0) return false;
+                count++; attacker |= i != 4;
+            }
+            return count >= 1 && count <= 3 && attacker;
+        }
+        /// <summary>The member who last came off the bench, and when, for a brief cue. -1 before any substitution.</summary>
+        public int LastSubstitute { get; private set; } = -1;
         public int PartyLevel { get { var n = 0; for (var i = 0; i < 6; i++) if (Save.party[i]) n += Save.levels[i]; return n; } }
         public int NextHire { get { for (var i = 0; i < 6; i++) if (Save.levels[i] == 0) return i; return -1; } }
         public long LevelCost(int index) => (long)Math.Round(Balance.levelCost * Math.Pow(Save.levels[index], Balance.levelCostGrowth));
@@ -192,6 +212,7 @@ namespace DOTORION.Events.Subjugation
             Save.levels[index] = StartLevel(index);
             _health[index] = MaxHealth(index);
             Save.party[index] = PartyCount < 3;
+            Save.lineup[index] = LineupCount < 3;
             RosterChanged();
             return true;
         }
@@ -236,6 +257,8 @@ namespace DOTORION.Events.Subjugation
             // A healer alone cannot clear a round.
             if (Save.party[index] && index != 4 && PartyCount == 2 && Save.party[4]) return false;
             Save.party[index] = !Save.party[index];
+            // A hand-made change adopts the team as it stands now, substitutes included, as the new lineup.
+            Array.Copy(Save.party, Save.lineup, 6);
             RosterChanged();
             return true;
         }
@@ -306,7 +329,22 @@ namespace DOTORION.Events.Subjugation
             var received = Math.Min(_health[front], EnemyAttack);
             _health[front] -= received;
             Numbers.Add(new CombatNumber { target = front, amount = received, enemy = true });
+            if (_health[front] <= 0) Substitute(front);
             if (PartyHp == 0) { RetryRemaining = Balance.retrySeconds; Outcome = -1; OutcomeRemaining = Balance.retrySeconds; }
+        }
+
+        /// <summary>A fallen fighter leaves at once for a random benched member who still has health this fight.
+        /// Idle players get all six members' health this way; a player who swaps by hand before a fall picks who comes in.</summary>
+        private void Substitute(int fallen)
+        {
+            var candidates = new System.Collections.Generic.List<int>();
+            for (var i = 0; i < 6; i++) if (Save.levels[i] > 0 && !Save.party[i] && _health[i] > 0) candidates.Add(i);
+            if (candidates.Count == 0) return;
+            var pick = candidates[Math.Min(candidates.Count - 1, (int)(Roll() * candidates.Count))];
+            Save.party[fallen] = false;
+            Save.party[pick] = true;
+            LastSubstitute = pick;
+            Changed?.Invoke();
         }
 
         /// <summary>A lost fight drops back one round and repeats it, so idle time keeps earning coins.</summary>
@@ -320,6 +358,10 @@ namespace DOTORION.Events.Subjugation
 
         private void ResetBattle()
         {
+            // Substitutes go back to the bench: every fight starts from the chosen lineup.
+            var substituted = false;
+            for (var i = 0; i < 6; i++) substituted |= Save.party[i] != Save.lineup[i];
+            if (substituted) { Array.Copy(Save.lineup, Save.party, 6); Changed?.Invoke(); }
             _announce = true;
             EnemyHp = EnemyMaxHp;
             for (var i = 0; i < 6; i++) _health[i] = Save.levels[i] > 0 ? MaxHealth(i) : 0;

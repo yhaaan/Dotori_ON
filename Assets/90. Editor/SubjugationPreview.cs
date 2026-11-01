@@ -35,7 +35,7 @@ namespace DOTORION.Editor
                     pixels.Draw(game, state, 2);
                     File.WriteAllBytes("Logs/ChiikawaPreview/state-" + state + ".png", pixels.Texture.EncodeToPNG());
                 }
-                for (var i = 0; i < 6; i++) { game.Save.levels[i] = game.StartLevel(i); game.Save.party[i] = i >= 3; }
+                for (var i = 0; i < 6; i++) { game.Save.levels[i] = game.StartLevel(i); game.Save.party[i] = game.Save.lineup[i] = i >= 3; }
                 game.SelectRound(game.Save.round);
                 for (var state = 0; state < 3; state++)
                 {
