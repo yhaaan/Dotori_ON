@@ -503,6 +503,16 @@ namespace DOTORION.Tests
         }
 
         [Test]
+        public void RoundsPastR100PayTheHardRewardMultiplier()
+        {
+            var game = new SubjugationGame(null, LoadBalance());
+            var b = game.Balance;
+            Assert.That(game.Reward(100), Is.EqualTo(Math.Round(b.baseReward * Math.Pow(100, b.rewardGrowth) * b.bossReward)));
+            Assert.That(game.Reward(101), Is.EqualTo(Math.Round(b.baseReward * Math.Pow(101, b.rewardGrowth) * b.hardReward)));
+            Assert.That(game.Reward(110), Is.EqualTo(Math.Round(b.baseReward * Math.Pow(110, b.rewardGrowth) * b.bossReward * b.hardReward)));
+        }
+
+        [Test]
         public void MilestoneRewardsFollowClearsAndPayTheirRound()
         {
             Assert.That(SubjugationGame.RewardMilestones, Is.EqualTo(new[] { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }));
