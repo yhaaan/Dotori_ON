@@ -53,7 +53,7 @@ namespace DOTORION.Events.Subjugation
             GetCursorPos(out var hover); GetWindowRect(_handle, out var hoverRect);
             var hx = hover.x - hoverRect.left; var hy = hover.y - hoverRect.top;
             AutoHovered = visible && hx >= _width * 453 / 480 && hx < _width * 477 / 480 && hy >= _height * 22 / 64 && hy < _height * 40 / 64;
-            if (!visible || IsIconic(main) || !IsWindowVisible(main)) { ShowWindow(_handle, 0); return; }
+            if (!visible || IsIconic(main) || !IsWindowVisible(main)) { RequestShown(false); return; }
             var width = Mathf.RoundToInt(480 * owner.UiScale);
             var height = Mathf.RoundToInt(64 * owner.UiScale);
             if (_width != width || _height != height) Allocate(width, height);
@@ -83,8 +83,18 @@ namespace DOTORION.Events.Subjugation
             UpdateLayeredWindow(_handle, IntPtr.Zero, ref position, ref size, _dc, ref source, 0, ref blend, 2);
             // Follow the main window's always-on-top preference without taking focus.
             var top = (GetWindowLong(main, -20) & 8) != 0;
-            SetWindowPos(_handle, new IntPtr(top ? -1 : -2), 0, 0, 0, 0, 0x1 | 0x2 | 0x10);
-            ShowWindow(_handle, 4);
+            if (((GetWindowLong(_handle, -20) & 8) != 0) != top) PostMessage(_handle, SetTopmostMessage, new IntPtr(top ? 1 : 0), IntPtr.Zero);
+            RequestShown(true);
+        }
+
+        // SetWindowPos and ShowWindow on this window wait for the event thread to answer. Calling them
+        // from Unity's thread every frame makes Windows mark the game window "Not Responding" after
+        // about 9 seconds, so the event thread is asked to do them itself, and only when something changes.
+        private const uint SetTopmostMessage = 0x8001, SetShownMessage = 0x8002;
+
+        private void RequestShown(bool shown)
+        {
+            if (IsWindowVisible(_handle) != shown) PostMessage(_handle, SetShownMessage, new IntPtr(shown ? 1 : 0), IntPtr.Zero);
         }
 
         private void RunWindow()
@@ -115,6 +125,16 @@ namespace DOTORION.Events.Subjugation
             var self = _active;
             if (self == null) return DefWindowProc(hwnd, message, wParam, lParam);
             if (message == 0x21) return new IntPtr(3); // MA_NOACTIVATE
+            if (message == SetTopmostMessage)
+            {
+                SetWindowPos(hwnd, new IntPtr(wParam != IntPtr.Zero ? -1 : -2), 0, 0, 0, 0, 0x1 | 0x2 | 0x10);
+                return IntPtr.Zero;
+            }
+            if (message == SetShownMessage)
+            {
+                ShowWindow(hwnd, wParam != IntPtr.Zero ? 4 : 0);
+                return IntPtr.Zero;
+            }
             if (message == 0x201)
             {
                 var x = (short)(lParam.ToInt64() & 0xffff);
