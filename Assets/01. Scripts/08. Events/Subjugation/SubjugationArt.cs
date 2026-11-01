@@ -14,7 +14,7 @@ namespace DOTORION.Events.Subjugation
         public const string EnemyResourcePath = "DOTORION/Events/Art/ChiikawaApprovedEnemies-v4";
         public const string StateResourcePath = "DOTORION/Events/Art/ChiikawaApprovedStates-v4";
         public const int MonsterCount = 10;
-        public static readonly string[] MonsterNames = { "키메라", "그 아이", "고블린", "데카츠요", "거대한 새", "두부 의태형", "거대 장수풍뎅이", "세이렌", "야만바", "검은 유성" };
+        public static readonly string[] MonsterNames = { "키메라", "그 아이", "고블린", "데카츠요", "거대한 새", "두부 의태형", "거대 장수풍뎅이", "야만바", "세이렌", "검은 유성" };
 
         // Explicit top-left source regions keep weapons, ears and tails whole even where
         // the generated silhouettes extend beyond geometric atlas cell boundaries.
@@ -70,6 +70,8 @@ namespace DOTORION.Events.Subjugation
                 var top = row == 0 ? 0 : splitY; var bottom = row == 0 ? splitY : enemies.height;
                 _monsters[id] = Read(enemies, enemyPixels, new RectInt(left, top, right - left, bottom - top), CombatPixelExtent);
             }
+            // The sheet draws the Siren 8th and Yamanba 9th; the Siren now fights rounds ending in 9 and Yamanba takes her place.
+            var siren = _monsters[7]; _monsters[7] = _monsters[8]; _monsters[8] = siren;
             IsLoaded = true;
         }
         private static Texture2D Load(string path)
