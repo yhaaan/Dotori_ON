@@ -58,6 +58,7 @@ namespace DOTORION.Events.Subjugation
         private Sprite _frame, _frameBorder, _weapon;
         private Image _toggleBorder;
         private GameObject _shop, _stripRoot, _debugCoins, _debugReset;
+        private Text _debugBackgroundLabel;
         private SubjugationBalance _balance;
         private float _resetArmedUntil;
         private bool _resetting;
@@ -289,6 +290,33 @@ namespace DOTORION.Events.Subjugation
             UiFactory.AnchorTop((RectTransform)reset.transform, 286, 268, 88, 24);
             reset.GetComponentInChildren<Text>().fontSize = 10;
             _debugReset = reset.gameObject;
+            var background = UiFactory.CreateButton("ChiikawaDebugBackground", _view.Dashboard.transform, _view.EventFont, "", ToggleDebugBackground);
+            UiFactory.AnchorTop((RectTransform)background.transform, 194, 268, 88, 24);
+            _debugBackgroundLabel = background.GetComponentInChildren<Text>();
+            _debugBackgroundLabel.fontSize = 10;
+            PaintDebugBackground();
+            MainBackground.Changed += PaintDebugBackground;
+        }
+
+        /// <summary>Testing aid: unlocks and shows the Chiikawa background without clearing R200, or takes it back.</summary>
+        private void ToggleDebugBackground()
+        {
+            if (MainBackground.IsUnlocked(MainBackground.Chiikawa))
+            {
+                MainBackground.Lock(MainBackground.Chiikawa);
+                _view.Dashboard.ShowFeedback("치이카와 배경 잠금", false);
+                return;
+            }
+
+            MainBackground.Unlock(MainBackground.Chiikawa);
+            MainBackground.Select(MainBackground.Chiikawa);
+            _view.Dashboard.ShowFeedback("치이카와 배경 적용", false);
+        }
+
+        private void PaintDebugBackground()
+        {
+            if (_debugBackgroundLabel != null)
+                _debugBackgroundLabel.text = MainBackground.IsUnlocked(MainBackground.Chiikawa) ? "배경 잠금" : "치이카와 배경";
         }
 
         /// <summary>Second press within four seconds wipes this event: the server rows, then the local save.</summary>
@@ -757,6 +785,8 @@ namespace DOTORION.Events.Subjugation
             if (_stripRoot != null) SubjugationPixels.Release(_stripRoot);
             if (_debugCoins != null) SubjugationPixels.Release(_debugCoins);
             if (_debugReset != null) SubjugationPixels.Release(_debugReset);
+            MainBackground.Changed -= PaintDebugBackground;
+            if (_debugBackgroundLabel != null) SubjugationPixels.Release(_debugBackgroundLabel.transform.parent.gameObject);
             if (_view != null) _view.BindEventRounds(_rounds, _bestRounds, false);
         }
     }
