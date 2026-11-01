@@ -430,11 +430,11 @@ namespace DOTORION.Tests
         [Test]
         public void FinalRoundIsTheCapAndRepeatsAfterClear()
         {
-            var game = new SubjugationGame(new SubjugationSave { round = 150, maxRound = 180 }, new SubjugationBalance { enemyHealth = .001 });
-            Assert.That(game.Save.round, Is.EqualTo(100)); Assert.That(game.Save.maxRound, Is.EqualTo(100));
+            var game = new SubjugationGame(new SubjugationSave { round = 250, maxRound = 280 }, new SubjugationBalance { enemyHealth = .001 });
+            Assert.That(game.Save.round, Is.EqualTo(200)); Assert.That(game.Save.maxRound, Is.EqualTo(200));
             game.Tick(1, true);
             Assert.That(game.Outcome, Is.EqualTo(1));
-            Assert.That(game.Save.round, Is.EqualTo(100)); Assert.That(game.Save.maxRound, Is.EqualTo(100));
+            Assert.That(game.Save.round, Is.EqualTo(200)); Assert.That(game.Save.maxRound, Is.EqualTo(200));
         }
 
         // Three attackers need two Lv100 members and one around Lv70; a little less does not clear.
@@ -487,7 +487,7 @@ namespace DOTORION.Tests
             var final = new SubjugationGame(new SubjugationSave { round = 100 }, new SubjugationBalance { enemyHealth = .001 });
             Assert.That(final.HasCleared(100), Is.False);
             final.Tick(1, true);
-            Assert.That(final.HasCleared(100), Is.True); // maxRound stays 100, bestClear records the win.
+            Assert.That(final.HasCleared(100), Is.True); Assert.That(final.Save.maxRound, Is.EqualTo(101)); // R100 now leads on to R101.
             var legacy = new SubjugationGame(new SubjugationSave { round = 31, maxRound = 41 });
             Assert.That(legacy.Save.bestClear, Is.EqualTo(40));
         }
@@ -532,8 +532,66 @@ namespace DOTORION.Tests
             {
                 for (var i = 1; i <= 10; i++) { Assert.That(art.Monster(i), Is.Not.Null); Assert.That(art.Monster(i).Width, Is.GreaterThan(1)); }
                 Assert.That(art.Monster(11), Is.SameAs(art.Monster(1)));
+                // The Siren fights rounds ending in 9; Yamanba moved to rounds ending in 8.
+                Assert.That(SubjugationArt.MonsterNames[8], Is.EqualTo("세이렌"));
+                Assert.That(SubjugationArt.MonsterNames[7], Is.EqualTo("야만바"));
+                Assert.That(art.Monster(19), Is.SameAs(art.Monster(9)));
                 for (var i = 0; i < 6; i++) Assert.That(art.Down(i), Is.Not.Null);
             }
+        }
+
+        [Test]
+        public void WeaponsStayLockedUntilR100IsCleared()
+        {
+            var game = new SubjugationGame(new SubjugationSave { round = 100, coins = 1000000 }, new SubjugationBalance { enemyHealth = .001 });
+            Assert.That(game.WeaponsUnlocked, Is.False);
+            Assert.That(game.BuyWeapon(0), Is.False);
+            Assert.That(game.Save.coins, Is.EqualTo(1000000));
+            game.Tick(1, true);
+            Assert.That(game.WeaponsUnlocked, Is.True);
+            var coins = game.Save.coins;
+            Assert.That(game.BuyWeapon(0), Is.True);
+            Assert.That(game.WeaponLevel(0), Is.EqualTo(1));
+            Assert.That(game.Save.coins, Is.EqualTo(coins - game.WeaponCost));
+            Assert.That(game.BuyWeapon(0), Is.False); // Already owned.
+            Assert.That(game.BuyWeapon(1), Is.False); // Hachiware is not hired.
+        }
+
+        [Test]
+        public void WeaponUpgradeSpendsCoinsAndNeverDropsALevelOnFailure()
+        {
+            var game = new SubjugationGame(new SubjugationSave { bestClear = 100, round = 101, maxRound = 101, coins = 100000 });
+            game.BuyWeapon(0);
+            Assert.That(game.WeaponUpgradeCost(0), Is.EqualTo(400));
+            Assert.That(game.WeaponChance(0), Is.EqualTo(.9).Within(1e-9));
+            var coins = game.Save.coins;
+            game.Roll = () => .95; // Above 90%: fails.
+            Assert.That(game.UpgradeWeapon(0), Is.EqualTo(WeaponUpgrade.Failed));
+            Assert.That(game.WeaponLevel(0), Is.EqualTo(1));
+            Assert.That(game.Save.coins, Is.EqualTo(coins - 400));
+            game.Roll = () => .1;
+            Assert.That(game.UpgradeWeapon(0), Is.EqualTo(WeaponUpgrade.Success));
+            Assert.That(game.WeaponLevel(0), Is.EqualTo(2));
+            Assert.That(game.WeaponChance(0), Is.LessThan(.9));
+            game.Save.coins = 0;
+            Assert.That(game.UpgradeWeapon(0), Is.EqualTo(WeaponUpgrade.Refused));
+            Assert.That(game.WeaponLevel(0), Is.EqualTo(2));
+            game.Save.coins = long.MaxValue / 2; game.Save.weapons[0] = game.Balance.weaponMaxLevel;
+            Assert.That(game.UpgradeWeapon(0), Is.EqualTo(WeaponUpgrade.Refused));
+        }
+
+        [Test]
+        public void WeaponAddsHealthAndAttackOnTopOfTheMember()
+        {
+            var game = new SubjugationGame(new SubjugationSave { bestClear = 100, round = 101, maxRound = 101, coins = 100000 });
+            var health = game.MaxHealth(0); var power = game.Power(0);
+            game.BuyWeapon(0);
+            Assert.That(game.BaseMaxHealth(0), Is.EqualTo(health));
+            Assert.That(game.BasePower(0), Is.EqualTo(power));
+            Assert.That(game.MaxHealth(0), Is.EqualTo(health + game.Balance.weaponHealth));
+            Assert.That(game.Power(0), Is.EqualTo(power + game.Balance.weaponAttack));
+            var legacy = new SubjugationGame(new SubjugationSave { weapons = null });
+            Assert.That(legacy.Save.weapons, Is.EqualTo(new int[6])); // Saves from before weapons own none.
         }
 
         [Test]
