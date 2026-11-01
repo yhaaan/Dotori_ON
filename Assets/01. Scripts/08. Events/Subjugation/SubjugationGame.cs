@@ -43,10 +43,10 @@ namespace DOTORION.Events.Subjugation
         // The chance is a whole percent on a hyperbola, chance x (1 + offset) / (level + offset): 90% at Lv1, the 10% floor by Lv99.
         // On a hyperbola the expected number of tries grows in a straight line with the level.
         public int weaponUnlockRound = 100;
-        public double weaponCost = 500000;
+        public double weaponCost = 100000;
         public int weaponMaxLevel = 100;
-        // A try costs 18,000 x level; with the hyperbolic chance the expected cost per level grows about with level squared.
-        public double weaponUpgradeCost = 18000;
+        // A try costs 10,800 x level; with the hyperbolic chance the expected cost per level grows about with level squared.
+        public double weaponUpgradeCost = 10800;
         public double weaponUpgradeCostGrowth = 1;
         public int weaponChance = 90;
         public double weaponChanceOffset = 11.375;
