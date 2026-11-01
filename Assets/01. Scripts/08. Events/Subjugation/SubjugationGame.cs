@@ -4,7 +4,7 @@ namespace DOTORION.Events.Subjugation
 {
     // Pure game rules: no attendance mutations, rendering, network or Unity dependency.
     // Tuned so 15 days of 6 working hours barely reach and clear R100 with Lv100 x2 + Lv70 (Documentation/ChiikawaBalance.md).
-    // Past R100 enemies hit 1.8x as hard: no Lv100 party clears R110 without weapons, and R200 takes another ~15 days with them.
+    // Past R100 enemies hit 1.8x as hard: no Lv100 party clears R110 without weapons. With them R150 takes about 15 more days, R200 far longer.
     [Serializable]
     public sealed class SubjugationBalance
     {
@@ -44,8 +44,8 @@ namespace DOTORION.Events.Subjugation
         public int weaponUnlockRound = 100;
         public double weaponCost = 500000;
         public int weaponMaxLevel = 100;
-        // A try costs 3,600 x level; with the hyperbolic chance the expected cost per level grows about with level squared.
-        public double weaponUpgradeCost = 3600;
+        // A try costs 18,000 x level; with the hyperbolic chance the expected cost per level grows about with level squared.
+        public double weaponUpgradeCost = 18000;
         public double weaponUpgradeCostGrowth = 1;
         public int weaponChance = 90;
         public double weaponChanceOffset = 11.375;

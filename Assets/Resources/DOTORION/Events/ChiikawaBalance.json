@@ -27,7 +27,7 @@
   "weaponUnlockRound": 100,
   "weaponCost": 500000,
   "weaponMaxLevel": 100,
-  "weaponUpgradeCost": 3600,
+  "weaponUpgradeCost": 18000,
   "weaponUpgradeCostGrowth": 1,
   "weaponChance": 90,
   "weaponChanceOffset": 11.375,
