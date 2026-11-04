@@ -234,7 +234,9 @@ namespace DOTORION.Events.Subjugation
                 _faces[i].preserveAspect = true;
                 _faces[i].raycastTarget = false;
                 UiFactory.Stretch(_faces[i].rectTransform);
-                _names[i] = Label("Member" + i, _rosterPage.transform, "", 50, y, 220, 40, 12);
+                // Three lines when armed (name, health, attack), so the label takes the whole 44px row.
+                _names[i] = Label("Member" + i, _rosterPage.transform, "", 50, y - 2, 220, 44, 12);
+                _names[i].lineSpacing = .92f;
                 _party[i] = UiFactory.CreateButton("Party" + i, _rosterPage.transform, _view.EventFont, "", () => Purchase(() => _game.ToggleParty(index)));
                 UiFactory.AnchorTop((RectTransform)_party[i].transform, 274, y + 6, 64, 28);
                 _buy[i] = UiFactory.CreateButton("Upgrade" + i, _rosterPage.transform, _view.EventFont, "", () => Purchase(() => _game.Save.levels[index] > 0 ? _game.LevelUp(index) : _game.Hire(index)));
@@ -472,11 +474,11 @@ namespace DOTORION.Events.Subjugation
                 _weaponRows[i].enabled = !owned;
                 _weaponIcons[i].color = owned ? Color.white : new Color(.38f, .4f, .45f);
                 _weaponNames[i].color = owned ? new Color(.18f, .24f, .34f) : new Color(.78f, .81f, .86f);
-                _weaponNames[i].text = FitWidth(_weaponNames[i], !owned
+                _weaponNames[i].text = !owned
                     ? SubjugationGame.WeaponNames[i] + "  미보유\n구입 시 체력 +" + _game.Balance.weaponHealth.ToString("0")
                         + stat + (_game.Balance.weaponAttack * (i == 4 ? _game.Balance.healRatio : 1)).ToString("0.#")
                     : SubjugationGame.WeaponNames[i] + "  Lv." + _game.WeaponLevel(i) + (maxed ? " (최대)" : "")
-                        + "\n체력 +" + _game.WeaponHealth(i).ToString("0") + stat + _game.WeaponPower(i).ToString("0.#"));
+                        + "\n체력 +" + _game.WeaponHealth(i).ToString("0") + stat + _game.WeaponPower(i).ToString("0.#");
                 // The chance is a read-out beside the button, coloured from safe (green) to risky (red).
                 var chance = _game.WeaponChance(i);
                 _weaponChanceCaption[i].text = owned && !maxed ? "성공 확률" : "";
@@ -489,18 +491,6 @@ namespace DOTORION.Events.Subjugation
                     : owned ? "강화  " + cost.ToString("N0") + " 코인" : "구입  " + cost.ToString("N0") + " 코인";
                 _weaponBuy[i].interactable = unlocked && !_storageBlocked && hired && !maxed && _game.Save.coins >= cost;
             }
-        }
-
-        /// <summary>Shrinks the label (12 down to 8) until its widest line fits, so long stat lines never run under the buttons.</summary>
-        private static string FitWidth(Text label, string text)
-        {
-            label.text = text;
-            for (var size = 12; size >= 8; size--)
-            {
-                label.fontSize = size;
-                if (label.preferredWidth <= label.rectTransform.rect.width) break;
-            }
-            return text;
         }
 
         private void MoveRound(int delta)
@@ -673,13 +663,14 @@ namespace DOTORION.Events.Subjugation
                 var hired = _game.Save.levels[i] > 0;
                 var next = i == _game.NextHire;
                 _faces[i].color = hired || next ? Color.white : new Color(.72f, .77f, .85f, .85f);
-                // With a weapon, the total comes first and its parts after: "최대체력 400(100+300)  공격력 100(50+50)".
+                // With a weapon, the total comes first and its parts after: "최대체력 400(100+300)" and "공격력 100(50+50)".
+                // The font never shrinks; an armed member's attack goes on its own line instead.
                 var armed = _game.HasWeapon(i);
-                _names[i].text = FitWidth(_names[i], SubjugationGame.Names[i] + "  Lv." + _game.Level(i)
+                _names[i].text = SubjugationGame.Names[i] + "  Lv." + _game.Level(i)
                     + "\n최대체력 " + _game.MaxHealth(i).ToString("0")
                     + (armed ? "(" + _game.BaseMaxHealth(i).ToString("0") + "+" + _game.WeaponHealth(i).ToString("0") + ")" : "")
-                    + (i == 4 ? "  회복량 " : "  공격력 ") + _game.Power(i).ToString("0.#")
-                    + (armed ? "(" + _game.BasePower(i).ToString("0.#") + "+" + _game.WeaponPower(i).ToString("0.#") + ")" : ""));
+                    + (armed ? "\n" : "  ") + (i == 4 ? "회복량 " : "공격력 ") + _game.Power(i).ToString("0.#")
+                    + (armed ? "(" + _game.BasePower(i).ToString("0.#") + "+" + _game.WeaponPower(i).ToString("0.#") + ")" : "");
                 _party[i].gameObject.SetActive(hired);
                 _party[i].GetComponentInChildren<Text>().text = _game.Save.party[i] ? "출전중" : "출전";
                 _party[i].interactable = !_storageBlocked && (_game.Save.party[i] ? _game.PartyCount > 1 : _game.PartyCount < 3);
