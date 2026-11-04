@@ -579,9 +579,10 @@ namespace DOTORION.Tests
         }
 
         [Test]
-        public void WeaponsStayLockedUntilR100IsCleared()
+        public void WeaponsStayLockedUntilR90IsCleared()
         {
-            var game = new SubjugationGame(new SubjugationSave { round = 100, coins = 1000000 }, new SubjugationBalance { enemyHealth = .001 });
+            Assert.That(new SubjugationBalance().weaponUnlockRound, Is.EqualTo(90));
+            var game = new SubjugationGame(new SubjugationSave { round = 90, coins = 1000000 }, new SubjugationBalance { enemyHealth = .001 });
             Assert.That(game.WeaponsUnlocked, Is.False);
             Assert.That(game.BuyWeapon(0), Is.False);
             Assert.That(game.Save.coins, Is.EqualTo(1000000));
