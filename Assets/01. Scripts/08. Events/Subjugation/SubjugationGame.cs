@@ -44,7 +44,7 @@ namespace DOTORION.Events.Subjugation
         // A failed upgrade spends the coins but never lowers the level. A weapon level is worth two member levels.
         // The chance is a whole percent on a hyperbola, chance x (1 + offset) / (level + offset): 90% at Lv1, the 10% floor by Lv99.
         // On a hyperbola the expected number of tries grows in a straight line with the level.
-        public int weaponUnlockRound = 100;
+        public int weaponUnlockRound = 90;
         public double weaponCost = 100000;
         public int weaponMaxLevel = 100;
         // A try costs 10,800 x level; with the hyperbolic chance the expected cost per level grows about with level squared.

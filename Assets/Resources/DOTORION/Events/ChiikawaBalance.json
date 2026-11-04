@@ -25,7 +25,7 @@
   "healthPerLevel": 20,
   "healRatio": 0.37,
   "retrySeconds": 3,
-  "weaponUnlockRound": 100,
+  "weaponUnlockRound": 90,
   "weaponCost": 100000,
   "weaponMaxLevel": 100,
   "weaponUpgradeCost": 10800,

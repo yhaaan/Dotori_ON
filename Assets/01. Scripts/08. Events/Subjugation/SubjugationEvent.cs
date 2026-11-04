@@ -42,7 +42,7 @@ namespace DOTORION.Events.Subjugation
 
         private const string VisibleKey = "DOTORION.Chiikawa.Visible";
         /// <summary>Clearing this round lets the reward tab hand out the Chiikawa main background, kept after the event ends.</summary>
-        public const int BackgroundRewardRound = 200;
+        public const int BackgroundRewardRound = 150;
         private const int ShopHeight = 338;
         private DOTORIONView _view;
         private WindowsOverlayWindow _window;
