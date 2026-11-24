@@ -27,8 +27,8 @@ namespace DOTORION.UI
     {
         private const string AppPrefabResourcePath = "DOTORION/DOTORIONApp";
 
-        // Polling stands in for a Realtime subscription; a dropped poll self-heals
-        // on the next tick instead of leaving the roster stale until a reconnect.
+        // Realtime invalidates snapshots; a five-minute safety read recovers any
+        // missed signal. Adaptive polling below remains the disconnected fallback.
         //
         // Every poll is two requests that cost egress whether or not anything
         // changed, and the overlay stays open around the clock. A fixed three
@@ -43,6 +43,7 @@ namespace DOTORION.UI
         private const float FocusedTeamStatePollSeconds = 5f;
         private const float WorkingTeamStatePollSeconds = 15f;
         private const float QuietTeamStatePollSeconds = 60f;
+        private const float LiveSafetyPollSeconds = 300f;
 
         /// <summary>
         /// How long to wait before asking again for a check-in state that did
@@ -144,6 +145,8 @@ namespace DOTORION.UI
         private HttpClientSupabaseTransport _supabaseTransport;
         private SupabaseIdentityClient _supabaseIdentity;
         private ITeamBackend _backend;
+        private ITeamChangeSignals _changeSignals;
+        private readonly TeamChangeRefreshScheduler _signalRefresh = new TeamChangeRefreshScheduler();
         private IMockTeamBackendControls _mockControls;
         private IDisposable _eventSubscription;
         private IReadOnlyList<MemberState> _members;
@@ -177,6 +180,7 @@ namespace DOTORION.UI
         private readonly UnreadNoteTracker _unreadNotes = new UnreadNoteTracker();
         private int _consecutivePollFailures;
         private bool _refreshInProgress;
+        private int _activeStateReads;
         private bool _heartbeatInProgress;
         private bool _identityActivationInProgress;
         private bool _signOutInProgress;
@@ -401,22 +405,28 @@ namespace DOTORION.UI
             }
 
             var now = Time.unscaledTime;
-            if (now >= _nextTeamStatePoll && now - _lastTeamStatePoll >= CurrentTeamStatePollSeconds())
+            if (_signalRefresh.Observe(_changeSignals, now))
+            {
+                // A confirmed join covers everything missed during the outage,
+                // even when a previous REST failure was still backing off.
+                _nextTeamStatePoll = 0f;
+            }
+            var pollSeconds = _changeSignals?.IsLive == true
+                ? LiveSafetyPollSeconds
+                : CurrentTeamStatePollSeconds();
+            if (now >= _nextTeamStatePoll &&
+                (_signalRefresh.IsDue(now) || now - _lastTeamStatePoll >= pollSeconds))
             {
                 RefreshStateWithoutWaiting();
+            }
 
-                // The check-in state is read once and then only after claiming,
-                // so without this the button would still say "taken" the morning
-                // after. Six o'clock is when the team's day turns over, and the
-                // person watching should see the button change on its own. The
-                // same check picks up a read that failed at sign-in, which would
-                // otherwise leave the button hidden until tomorrow.
-                if (_view != null && _dailyCheckInDay != TeamDay.Today &&
-                    now >= _nextDailyCheckInAttempt)
-                {
-                    _nextDailyCheckInAttempt = now + DailyCheckInRetrySeconds;
-                    LoadDailyCheckIn();
-                }
+            // Daily attendance has its own retry clock: a quiet live channel must
+            // not delay the new day's button until the five-minute safety read.
+            if (_view != null && _dailyCheckInDay != TeamDay.Today &&
+                now >= _nextDailyCheckInAttempt)
+            {
+                _nextDailyCheckInAttempt = now + DailyCheckInRetrySeconds;
+                LoadDailyCheckIn();
             }
 
             if (now >= _nextHeartbeat)
@@ -807,6 +817,7 @@ namespace DOTORION.UI
             _firstRunNameView.Hide();
             CheckForUpdate();
             _view.SetDailyCheckIn(null, _backend is ITeamCheckIn);
+            _nextDailyCheckInAttempt = Time.unscaledTime + DailyCheckInRetrySeconds;
             LoadDailyCheckIn();
             if (PlayerPrefs.GetInt(MiniModePreferenceKey, 0) == 1)
             {
@@ -820,18 +831,32 @@ namespace DOTORION.UI
         /// </summary>
         private ITeamBackend CreateBackend(LocalIdentityProfile profile, SupabaseMemberRecord remoteMember)
         {
+            DisposeChangeSignals();
             if (_useMockBackend)
             {
                 return new ProfiledMockTeamBackend(profile.DisplayName);
             }
 
-            return new SupabaseTeamBackend(
+            var backend = new SupabaseTeamBackend(
                 SupabaseProjectConfig.ProjectUrl,
                 SupabaseProjectConfig.PublishableKey,
                 _supabaseTransport,
                 _supabaseIdentity,
                 remoteMember.Id,
                 profile.ClientInstanceId);
+            _changeSignals = new SupabaseRealtimeChannel(
+                SupabaseProjectConfig.ProjectUrl,
+                SupabaseProjectConfig.PublishableKey,
+                _supabaseIdentity,
+                remoteMember.TeamId);
+            return backend;
+        }
+
+        private void DisposeChangeSignals()
+        {
+            (_changeSignals as IDisposable)?.Dispose();
+            _changeSignals = null;
+            _signalRefresh.Reset();
         }
 
         private void TeardownSession()
@@ -859,6 +884,7 @@ namespace DOTORION.UI
             _avatarPhotos = null;
             _avatarSlots?.Dispose();
             _avatarSlots = null;
+            DisposeChangeSignals();
             (_backend as IDisposable)?.Dispose();
             _backend = null;
             _mockControls = null;
@@ -870,6 +896,7 @@ namespace DOTORION.UI
             _lastTeamStatePoll = float.NegativeInfinity;
             _nextHeartbeat = 0f;
             _refreshInProgress = false;
+            _activeStateReads = 0;
             _heartbeatInProgress = false;
             _consecutivePollFailures = 0;
             while (_pendingEvents.TryDequeue(out _))
@@ -955,7 +982,9 @@ namespace DOTORION.UI
             {
                 if (string.Equals(member.MemberId, _backend.LocalMemberId, StringComparison.Ordinal))
                 {
-                    return member;
+                    return _backend is SupabaseTeamBackend live
+                        ? live.ApplyConfirmedHeartbeat(member)
+                        : member;
                 }
             }
 
@@ -2221,25 +2250,38 @@ namespace DOTORION.UI
 
         private async Task RefreshStateAsync()
         {
-            if (_backend == null || _view == null)
+            var requestedBackend = _backend;
+            if (requestedBackend == null || _view == null)
             {
                 return;
             }
 
-            // A refresh after our own change counts as a poll, so the timer does
-            // not ask for the roster that just arrived a second time.
-            _lastTeamStatePoll = Time.unscaledTime;
-            var members = await _backend.GetTeamStateAsync(_lifetime.Token);
-            if (_backend == null || _view == null)
+            // Sign-in and mutation reads also block signal-driven reads. Otherwise
+            // a fast join can race the initial snapshot and its nudge cursor.
+            _activeStateReads++;
+            try
             {
-                return;
-            }
+                // A refresh after our own change counts as a poll, so the timer
+                // does not ask for the roster that just arrived a second time.
+                _lastTeamStatePoll = Time.unscaledTime;
+                var members = await requestedBackend.GetTeamStateAsync(_lifetime.Token);
+                if (!ReferenceEquals(_backend, requestedBackend) || _view == null)
+                {
+                    return;
+                }
 
-            _members = members;
-            // A note that was withdrawn before anyone looked has nothing left to
-            // announce, and neither does a member who went home or left the team.
-            _unreadNotes.RetainOnly(MembersWithNotes(members));
-            _view.Bind(_members, _backend.LocalMemberId, DateTimeOffset.UtcNow, _unreadNotes);
+                _members = members;
+                // A note that was withdrawn before anyone looked has nothing left to
+                // announce, and neither does a member who went home or left the team.
+                _unreadNotes.RetainOnly(MembersWithNotes(members));
+                _view.Bind(_members, requestedBackend.LocalMemberId, DateTimeOffset.UtcNow, _unreadNotes);
+            }
+            finally
+            {
+                // Teardown resets the count; an old response must not alter the
+                // next session's pending refresh or bind its roster into that UI.
+                if (ReferenceEquals(_backend, requestedBackend)) _activeStateReads--;
+            }
         }
 
         /// <summary>
@@ -2248,22 +2290,30 @@ namespace DOTORION.UI
         /// </summary>
         private async void RefreshStateWithoutWaiting()
         {
-            if (_refreshInProgress || _mutationInProgress || _signOutInProgress)
+            if (_refreshInProgress || _activeStateReads > 0 || _mutationInProgress || _signOutInProgress ||
+                _quitting || _backend == null || _view == null)
             {
                 return;
             }
 
+            var requestedBackend = _backend;
             _refreshInProgress = true;
+            // Only a started read consumes invalidations. Signals arriving while
+            // it is in flight remain pending for the following read.
+            _signalRefresh.MarkRefreshStarted();
             try
             {
                 await RefreshStateAsync();
+                if (!ReferenceEquals(_backend, requestedBackend)) return;
                 _consecutivePollFailures = 0;
+                _nextTeamStatePoll = 0f;
             }
             catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
             {
             }
             catch (Exception exception)
             {
+                if (!ReferenceEquals(_backend, requestedBackend)) return;
                 // A dead connection would otherwise fill the console with the same
                 // exception on every poll, so back off and log once per streak
                 // instead of once per attempt.
@@ -2274,11 +2324,14 @@ namespace DOTORION.UI
 
                 _consecutivePollFailures++;
                 _nextTeamStatePoll = Time.unscaledTime + PollBackoffSeconds(_consecutivePollFailures);
+                // A live socket does not prove REST succeeded; retry after backoff
+                // rather than forgetting this change for the next five minutes.
+                _signalRefresh.RequestRetry(Time.unscaledTime);
                 _view?.ShowFeedback(BackendError(exception), true);
             }
             finally
             {
-                _refreshInProgress = false;
+                if (ReferenceEquals(_backend, requestedBackend)) _refreshInProgress = false;
             }
         }
 
@@ -2291,6 +2344,7 @@ namespace DOTORION.UI
         /// <summary>
         /// How long the roster may go unrefreshed right now. Read every frame, so
         /// the answer follows focus and attendance without waiting for a tick.
+        /// A live Realtime channel uses signals plus a 300-second safety read instead.
         /// </summary>
         private float CurrentTeamStatePollSeconds()
         {
@@ -2407,6 +2461,7 @@ namespace DOTORION.UI
             _lifetime?.Cancel();
             _eventSubscription?.Dispose();
             _updateDownloader?.Dispose();
+            DisposeChangeSignals();
             (_backend as IDisposable)?.Dispose();
             _supabaseTransport?.Dispose();
             _lifetime?.Dispose();

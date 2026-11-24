@@ -41,6 +41,9 @@ namespace DOTORION.Supabase
         private Dictionary<string, MemberState> _previousSnapshot;
         private string _nudgeCursorUtc;
         private Guid? _openAttendanceSessionId;
+        private Guid _confirmedHeartbeatSessionId;
+        private DateTimeOffset _confirmedHeartbeatAtUtc;
+        private DateTimeOffset _confirmedCheckInAtUtc;
         private bool _disposed;
 
         public SupabaseTeamBackend(
@@ -604,7 +607,8 @@ namespace DOTORION.Supabase
 
             try
             {
-                await CallRpcAsync("heartbeat", body, cancellationToken);
+                var response = await CallRpcAsync("heartbeat", body, cancellationToken);
+                CaptureConfirmedHeartbeat(response.Body, sessionId);
             }
             catch (SupabaseApiException exception) when (
                 exception.ServerMessage == "attendance_session_not_open"
@@ -622,6 +626,50 @@ namespace DOTORION.Supabase
                 }
 
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Reuses the existing heartbeat reply for local freshness checks. A live
+        /// roster may be five minutes old, but that must not pause local gameplay
+        /// whose attendance guard expires after three minutes. This does not infer
+        /// health from a live socket or fabricate a heartbeat from the local clock.
+        /// </summary>
+        public MemberState ApplyConfirmedHeartbeat(MemberState snapshot)
+        {
+            DateTimeOffset confirmedAt;
+            lock (_gate)
+            {
+                if (snapshot == null || !snapshot.IsClockedIn || snapshot.MemberId != LocalMemberId
+                    || _openAttendanceSessionId != _confirmedHeartbeatSessionId
+                    || snapshot.CheckedInAtUtc != _confirmedCheckInAtUtc
+                    || (snapshot.LastHeartbeatAtUtc.HasValue && snapshot.LastHeartbeatAtUtc.Value >= _confirmedHeartbeatAtUtc))
+                    return snapshot;
+                confirmedAt = _confirmedHeartbeatAtUtc;
+            }
+
+            return new MemberState(snapshot.MemberId, snapshot.DisplayName, snapshot.AvatarKey, snapshot.SortOrder,
+                snapshot.AttendanceStatus, snapshot.ActivityStatus, snapshot.ConnectionStatus,
+                snapshot.CheckedInAtUtc, snapshot.ActivityStartedAtUtc, confirmedAt,
+                snapshot.LastCheckedOutAtUtc, snapshot.UpdatedAtUtc, snapshot.StatusNote);
+        }
+
+        private void CaptureConfirmedHeartbeat(string body, Guid requestedSessionId)
+        {
+            StateDocument document;
+            try { document = JsonUtility.FromJson<StateDocument>(body); }
+            catch (ArgumentException) { return; }
+            if (document == null || document.member_id != LocalMemberId
+                || document.attendance_session_id != requestedSessionId.ToString("D")) return;
+            var heartbeatAt = ParseTimestamp(document.last_heartbeat_at);
+            var checkedInAt = ParseTimestamp(document.checked_in_at);
+            if (!heartbeatAt.HasValue || !checkedInAt.HasValue) return;
+            lock (_gate)
+            {
+                if (_openAttendanceSessionId != requestedSessionId) return;
+                _confirmedHeartbeatSessionId = requestedSessionId;
+                _confirmedHeartbeatAtUtc = heartbeatAt.Value;
+                _confirmedCheckInAtUtc = checkedInAt.Value;
             }
         }
 

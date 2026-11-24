@@ -15,6 +15,8 @@ namespace DOTORION.Supabase
         private readonly ISupabaseHttpTransport _transport;
         private readonly ISupabaseAuthSessionStore _sessionStore;
         private readonly ISupabaseClock _clock;
+        // REST and Realtime share rotating credentials, even across threads.
+        private readonly SemaphoreSlim _sessionGate = new SemaphoreSlim(1, 1);
         private SupabaseAuthSession _session;
 
         public SupabaseIdentityClient(
@@ -261,17 +263,25 @@ namespace DOTORION.Supabase
         public async Task<SupabaseAuthSession> GetValidSessionAsync(
             CancellationToken cancellationToken)
         {
-            if (_session == null)
+            await _sessionGate.WaitAsync(cancellationToken);
+            try
             {
-                throw new InvalidOperationException("Supabase identity has not been initialized.");
-            }
+                if (_session == null)
+                {
+                    throw new InvalidOperationException("Supabase identity has not been initialized.");
+                }
 
-            if (ShouldRefresh(_session))
+                if (ShouldRefresh(_session))
+                {
+                    _session = await RefreshStoredSessionAsync(_session, cancellationToken);
+                }
+
+                return _session;
+            }
+            finally
             {
-                _session = await RefreshStoredSessionAsync(_session, cancellationToken);
+                _sessionGate.Release();
             }
-
-            return _session;
         }
 
         public async Task<SupabaseMemberRecord> ClaimMemberNameAsync(
