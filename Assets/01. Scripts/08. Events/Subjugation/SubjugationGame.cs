@@ -57,6 +57,8 @@ namespace DOTORION.Events.Subjugation
         public double weaponHealthPerLevel = 40;
         public double weaponAttack = 30;
         public double weaponAttackPerLevel = 6;
+        // One-time apology for the server maintenance, sent with v1.6.0 to everyone who opens the reward tab.
+        public long apologyCoins = 300000000;
     }
 
     [Serializable]
@@ -76,6 +78,8 @@ namespace DOTORION.Events.Subjugation
         public bool[] lineup;
         // Weapon level per member, 0 = not bought. Saves from before weapons have none.
         public int[] weapons = { 0, 0, 0, 0, 0, 0 };
+        // The maintenance apology coins were taken. Older saves read false and can take them once.
+        public bool apologyClaimed;
     }
 
     public enum WeaponUpgrade { Refused, Success, Failed }
@@ -96,6 +100,18 @@ namespace DOTORION.Events.Subjugation
         // Every 10th clear pays DOTORION points equal to its round, claimed once on the server.
         public static readonly int[] RewardMilestones = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
         public bool HasCleared(int round) => Save.bestClear >= round;
+        public bool CanClaimApology => !Save.apologyClaimed && Balance.apologyCoins > 0;
+
+        /// <summary>Pays the maintenance apology coins once per save. A second call changes nothing.</summary>
+        public bool ClaimApology()
+        {
+            if (!CanClaimApology) return false;
+            Save.apologyClaimed = true;
+            Save.coins = Save.coins > long.MaxValue - Balance.apologyCoins ? long.MaxValue : Save.coins + Balance.apologyCoins;
+            Changed?.Invoke();
+            return true;
+        }
+
         public void GrantDebugCoins() { Save.coins = Save.coins > long.MaxValue - 9999 ? long.MaxValue : Save.coins + 9999; Changed?.Invoke(); }
         public double RetryRemaining { get; private set; }
         /// <summary>Seconds left on the "ROUND n" banner shown as each fight begins. The fight runs underneath.</summary>

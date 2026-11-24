@@ -90,6 +90,11 @@ namespace DOTORION.Events.Subjugation
         private readonly Text[] _rewardNames = new Text[10];
         private Text _rewardEarned;
         private Text _backgroundRewardName;
+        private GameObject _apology;
+        private CanvasGroup _toast;
+        private Text _toastText;
+        private float _toastShownAt = -100;
+        private const float ToastSeconds = 2.2f, ToastFadeSeconds = .6f;
         private Button _backgroundRewardButton;
         private readonly Button[] _rewardButtons = new Button[10];
         private readonly CancellationTokenSource _lifetime = new CancellationTokenSource();
@@ -264,6 +269,7 @@ namespace DOTORION.Events.Subjugation
             _rewardPage.SetActive(false);
             BuildRoundPage();
             BuildWeaponPage();
+            BuildApology(panel.transform);
             _shop.SetActive(false);
 
             // Full mode is one Unity window: the strip cannot be detached and moves in the native drag loop.
@@ -553,6 +559,64 @@ namespace DOTORION.Events.Subjugation
         private bool BackgroundClaimable => _game.HasCleared(BackgroundRewardRound) && !MainBackground.IsUnlocked(MainBackground.Chiikawa);
 
         /// <summary>The background is kept on this PC, not on the point server, so it can be taken without a connection.</summary>
+        /// <summary>
+        /// The maintenance apology: until it is taken, a card covers the reward tab with the notice and a claim
+        /// button under it. A toast reports the coins and fades out. Built last so both sit above the pages.
+        /// </summary>
+        private void BuildApology(Transform panel)
+        {
+            var veil = UiFactory.CreateImage("Apology", _rewardPage.transform, new Color(0, 0, 0, .55f));
+            veil.raycastTarget = true;
+            UiFactory.AnchorTop(veil.rectTransform, 0, 56, 480, ShopHeight - 56);
+            var card = UiFactory.CreateImage("ApologyCard", veil.transform, new Color(.97f, .98f, 1f));
+            var cardRect = card.rectTransform;
+            cardRect.anchorMin = cardRect.anchorMax = cardRect.pivot = new Vector2(.5f, .5f);
+            cardRect.sizeDelta = new Vector2(320, 150); cardRect.anchoredPosition = Vector2.zero;
+            var title = Label("ApologyTitle", card.transform, "서버 점검 사과 보상", 0, 14, 320, 22, 15);
+            title.alignment = TextAnchor.MiddleCenter; title.fontStyle = FontStyle.Bold;
+            var body = Label("ApologyBody", card.transform, "점검으로 불편을 드려 죄송합니다.\n치이카와 코인 " + _game.Balance.apologyCoins.ToString("N0") + "개를 드립니다.", 0, 42, 320, 44, 12);
+            body.alignment = TextAnchor.MiddleCenter;
+            var claim = UiFactory.CreateButton("ClaimApology", card.transform, _view.EventFont, "받기", ClaimApology);
+            UiFactory.AnchorTop((RectTransform)claim.transform, 100, 100, 120, 32);
+            _apology = veil.gameObject;
+
+            var toast = UiFactory.CreateImage("CoinToast", panel, new Color(.1f, .13f, .2f, .92f));
+            toast.raycastTarget = false;
+            var toastRect = toast.rectTransform;
+            toastRect.anchorMin = toastRect.anchorMax = toastRect.pivot = new Vector2(.5f, .5f);
+            toastRect.sizeDelta = new Vector2(300, 48); toastRect.anchoredPosition = new Vector2(0, -10);
+            _toastText = UiFactory.CreateText("Message", toast.transform, _view.EventFont, 18, TextAnchor.MiddleCenter, new Color(1f, .86f, .35f));
+            _toastText.fontStyle = FontStyle.Bold;
+            UiFactory.Stretch(_toastText.rectTransform);
+            _toast = toast.gameObject.AddComponent<CanvasGroup>();
+            _toast.blocksRaycasts = false; _toast.interactable = false;
+            toast.gameObject.SetActive(false);
+        }
+
+        private void ClaimApology()
+        {
+            if (_storageBlocked || !_game.ClaimApology()) return;
+            Persist(); RefreshShop();
+            ShowToast("+" + _game.Balance.apologyCoins.ToString("N0") + " 코인 획득!");
+        }
+
+        private void ShowToast(string message)
+        {
+            _toastText.text = message;
+            _toastShownAt = Time.unscaledTime;
+            _toast.alpha = 1;
+            _toast.gameObject.SetActive(true);
+        }
+
+        /// <summary>Holds the toast, then fades it out over the last ToastFadeSeconds and hides it.</summary>
+        private void UpdateToast()
+        {
+            if (_toast == null || !_toast.gameObject.activeSelf) return;
+            var left = _toastShownAt + ToastSeconds - Time.unscaledTime;
+            if (left <= 0) { _toast.gameObject.SetActive(false); return; }
+            _toast.alpha = Mathf.Clamp01(left / ToastFadeSeconds);
+        }
+
         private void ClaimBackground()
         {
             if (!BackgroundClaimable || !MainBackground.Unlock(MainBackground.Chiikawa)) return;
@@ -613,7 +677,7 @@ namespace DOTORION.Events.Subjugation
         {
             get
             {
-                var n = BackgroundClaimable ? 1 : 0;
+                var n = (BackgroundClaimable ? 1 : 0) + (_game.CanClaimApology ? 1 : 0);
                 if (_claimsLoaded) foreach (var m in SubjugationGame.RewardMilestones) if (_game.HasCleared(m) && !_claimed.Contains(m)) n++;
                 return n;
             }
@@ -642,6 +706,7 @@ namespace DOTORION.Events.Subjugation
             _backgroundRewardButton.GetComponentInChildren<Text>().text = owned ? "받음" : reached ? "보상받기" : "미달성";
             _backgroundRewardButton.interactable = reached && !owned;
             _backgroundRewardName.color = reached || owned ? new Color(.18f, .24f, .34f) : new Color(.5f, .55f, .62f);
+            _apology.SetActive(_game.CanClaimApology);
         }
 
         private void RefreshShop()
@@ -684,6 +749,7 @@ namespace DOTORION.Events.Subjugation
         private void Update()
         {
             if (_game == null || _disposed) return;
+            UpdateToast();
             if (Application.isPlaying && !IsRunning(DateTimeOffset.UtcNow))
             {
                 // Past the deadline the whole event leaves; OnDestroy restores the window and cards.

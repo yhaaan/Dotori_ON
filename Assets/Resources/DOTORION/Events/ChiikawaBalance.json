@@ -36,5 +36,6 @@
   "weaponHealth": 200,
   "weaponHealthPerLevel": 40,
   "weaponAttack": 30,
-  "weaponAttackPerLevel": 6
+  "weaponAttackPerLevel": 6,
+  "apologyCoins": 300000000
 }
