@@ -555,6 +555,24 @@ namespace DOTORION.Tests
             return JsonUtility.FromJson<SubjugationBalance>(config.text);
         }
         [Test]
+        public void ApologyCoinsArePaidOncePerSave()
+        {
+            var game = new SubjugationGame(new SubjugationSave { coins = 20 }, LoadBalance());
+            Assert.That(game.Balance.apologyCoins, Is.EqualTo(300000000));
+            Assert.That(game.CanClaimApology, Is.True);
+            Assert.That(game.ClaimApology(), Is.True);
+            Assert.That(game.Save.coins, Is.EqualTo(300000020));
+            Assert.That(game.Save.apologyClaimed, Is.True);
+            Assert.That(game.ClaimApology(), Is.False);
+            Assert.That(game.Save.coins, Is.EqualTo(300000020));
+            // A save written before the apology reads as unclaimed, and a claimed one stays claimed.
+            var old = JsonUtility.FromJson<SubjugationSave>("{\"version\":2,\"coins\":5}");
+            Assert.That(new SubjugationGame(old, LoadBalance()).CanClaimApology, Is.True);
+            var reloaded = JsonUtility.FromJson<SubjugationSave>(JsonUtility.ToJson(game.Save));
+            Assert.That(new SubjugationGame(reloaded, LoadBalance()).CanClaimApology, Is.False);
+        }
+
+        [Test]
         public void DebugGrantAdds9999WithoutChangingRosterAndClampsOverflow()
         {
             var game = new SubjugationGame(new SubjugationSave { coins = 20 });
