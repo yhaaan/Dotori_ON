@@ -27,10 +27,22 @@ namespace DOTORION.UI
     {
         private const string AppPrefabResourcePath = "DOTORION/DOTORIONApp";
 
-        // Polling stands in for a Realtime subscription. Four members at three
-        // seconds is a handful of requests a minute, and a dropped poll self-heals
+        // Polling stands in for a Realtime subscription; a dropped poll self-heals
         // on the next tick instead of leaving the roster stale until a reconnect.
-        private const float TeamStatePollSeconds = 3f;
+        //
+        // Every poll is two requests that cost egress whether or not anything
+        // changed, and the overlay stays open around the clock. A fixed three
+        // seconds used up the free plan's 5 GB in November 2026 and the project
+        // was restricted, so the interval now follows how much a fresh roster is
+        // worth at that moment:
+        // - the window has focus: someone is reading it right now;
+        // - clocked in at the desk: a teammate's change or a nudge can wait a few
+        //   seconds, nobody is staring at the overlay;
+        // - clocked out, or away from the desk: nothing is read until they return,
+        //   and focusing the window brings the short interval back at once.
+        private const float FocusedTeamStatePollSeconds = 5f;
+        private const float WorkingTeamStatePollSeconds = 15f;
+        private const float QuietTeamStatePollSeconds = 60f;
 
         /// <summary>
         /// How long to wait before asking again for a check-in state that did
@@ -44,7 +56,7 @@ namespace DOTORION.UI
         // single failed heartbeat never clocks anyone out.
         private const float HeartbeatSeconds = 45f;
 
-        private const float MaximumPollBackoffSeconds = 30f;
+        private const float MaximumPollBackoffSeconds = 60f;
 
         /// <summary>
         /// How long the desk has to stay quiet before the overlay says so on the
@@ -140,7 +152,16 @@ namespace DOTORION.UI
         private NotificationTonePlayer _tonePlayer;
         private WindowsOverlayWindow _window;
         private float _nextTimerRefresh;
+
+        /// <summary>Earliest time the next poll may go out; only failures push it back.</summary>
         private float _nextTeamStatePoll;
+
+        /// <summary>
+        /// When the roster was last asked for, by the poll or after a change of
+        /// our own. The interval is measured from here every frame, so focusing
+        /// the window shortens a long wait instead of sitting it out.
+        /// </summary>
+        private float _lastTeamStatePoll = float.NegativeInfinity;
 
         /// <summary>
         /// The team day the check-in state was last read for. Only a reply from
@@ -380,9 +401,8 @@ namespace DOTORION.UI
             }
 
             var now = Time.unscaledTime;
-            if (now >= _nextTeamStatePoll)
+            if (now >= _nextTeamStatePoll && now - _lastTeamStatePoll >= CurrentTeamStatePollSeconds())
             {
-                _nextTeamStatePoll = now + TeamStatePollSeconds;
                 RefreshStateWithoutWaiting();
 
                 // The check-in state is read once and then only after claiming,
@@ -728,7 +748,8 @@ namespace DOTORION.UI
             _backend = CreateBackend(profile, remoteMember);
             _mockControls = _backend as IMockTeamBackendControls;
             _eventSubscription = _backend.Events.Subscribe(new TeamEventObserver(_pendingEvents));
-            _nextTeamStatePoll = Time.unscaledTime + TeamStatePollSeconds;
+            _nextTeamStatePoll = 0f;
+            _lastTeamStatePoll = Time.unscaledTime;
             _nextHeartbeat = Time.unscaledTime + HeartbeatSeconds;
 
             _view = Instantiate(_mainViewPrefab, transform);
@@ -846,6 +867,7 @@ namespace DOTORION.UI
             _members = null;
             _nextTimerRefresh = 0f;
             _nextTeamStatePoll = 0f;
+            _lastTeamStatePoll = float.NegativeInfinity;
             _nextHeartbeat = 0f;
             _refreshInProgress = false;
             _heartbeatInProgress = false;
@@ -2204,6 +2226,9 @@ namespace DOTORION.UI
                 return;
             }
 
+            // A refresh after our own change counts as a poll, so the timer does
+            // not ask for the roster that just arrived a second time.
+            _lastTeamStatePoll = Time.unscaledTime;
             var members = await _backend.GetTeamStateAsync(_lifetime.Token);
             if (_backend == null || _view == null)
             {
@@ -2240,8 +2265,8 @@ namespace DOTORION.UI
             catch (Exception exception)
             {
                 // A dead connection would otherwise fill the console with the same
-                // exception every three seconds, so back off and log once per
-                // streak instead of once per attempt.
+                // exception on every poll, so back off and log once per streak
+                // instead of once per attempt.
                 if (_consecutivePollFailures == 0)
                 {
                     Debug.LogException(exception);
@@ -2259,8 +2284,27 @@ namespace DOTORION.UI
 
         private static float PollBackoffSeconds(int consecutiveFailures)
         {
-            var seconds = TeamStatePollSeconds * (1 << Math.Min(consecutiveFailures, 4));
+            var seconds = FocusedTeamStatePollSeconds * (1 << Math.Min(consecutiveFailures, 4));
             return Math.Min(seconds, MaximumPollBackoffSeconds);
+        }
+
+        /// <summary>
+        /// How long the roster may go unrefreshed right now. Read every frame, so
+        /// the answer follows focus and attendance without waiting for a tick.
+        /// </summary>
+        private float CurrentTeamStatePollSeconds()
+        {
+            if (Application.isFocused)
+            {
+                return FocusedTeamStatePollSeconds;
+            }
+
+            // The same quiet spell that turns the status into a break: past it,
+            // nobody is at the desk to see the overlay change.
+            var atDesk = _window == null || _window.IdleSeconds < IdleBreakSeconds;
+            return IsLocalMemberClockedIn() && atDesk
+                ? WorkingTeamStatePollSeconds
+                : QuietTeamStatePollSeconds;
         }
 
         private async void SendHeartbeatWithoutWaiting()
